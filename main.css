@@ -1,0 +1,246 @@
+/* Color:Name */
+.nc0 {
+	color:#00B200;
+}
+.nc1 {
+	color:#8482FF;
+}
+.nc2 {
+	color:#B5B2FF;
+}
+.nc3 {
+	color:#FF71FF;
+}
+.nc4 {
+	color:#FF0;
+}
+.nc5 {
+	color:#FF8200;
+}
+.nc6 {
+	color:#F00;
+}
+.nc7 {
+	color:#A514FF;
+}
+.nc8 {
+	color:#00A2FF;
+}
+.nc9 {
+	color:#003CE7;
+}
+.ncA {
+	color:#FF8684;
+}
+.ncB {
+	color:#944531;
+}
+
+/* Color:Skill */
+.S {
+	color:#D22;
+	font-weight:bold;
+}
+.A {
+	color:#C60;
+	font-weight:bold;
+}
+.B {
+	color:#880;
+	font-weight:bold;
+}
+.C {
+	color:#080;
+	font-weight:bold;
+}
+.D {
+	color:#09A;
+	font-weight:bold;
+}
+.E {
+	color:#00B;
+	font-weight:bold;
+}
+.F {
+	color:#808;
+	font-weight:bold;
+}
+
+/* Color:Magic */
+.fire {
+	color:#A00;
+}
+.water {
+	color:#00A;
+}
+.earth {
+	color:#840;
+}
+.wind {
+	color:#080;
+}
+.light {
+	color:#888;
+}
+.dark {
+	color:#848;
+}
+
+/* Color:Other */
+.nm {
+	color:#F00;
+}
+.plus {
+	color:#C20;
+}
+.minus {
+	color:#C20;
+}
+.on {
+	color:#1C2;
+}
+.off {
+	color:#EDB;
+}
+.list {
+	color:#C60;
+}
+.bol {
+	color:#62C;
+}
+
+/* Other */
+.cnt {
+	text-align:center;
+}
+.lft {
+	text-align:left;
+}
+.rgt {
+	text-align:right;
+}
+
+/* Tag */
+a:active,a:hover,a:link,a:visited {
+	font-weight:bold;
+}
+a:active,a:hover {
+	color:#88F;
+}
+a:link {
+	color:#00F;
+}
+a:visited {
+	color:#40F;
+}
+body {
+	margin:0px;
+	background-color:#FFB43C;
+	color:#000;
+	padding:0px;
+	text-align:center;
+}
+div#all {
+	background-color:#FFFACD;
+	border:1px solid #420;
+	text-align:left;
+}
+div#footer {
+	background-color:#E60;
+	border-top:1px solid #420;
+	margin:0px;
+	text-align:right;
+}
+div#infobox {
+	border:solid 1px #F0CD96;
+	padding:0px;
+}
+div#infobox div#date {
+	background-color:#F0CD96;
+	font-weight:bold;
+}
+div#infobox ul#info {
+	margin:0 0 0 2em;
+	padding:0px;
+}
+div#infobox ul#info li {
+	margin:0px;
+	list-style-type:disc;
+	padding:0px;
+}
+div#infobox ul#info li#boxtitle {
+	color:#F80;
+	font-weight:bold;
+	list-style-type:circle;
+}
+h1 {
+	background-color:#FFF;
+	font-weight:bold;
+	margin:0px;
+	text-align:left;
+}
+h2 {
+	background-color:#420;
+	color:#FFF;
+	font-weight:bold;
+	margin:0px;
+	text-align:left;
+}
+hr.normal {
+	background:#420;
+	border:0;
+	color:#420;
+	height:1px;
+	margin:0px 0px;
+	width:auto;
+}
+p {
+	margin:0px;
+	text-align:left;
+}
+table {
+	border-collapse:collapse;
+	padding:0px;
+	text-align:left;
+}
+table td,th {
+	border:1px solid #420;
+	margin:0px;
+}
+table th {
+	background-color:#FFB43C;
+	color:#420;
+	font-weight:bold;
+	text-align:left;
+}
+table#status td {
+	text-align:right;
+}
+table#status td.cnt {
+	text-align:center;
+}
+table#status td.lft {
+	text-align:left;
+}
+table#topcount tr {
+	background-color:#FCEFC0;
+	border:1px solid #F0CD96;
+}
+table#topcount td {
+	border:0px;
+}
+ul#dblink {
+	list-style-type:none;
+	margin:0px;
+	padding:0px;
+}
+ul#dblink li {
+	border:solid 1px #F0CD96;
+}
+ul#footlink {
+	text-align:right;
+	list-style-type:none;
+	margin:0px;
+	padding:0px;
+}
+

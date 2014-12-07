@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<categories>
+	<category id="10000" name="消耗品">
+		<group id="10000" name="持ち出し不可" />
+		<group id="11000" name="HP回復" />
+		<group id="11100" name="特殊回復" />
+		<group id="11200" name="ボックス" />
+		<group id="11300" name="魔法効果" />
+		<group id="11400" name="黄金のリンゴ" />
+		<group id="11500" name="包帯" />
+		<group id="11600" name="聖水・聖酒" />
+		<group id="11699" name="ソウルストーン" />
+		<group id="11800" name="ガチャ用" />
+		<group id="11900" name="チャームクリスタル" />
+		<group id="12000" name="PROCクリスタル" />
+		<group id="13000" name="魔法書" />
+	</category>
+	<category id="20000" name="主武器">
+		<group id="20000" name="短剣" />
+		<group id="21000" name="長剣" />
+		<group id="22000" name="斧" />
+		<group id="23000" name="槌" />
+		<group id="24000" name="杖" />
+		<group id="25000" name="弓" />
+	</category>
+	<category id="30000" name="補武器">
+		<group id="30000" name="矢" />
+		<group id="31000" name="盾" />
+		<group id="32000" name="書物" />
+	</category>
+	<category id="40000" name="防具">
+		<group id="40000" name="頭" />
+		<group id="41000" name="胴" />
+		<group id="42000" name="脚" />
+		<group id="43000" name="足" />
+		<group id="44000" name="首" />
+		<group id="45000" name="腰" />
+		<group id="46000" name="背" />
+		<group id="48000" name="装飾品" />
+		<group id="49000" name="魂" />
+	</category>
+	<category id="50000" name="素材・その他">
+		<group id="50000" name="11神の証" />
+		<group id="55000" name="一般アイテム1" />
+		<group id="56000" name="一般アイテム2" />
+		<group id="58000" name="一般アイテム3" />
+		<group id="59000" name="一般アイテム4" />
+		<group id="60000" name="キーアイテム" />
+	</category>
+</categories>

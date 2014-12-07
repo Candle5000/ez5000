@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<categories>
+	<category id="1" name="クラス固有">
+		<group id="10" name="TACTICS" />
+		<group id="11" name="DEFENCE" />
+		<group id="12" name="AURA" />
+		<group id="13" name="MEDITATION" />
+		<group id="14" name="HOLY" />
+		<group id="15" name="SCOUTING" />
+		<group id="16" name="ASSAULT" />
+		<group id="17" name="BERSERK" />
+		<group id="18" name="PROTECTION" />
+		<group id="19" name="ELEMENTAL" />
+		<group id="20" name="ENCHANTMENT" />
+		<group id="21" name="DISCIPLINE" />
+		<group id="22" name="CONVICTION" />
+		<group id="23" name="ARCHERY" />
+		<group id="24" name="BANDITRY" />
+	</category>
+	<category id="4" name="魔法">
+		<group id="40" name="光属性" />
+		<group id="41" name="火属性" />
+		<group id="42" name="水属性" />
+		<group id="43" name="土属性" />
+		<group id="44" name="風属性" />
+		<group id="45" name="闇属性" />
+	</category>
+	<category id="6" name="モンスター固有">
+		<group id="61" name="物理攻撃" />
+		<group id="62" name="魔法攻撃" />
+		<group id="63" name="特殊攻撃" />
+		<group id="66" name="強化魔法" />
+		<group id="67" name="弱化魔法" />
+		<group id="69" name="その他" />
+	</category>
+</categories>

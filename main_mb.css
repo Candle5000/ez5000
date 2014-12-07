@@ -1,0 +1,61 @@
+body {
+	font-size:x-small;
+}
+div#all {
+	margin:0px;
+}
+div#footer {
+	padding:1px;
+}
+div#infobox {
+	font-size:xx-small;
+	margin:4px;
+}
+div#infobox div#date {
+	padding:1px 2px;
+	width:60%;
+}
+h1 {
+	border:solid 2px #E60;
+	border-left:solid 8px #E60;
+	font-size:medium;
+	padding:0px 3px;
+}
+h2 {
+	font-size:small;
+	padding:0px 2px;
+}
+p {
+	font-size:x-small;
+	padding:2px;
+}
+table {
+	font-size:xx-small;
+	margin:3px auto 3px auto;
+	width:100%;
+}
+table td,th {
+	padding:0px;
+}
+table th {
+	font-size:x-small;
+}
+table#topcount {
+	width:90%;
+}
+ul#dblink {
+	font-size:small;
+}
+ul#dblink li {
+	margin:3px;
+	padding:2px 4px;
+}
+ul#linklist {
+	list-style-type:none;
+	margin:2px 0px;
+	padding:0px;
+}
+ul#linklist li {
+	padding:1px 2px;
+}
+

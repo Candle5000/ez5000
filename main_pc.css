@@ -1,0 +1,57 @@
+body {
+	font-size:medium;
+}
+div#all {
+	margin:0px auto 0px auto;
+	width:840px;
+}
+div#footer {
+	padding:2px 6px;
+}
+div#infobox {
+	margin:10px;
+}
+div#infobox div#date {
+	padding:2px;
+	width:180px;
+}
+h1 {
+	border:solid 4px #E60;
+	border-left:solid 12px #E60;
+	font-size:x-large;
+	padding:8px 16px;
+}
+h2 {
+	font-size:large;
+	padding:0px 8px;
+}
+p {
+	font-size:medium;
+	padding:15px;
+}
+table {
+	margin:10px auto 10px auto;
+	width:480px;
+}
+table td,th {
+	padding:5px;
+}
+table th {
+	font-size:large;
+}
+table#status {
+	width:640px;
+}
+table#topcount {
+	width:720;
+}
+ul#dblink li {
+	background: -webkit-gradient(linear, left top, right bottom, from(#FFFACD),color-stop(0.7, #FFFACD),to(#F0CD96));
+	font-size:large;
+	margin:5px;
+	padding:10px 15px;
+}
+ul#linklist {
+	list-style-type:disc;
+}
+
