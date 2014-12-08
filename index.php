@@ -47,14 +47,6 @@ $count = $data->top_count();
 </div>
 <hr class="normal">
 <div id="infobox">
-	<div id="date">2014/12/07</div>
-	<ul id="info">
-		<li id="boxtitle">スキルデータの作成完了</li>
-		<li>スキルデータのデータ入力完了</li>
-		<li>不明な点の情報提供と間違いの修正にご協力お願いします</li>
-	</ul>
-</div>
-<div id="infobox">
 	<div id="date">2014/11/10</div>
 	<ul id="info">
 		<li id="boxtitle">更新のお知らせ</li>
