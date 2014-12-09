@@ -7,20 +7,24 @@ class Form {
 	//--------------------------
 	//変数の宣言
 	//--------------------------
+	private $action;
+	private $method;
+	private $enctype;
 
 	//--------------------------
 	//コンストラクタ
 	//--------------------------
-	/*
-	function Form() {
+	function Form($act, $mth, $enc) {
+		$this->action = $act;
+		$this->method = $mth;
+		$this->enctype = $enc;
 	}
-	*/
 
 	//--------------------------
 	//フォーム開始
 	//--------------------------
-	function start($action, $method, $enctype) {
-		return("<form action=\"$action\" method=\"$method\" enctype=\"$enctype\">");
+	function start() {
+		return("<form action=\"".$this->action."\" method=\"".$this->method."\" enctype=\"".$this->enctype."\">");
 	}
 
 	//--------------------------
