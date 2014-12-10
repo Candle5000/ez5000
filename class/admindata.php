@@ -9,7 +9,7 @@ class AdminData extends GuestData {
 	//--------------------------
 	function AdminData($userName, $password, $database) {
 		parent::GuestData($userName, $password, $database, 0);
-		if($userName != "admin" || $userName != "root") {
+		if($userName != "admin") {
 			die("ERROR:管理者権限がありません\n");
 			session_destroy();
 		}
@@ -22,17 +22,14 @@ class AdminData extends GuestData {
 		$sql = "INSERT INTO ".$table." (".$cols.") VALUES (".$values.")";
 		$this->query($sql);
 	}
-}
 
 	//--------------------------
 	//データ更新
 	//--------------------------
 	function update_data($table, $cols, $values, $target) {
-		$date = date("Y-m-d");
-		foreach($cols as $col) {
-			foreach($values as $val) {
-				$set[] = $col."='".$val."'";
-			}
+		foreach($cols as $key=>$col) {
+			$val = $values[$key];
+			$set[] = $col."='".$val."'";
 		}
 		$sql = "UPDATE ".$table." SET ".implode(",", $set)." WHERE ".$target;
 		$this->query($sql);
@@ -42,7 +39,9 @@ class AdminData extends GuestData {
 	//更新日付を記録
 	//--------------------------
 	function timestamp($table, $target) {
-		$sql = "UPDATE ".$table." SET updated='".date("Y-m-d")."' WHERE ".$target;
+		$date = date("Y-m-d");
+		$sql = "UPDATE ".$table." SET updated='".$date."' WHERE ".$target;
 		$this->query($sql);
 	}
+}
 ?>

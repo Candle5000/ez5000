@@ -24,14 +24,14 @@ class Form {
 	//フォーム開始
 	//--------------------------
 	function start() {
-		return("<form action=\"".$this->action."\" method=\"".$this->method."\" enctype=\"".$this->enctype."\">");
+		return("<form action=\"".$this->action."\" method=\"".$this->method."\" enctype=\"".$this->enctype."\">\n");
 	}
 
 	//--------------------------
 	//フォーム終了
 	//--------------------------
 	function close() {
-		return("</form>");
+		return("</form>\n");
 	}
 
 	//--------------------------
@@ -75,7 +75,7 @@ class Form {
 				if(isset($array["name"])) $part .= ' name="'.$array["name"].'"';
 				if(isset($array["value"])) $part .= ' value="'.$array["value"].'"';
 				if(isset($array["size"])) $part .= ' size="'.$array["size"].'"';
-				if(isset($array["checked"]) && $array["value"] == $array["checked"]) $part .= " checked";
+				if(isset($array["checked"]) && ($array["checked"]) == 1) $part .= " checked";
 				$part .= ">";
 				break;
 
@@ -83,15 +83,15 @@ class Form {
 				$part .= '<textarea name="'.$array["name"].'"';
 				if(isset($array["cols"])) $part .= ' cols="'.$array["cols"].'"';
 				if(isset($array["rows"])) $part .= ' rows="'.$array["rows"].'"';
-				$part .= ">";
+				$part .= " wrap=\"soft\">";
 				if(isset($array["value"])) $part .= $array["value"];
 				$part .= "</textarea>";
 				break;
 
 			case "select":
 				$part .= '<select name="'.$array["name"].">\n";
-				foreach($array["option"] as $option) {
-					$part .= '<option value="'.key($array["option"]).'"';
+				foreach($array["option"] as $key=>$option) {
+					$part .= '<option value="'.$key.'"';
 					if(isset($array["selected"]) && $array["value"] == $array["selected"]) $part .= " selected";
 					$part .= ">".$option."</option>\n";
 				}
@@ -113,6 +113,6 @@ class Form {
 			}
 		}
 
-		return($part);
+		return($part."\n");
 	}
 }
