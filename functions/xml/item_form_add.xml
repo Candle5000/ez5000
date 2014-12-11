@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form>
+	<part part="input" type="text" name="new_id" value="" size="4" />
+	<part part="input" type="text" name="new_name" value="" size="20" br="1" />
+	<part part="textarea" name="new_text" cols="48" rows="2" br="1" />
+	<part part="input" type="checkbox" name="new_rare" value="1" tail="RARE " />
+	<part part="input" type="checkbox" name="new_notrade" value="1" tail="NOTRADE" br="1" />
+	<part head="売却" part="input" type="text" name="new_price" value="" size="8" />
+	<part head="スタック" part="input" type="text" name="new_stack" value="" size="4" br="1" />
+	<part part="textarea" name="new_note" cols="48" rows="2" br="1" />
+	<part part="input" type="checkbox" name="new_hidden" value="1" tail="未実装 " />
+	<part part="input" type="submit" name="submit_add" value="追加" />
+</form>

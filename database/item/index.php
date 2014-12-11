@@ -25,7 +25,7 @@ if(isset($_COOKIE['hidden'])) {
 	$hidden = $_COOKIE['hidden'];
 }
 
-if(item_group($id) != "分類未定義") {
+if(item_group($id) != -1) {
 	$title = "アイテムデータ ".item_category(item_category_id($id))." ".item_group($id);
 	$PAGE_ID = 20000 + (int)($id / 10);
 } else {
@@ -50,7 +50,7 @@ $data = new GuestData($userName, $password, $database, $hidden);
 <body>
 <div id="all">
 <?php
-if(item_group($id) != "分類未定義") {
+if(item_group($id) != -1) {
 //グループ表示
 ?>
 <h1>アイテムデータ</h1>
@@ -58,7 +58,7 @@ if(item_group($id) != "分類未定義") {
 <h2><?=item_category(item_category_id($id))?> <?=item_group($id)?></h2>
 <ul id="linklist">
 <?php
-	$data->select_group($id+1, item_id_end($id), "id,name", "items");
+	$data->select_group("id,name", "items", $id+1, item_group_end($id));
 	while($row = $data->fetch()){
 		$id = $row["id"];
 		$name = $row["name"];
@@ -127,7 +127,7 @@ foreach($categories->category as $category) {
 <li><a href="/"<?=mbi_ack(0)?>><?=mbi("0.")?>トップページ</a></li>
 </ul>
 <?
-$data->search_id("accesscount", $PAGE_ID);
+$data->select_id("accesscount", $PAGE_ID);
 $c_data = $data->fetch();
 pagefoot($data->access_count("accesscount", $PAGE_ID, $c_data["count"]));
 ?>

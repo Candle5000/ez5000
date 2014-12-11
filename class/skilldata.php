@@ -87,7 +87,7 @@ class SkillData extends MySQL {
 	//--------------------------
 	// id検索
 	//--------------------------
-	function search_id($s_id) {
+	function select_id($s_id) {
 		$this->sql = "SELECT * FROM skill WHERE id='$s_id'";
 		$this->query($this->sql);
 	}

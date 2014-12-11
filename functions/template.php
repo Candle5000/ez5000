@@ -13,6 +13,15 @@ function toppage() {
 }
 
 //----------------------------------------
+// 同一ページにリダイレクト
+//----------------------------------------
+function selfpage() {
+	$url = "http://".$_SERVER["HTTP_HOST"].$_SERVER["PHP_SELF"];
+	header("HTTP/1.1 301 Moved Permanently");
+	header("Location: $url");
+}
+
+//----------------------------------------
 // 端末種類取得
 //----------------------------------------
 function device_info() {
@@ -124,7 +133,7 @@ if(device_info() == "sp") {
 //----------------------------------------
 // アクセスカウンター
 //----------------------------------------
-function counter($countfile) {
+/*function counter($countfile) {
 	$fp = @fopen($countfile, "r");
 	if($fp) {
 		flock($fp, LOCK_EX);
@@ -146,7 +155,7 @@ function counter($countfile) {
 	} else {
 		return(-1);
 	}
-}
+}*/
 
 //----------------------------------------
 // フィーチャーフォン用アクセスキー

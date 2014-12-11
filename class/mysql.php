@@ -7,12 +7,12 @@ class MySQL {
 	//--------------------------
 	//変数の宣言
 	//--------------------------
-	public $m_Con;
-	public $m_HostName;
-	public $m_UserName;
-	public $m_Password;
-	public $m_Database;
-	public $m_Rows;
+	private $m_Con;
+	private $m_HostName;
+	private $m_UserName;
+	private $m_Password;
+	private $m_Database;
+	private $m_Rows;
 	
 	//--------------------------
 	//コンストラクタ
@@ -29,12 +29,12 @@ class MySQL {
 		$this->m_Con = mysql_connect($this->m_HostName, $this->m_UserName, $this->m_Password);
 		if(!$this->m_Con) {
 			session_destroy();
-			die("データベースへの接続に失敗しました DB:{$this->m_Database} {$this->m_Password}");
+			die("ERROR:データベースへの接続に失敗しました\n");
 		}
 		
 		//データベースを選択
 		if(!mysql_select_db($this->m_Database, $this->m_Con)) {
-			die("データベースの選択に失敗しました");
+			die("ERROR:データベースの選択に失敗しました\n");
 		}
 		//$sql = "SET NAMES utf8";
 		//$this->query($sql);
@@ -47,7 +47,7 @@ class MySQL {
 	function query($sql) {
 		$this->m_Rows = mysql_query($sql, $this->m_Con);
 		if(!$this->m_Rows) {
-			die("クエリ処理に失敗しました<br /><b>{$sql}</b><br />" . mysql_errno() . ":" . mysql_error());
+			die("クエリ処理に失敗しました<br />".$this->errors());
 		}
 		return($this->m_Rows);
 	}
@@ -98,7 +98,7 @@ class MySQL {
 	//エラーメッセージ
 	//--------------------------
 	function errors() {
-		return(mysql_errno() . ": " . mysql_error());
+		return(mysql_errno().":".mysql_error());
 	}
 	
 	//--------------------------

@@ -127,7 +127,7 @@ if($rows > 0) {
 <li><a href="/"<?=mbi_ack(0)?>><?=mbi("0.")?>トップページ</a></li>
 </ul>
 <?
-$data->search_id("accesscount", $PAGE_ID);
+$data->select_id("accesscount", $PAGE_ID);
 $c_data = $data->fetch();
 pagefoot($data->access_count("accesscount", $PAGE_ID, $c_data["count"]));
 ?>

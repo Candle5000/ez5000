@@ -53,7 +53,7 @@ while($row = $data->fetch()) {
 </ul>
 <hr class="normal">
 <?
-$data->search_id("accesscount", $PAGE_ID);
+$data->select_id("accesscount", $PAGE_ID);
 $c_data = $data->fetch();
 pagefoot($data->access_count("accesscount", $PAGE_ID, $c_data["count"]));
 ?>

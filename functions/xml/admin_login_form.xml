@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form>
+	<part head="ユーザー名" part="input" type="text" name="user" value="" size="10" br="1" />
+	<part head="パスワード" part="input" type="password" name="pass" value="" size="10" br="1" />
+	<part part="input" type="submit" name="submit_login" value="ログイン" br="1" />
+</form>

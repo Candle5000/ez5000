@@ -24,7 +24,7 @@ $data = new GuestData($userName, $password, $database, 0);
 
 $s_name = "";
 if($data->is_added("skill", $id)) {
-	$data->search_id("skill", $id);
+	$data->select_id("skill", $id);
 	$skill = $data->fetch();
 	$s_name = $skill["name"];
 	$categories = simplexml_load_file($xml);
