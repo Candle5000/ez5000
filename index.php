@@ -111,7 +111,7 @@ $count = $data->top_count();
 <li><a href="http://5000.sameha.org/">本家5000に帰る</a></li>
 </ul>
 <?
-$data->search_id("accesscount", $PAGE_ID);
+$data->select_id("accesscount", $PAGE_ID);
 $c_data = $data->fetch();
 pagefoot($data->access_count("accesscount", $PAGE_ID, $c_data["count"]));
 ?>
