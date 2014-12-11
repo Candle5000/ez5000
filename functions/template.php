@@ -131,31 +131,22 @@ if(device_info() == "sp") {
 }
 
 //----------------------------------------
-// アクセスカウンター
+// 管理ページヘッダー
 //----------------------------------------
-/*function counter($countfile) {
-	$fp = @fopen($countfile, "r");
-	if($fp) {
-		flock($fp, LOCK_EX);
-		$count = fgets($fp);
-		flock($fp, LOCK_UN);
-		fclose($fp);
-	} else {
-		$count = 0;
-	}
-	
-	$fp = @fopen($countfile, "w");
-	if($fp) {
-		$count++;
-		flock($fp, LOCK_EX);
-		fputs($fp, $count);
-		flock($fp, LOCK_UN);
-		fclose($fp);
-		return($count);
-	} else {
-		return(-1);
-	}
-}*/
+function admin_pagehead() {
+?>
+<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+<meta http-equiv="content-language" content="ja" />
+<?php
+if(device_info() == "sp") {
+?>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<?php
+}
+?>
+<title>管理者用 追加・更新</title>
+<?php
+}
 
 //----------------------------------------
 // フィーチャーフォン用アクセスキー

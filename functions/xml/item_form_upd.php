@@ -1,6 +1,7 @@
 <?php
 function xml_item_form_upd($row) {
-	foreach($row as $key=>$r) $row[$key] = mb_ereg_replace("\n", "&#10;", $r);
+	foreach($row as $key=>$r) $row[$key] = preg_replace("/[\r][\n]/", "##br##", $r);
+	foreach($row as $key=>$r) $row[$key] = preg_replace("/[\n]/", "##br##", $r);
 	$string = <<<XML
 <?xml version="1.0" encoding="UTF-8"?>
 <form>
