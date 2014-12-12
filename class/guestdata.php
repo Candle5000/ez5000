@@ -181,7 +181,7 @@ class GuestData extends MySQL {
 				$link_text = $row["name"];
 				$replace_pattern = "/##".$tbl[1].$id[1]."##/";
 			}
-			$replacement = '<a href="/database/'.$link_name.'/data/?id='.$id[1].'">'.$link_text.'</a>';
+			$replacement = '<a href="/db/'.$link_name.'/data/?id='.$id[1].'">'.$link_text.'</a>';
 			$str = preg_replace($replace_pattern, $replacement, $str);
 		}
 		return($str);

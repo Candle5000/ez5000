@@ -35,7 +35,7 @@ $count = $data->top_count();
 <hr class="normal">
 <ul id="linklist">
 <li><a href="./about/"<?=mbi_ack(1)?>><?=mbi("1.")?>このサイトについて</a></li>
-<li><a href="./database/"<?=mbi_ack(2)?>><?=mbi("2.")?>データベース</a></li>
+<li><a href="./db/"<?=mbi_ack(2)?>><?=mbi("2.")?>データベース</a></li>
 </ul>
 <hr class="normal">
 <div class="cnt">

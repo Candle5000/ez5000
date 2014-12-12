@@ -102,7 +102,7 @@ while($st = $data->fetch()) {
 <hr class="normal">
 <ul id="footlink">
 <li><a href="../"<?=mbi_ack(8)?>><?=mbi("8.")?>クラスデータ</a></li>
-<li><a href="/database/"<?=mbi_ack(9)?>><?=mbi("9.")?>データベース</a></li>
+<li><a href="/db/"<?=mbi_ack(9)?>><?=mbi("9.")?>データベース</a></li>
 <li><a href="/"<?=mbi_ack(0)?>><?=mbi("0.")?>トップページ</a></li>
 </ul>
 <hr class="normal">
