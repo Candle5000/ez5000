@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form>
+	<part head="ID" part="input" type="text" name="new_id" value="" size="4" />
+	<part head="NAME" part="input" type="text" name="new_name" value="" size="20" br="1" />
+	<part head="E_NAME" part="input" type="text" name="new_nameE" value="" size="20" />
+	<part head="S_NAME" part="input" type="text" name="new_nameS" value="" size="4" br="1" />
+	<part head="短剣" part="input" type="text" name="new_dagger" value="" size="1" />
+	<part head="長剣" part="input" type="text" name="new_sword" value="" size="1" />
+	<part head="斧" part="input" type="text" name="new_axe" value="" size="1" />
+	<part head="槌" part="input" type="text" name="new_hammer" value="" size="1" />
+	<part head="杖" part="input" type="text" name="new_wand" value="" size="1" />
+	<part head="弓" part="input" type="text" name="new_bow" value="" size="1" br="1" />
+	<part head="回避" part="input" type="text" name="new_dodge" value="" size="1" />
+	<part head="盾" part="input" type="text" name="new_shield" value="" size="1" />
+	<part head="元素" part="input" type="text" name="new_element" value="" size="1" />
+	<part head="光" part="input" type="text" name="new_light" value="" size="1" />
+	<part head="闇" part="input" type="text" name="new_dark" value="" size="1" br="1" />
+	<part part="textarea" name="new_note" cols="48" rows="2" br="1" />
+	<part part="input" type="submit" name="submit_add" value="追加" />
+</form>

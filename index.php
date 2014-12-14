@@ -2,10 +2,10 @@
 //=====================================
 // トップページ
 //=====================================
-require_once("./class/mysql.php");
-require_once("./class/guestdata.php");
-require_once("./functions/template.php");
-require_once("./functions/item.php");
+require_once("/var/www/class/mysql.php");
+require_once("/var/www/class/guestdata.php");
+require_once("/var/www/functions/template.php");
+require_once("/var/www/functions/item.php");
 
 $PAGE_ID = 10000;
 $title = "EZ5000テストサイト";
@@ -35,7 +35,7 @@ $count = $data->top_count();
 <hr class="normal">
 <ul id="linklist">
 <li><a href="./about/"<?=mbi_ack(1)?>><?=mbi("1.")?>このサイトについて</a></li>
-<li><a href="./database/"<?=mbi_ack(2)?>><?=mbi("2.")?>データベース</a></li>
+<li><a href="./db/"<?=mbi_ack(2)?>><?=mbi("2.")?>データベース</a></li>
 </ul>
 <hr class="normal">
 <div class="cnt">
@@ -46,6 +46,14 @@ $count = $data->top_count();
 </table>
 </div>
 <hr class="normal">
+<div id="infobox">
+	<div id="date">2014/12/07</div>
+	<ul id="info">
+		<li id="boxtitle">スキルデータの作成完了</li>
+		<li>スキルデータのデータ入力完了</li>
+		<li>不明な点の情報提供と間違いの修正にご協力お願いします</li>
+	</ul>
+</div>
 <div id="infobox">
 	<div id="date">2014/11/10</div>
 	<ul id="info">

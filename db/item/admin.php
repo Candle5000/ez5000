@@ -3,12 +3,10 @@
 // 管理者用 アイテムデータ 追加 更新 削除
 //=====================================
 require_once("/var/www/class/mysql.php");
-require_once("/var/www/class/itemdata.php");
 require_once("/var/www/class/guestdata.php");
 require_once("/var/www/class/admindata.php");
 require_once("/var/www/class/form.php");
 require_once("/var/www/functions/template.php");
-require_once("/var/www/functions/form.php");
 require_once("/var/www/functions/item.php");
 require_once("/var/www/functions/xml/item_form_upd.php");
 $group_xml = "/var/www/functions/xml/item_group.xml";
@@ -22,6 +20,19 @@ $page = 0;
 
 session_start();
 
+//ログイン
+if(isset($_SERVER["REQUEST_METHOD"]) == "POST") {
+	if(isset($_POST["submit_login"])) {
+		$_SESSION["user"] = $_POST["user"];
+		$_SESSION["pass"] = $_POST["pass"];
+	}
+}
+
+$form = new Form($_SERVER["PHP_SELF"], "POST", "multipart/form-data");
+if(isset($_SESSION["user"]) && isset($_SESSION["pass"])) {
+	$data = new AdminData($_SESSION["user"], $_SESSION["pass"], "ezdata");
+}
+
 if(isset($_SERVER["REQUEST_METHOD"]) == "POST") {
 
 	// ログアウト
@@ -30,20 +41,16 @@ if(isset($_SERVER["REQUEST_METHOD"]) == "POST") {
 		selfpage();
 	}
 
-	//ログイン
-	if(isset($_POST["submit_login"])) {
-		$_SESSION["user"] = $_POST["user"];
-		$_SESSION["pass"] = $_POST["pass"];
-	}
-
 	// 新規作成
 	if(isset($_POST["submit_add"])) {
-		$cols = "id,name,text,rare,notrade,price,stack,note,hidden";
-		foreach($_POST as $key=>$post) {
-			if(preg_match("/new_[a-zA-Z]+/", $key)) $values[] = $post;
+		$cols = array("id","name","text","rare","notrade","price","stack","note","hidden");
+		foreach($cols as $col) {
+			$values[] = isset($_POST["new_".$col]) ? "'".$_POST["new_".$col]."'" : 0;
 		}
+		$cols = implode(",", $cols);
 		$values = implode(",", $values);
 		$data->insert_data($table, $cols, $values);
+		$data->timestamp($table, "id=".$_POST["new_id"]);
 	}
 
 	// 変更
@@ -52,38 +59,27 @@ if(isset($_SERVER["REQUEST_METHOD"]) == "POST") {
 		$target = "id=".$id;
 		$cols = array("name","text","rare","notrade","price","stack","note","hidden");
 		foreach($cols as $col) {
-			$values[] = $_POST[$col][$id];
+			$values[] = isset($_POST[$col][$id]) ? preg_replace("/[\r][\n]/", "\n", $_POST[$col][$id]) : 0;
 		}
 		$data->update_data($table, $cols, $values, $target);
+		$data->timestamp($table, $target);
 	}
 
 	// 最初のページ
-	if(isset($_POST["submit_select"])) $_POST["page"] = 0;
+	if(isset($_POST["submit_group"])) $_POST["page"] = 0;
 
 	//グループの選択
 	if(isset($_POST["group"])) $group_id = $_POST["group"];
+	$data->select_group("id", $table, $group_id, item_group_end($group_id));
+	$count = $data->rows();	
 
 	//ページの選択
 	if(isset($_POST["page"])) $page = $_POST["page"];
 }
-
-$form = new Form($_SERVER["PHP_SELF"], "POST", "multipart/form-data");
-if(isset($_SESSION["user"]) && isset($_SESSION["pass"])) {
-	$data = new AdminData($_SESSION["user"], $_SESSION["pass"], "ezdata");
-}
 ?>
 <html>
 <head>
-<meta http-equiv="Content-type" content="text/html; charset=utf-8">
-<meta http-equiv="content-language" content="ja" />
-<?php
-if(device_info() == "sp") {
-?>
-<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<?php
-}
-?>
-<title>管理者用 追加・更新</title>
+<?=admin_pagehead()?>
 </head>
 <body>
 <?php
@@ -102,7 +98,7 @@ if(!isset($_SESSION["user"]) || !isset($_SESSION["pass"])) {
 ?>
 <h3>* * Item List * *</h3>
 <?=$form->start()?>
-<input type="submit" name="submit_logout" value="ログアウト">
+<?=$form->submit("logout", "ログアウト")?>
 <div>
 アイテムリストに新規追加<br>
 <?=$form->load_xml_file($form_add_xml)?>
@@ -110,37 +106,13 @@ if(!isset($_SESSION["user"]) || !isset($_SESSION["pass"])) {
 <hr>
 <div>
 グループ
-<select name="group">
-<?php
-	$categories = simplexml_load_file($group_xml);
-	foreach($categories->category as $category) {
-		foreach($category->group as $group) {
-?>
-<option <?=form_selected($group["id"], $group_id)?>><?=$category["name"]?> <?=$group["name"]?></option>
-<?php
-		}
-	}
-?>
-</select>
-<input type="submit" name="submit_select" value="表示">
+<?=$form->build_select_group($group_xml, $group_id)?>
 </div>
 <hr>
 ページ
-<select name="page">
-<?php
-	$data->select_group("id", $table, $group_id, item_group_end($group_id));
-	$itemcount = $data->rows();
-	for($s_page = 0; $s_page < $itemcount; $s_page += $PAGESIZE) {
-?>
-<option <?=form_selected($s_page, $page)?>><?=($s_page + 1)?>-<?=($s_page + $PAGESIZE)?></option>
-<?php
-	}
-?>
-</select>
-<input type="submit" name="submit_page" value="表示">
+<?=$form->build_select_page($count, $PAGESIZE, $page)?>
 <hr>
 <?php
-	// テーブルからデータを読む
 	$data->select_group_l("*", $table, $group_id, item_group_end($group_id), $page, $PAGESIZE);
 	while($row = $data->fetch()){
 ?>
@@ -152,7 +124,7 @@ if(!isset($_SESSION["user"]) || !isset($_SESSION["pass"])) {
 	}
 ?>
 <hr>
-<?=$itemcount?>件ヒット
+<?=$count?>件ヒット
 </form>
 </body>
 </html>

@@ -112,7 +112,7 @@ if($rows > 0) {
 		$id = $row["id"];
 		$name = $row["name"];
 ?>
-<li><a href="/database/item/data/?id=<?=$id?>"><?=$name?></a></li>
+<li><a href="/db/item/data/?id=<?=$id?>"><?=$name?></a></li>
 <?php
 	}
 }
@@ -123,7 +123,7 @@ if($rows > 0) {
 <hr class="normal">
 <ul id="footlink">
 <li><a href="./"<?=mbi_ack(9)?>><?=mbi("9.")?>アイテムデータ</a></li>
-<li><a href="/database/"<?=mbi_ack(9)?>><?=mbi("9.")?>データベース</a></li>
+<li><a href="/db/"<?=mbi_ack(9)?>><?=mbi("9.")?>データベース</a></li>
 <li><a href="/"<?=mbi_ack(0)?>><?=mbi("0.")?>トップページ</a></li>
 </ul>
 <?
