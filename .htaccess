@@ -1,0 +1,3 @@
+<Files ~ "^(README|\.gitignore)$">
+	deny from all
+</Files>
