@@ -24,7 +24,7 @@ $data = new GuestData($userName, $password, $database, 0);
 
 $s_name = "";
 if($data->is_added("skill", $id)) {
-	$data->search_id("skill", $id);
+	$data->select_id("skill", $id);
 	$skill = $data->fetch();
 	$s_name = $skill["name"];
 	$categories = simplexml_load_file($xml);
@@ -105,7 +105,7 @@ if(strlen($s_enhance)) {
 <ul id="footlink">
 <li><a href="../?id=<?=$group_id?>"<?=mbi_ack(7)?>><?=mbi("7.")?><?=$group_name?></a></li>
 <li><a href="../"<?=mbi_ack(8)?>><?=mbi("8.")?>スキルデータ</a></li>
-<li><a href="/database/"<?=mbi_ack(9)?>><?=mbi("9.")?>データベース</a></li>
+<li><a href="/db/"<?=mbi_ack(9)?>><?=mbi("9.")?>データベース</a></li>
 <li><a href="/"<?=mbi_ack(0)?>><?=mbi("0.")?>トップページ</a></li>
 </ul>
 <?pagefoot($s_count)?>

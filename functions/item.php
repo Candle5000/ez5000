@@ -57,7 +57,7 @@ function item_group($id) {
 			}
 		}
 	}
-	return("分類未定義");
+	return(-1);
 }
 
 //----------------------------------------
@@ -75,7 +75,7 @@ function item_category_id($id) {
 //----------------------------------------
 // グループ始点
 //----------------------------------------
-function item_id_start($id) {
+function item_group_id($id) {
 	if($id < 13000) {
 		$id -= $id % 100;
 		if($id == 11700) {
@@ -90,8 +90,8 @@ function item_id_start($id) {
 //----------------------------------------
 // グループ終点
 //----------------------------------------
-function item_id_end($start) {
-	if(item_group($start) == "分類未定義") {
+function item_group_end($start) {
+	if(item_group($start) == -1) {
 		return(-1);
 	}
 	if($start < 13000) {

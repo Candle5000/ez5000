@@ -23,12 +23,12 @@ $data = new GuestData($userName, $password, $database, 0);
 
 $i_name = "";
 if($data->is_added("items", $id)) {
-	$data->search_id("items", $id);
+	$data->select_id("items", $id);
 	$item = $data->fetch();
 	$i_name = $item["name"];
 	$category = item_category_id($id);
 	$categoryName = item_category($category);
-	$group = item_id_start($id);
+	$group = item_group_id($id);
 	$groupName = item_group($group);
 	$i_text = nl2br(str_replace("  ", "　", $item["text"]));
 	$i_rare = item_attribute($item["rare"]);
@@ -69,7 +69,7 @@ $title = "アイテムデータ $i_name";
 <ul id="footlink">
 <li><a href="../?id=<?=$group?>"<?=mbi_ack(7)?>><?=mbi("7.")?><?=$groupName?></a></li>
 <li><a href="../"<?=mbi_ack(8)?>><?=mbi("8.")?>アイテムデータ</a></li>
-<li><a href="/database/"<?=mbi_ack(9)?>><?=mbi("9.")?>データベース</a></li>
+<li><a href="/db/"<?=mbi_ack(9)?>><?=mbi("9.")?>データベース</a></li>
 <li><a href="/"<?=mbi_ack(0)?>><?=mbi("0.")?>トップページ</a></li>
 </ul>
 <?pagefoot($i_count)?>

@@ -24,7 +24,7 @@ $data = new GuestData($userName, $password, $database, 0);
 
 $title = "クラスデータ ";
 if($data->is_added("class", $id)) {
-	$data->search_id("class", $id);
+	$data->select_id("class", $id);
 	$class = $data->fetch();
 	$name = $class["name"];
 	$nameE = $class["nameE"];
@@ -61,13 +61,13 @@ if(isset($class)) {
 	if($id > 200) {
 		$classtype = "元ｸﾗｽ";
 		$classid = (int)(($id - 1) / 2) + 1;
-		$data->search_id("class", $classid);
+		$data->select_id("class", $classid);
 		$c0 = $data->fetch();
 		$classlist = "<a href=\"./?id=".$classid."\">".$c0["name"]."</a>";
 	} else {
 		$classtype = "上級ｸﾗｽ";
 		$classid = $id * 2;
-		$data->select_group(($classid - 1), $classid, "id,name", "class");
+		$data->select_group("id,name", "class", ($classid - 1), $classid);
 		$c1 = $data->fetch();
 		$c2 = $data->fetch();
 		$classlist = "<a href=\"./?id=".$c1["id"]."\">".$c1["name"]."</a><br />\n<a href=\"./?id=".$c2["id"]."\">".$c2["name"]."</a>";
@@ -89,7 +89,7 @@ if(isset($class)) {
 <tr><th colspan="9">ステータス</td></tr>
 <tr class="small"><td>Lv</td><td width="14%">HP</td><td width="14%">SP</td><td width="11%">STR</td><td width="11%">VIT</td><td width="11%">DEX</td><td width="11%">AGI</td><td width="11%">WIS</td><td width="11%">WIL</td></tr>
 <?php
-$data->select_group(1, $MAX_Lv, "*", $nameS);
+$data->select_group("*", $nameS, 1, $MAX_Lv);
 while($st = $data->fetch()) {
 	if(($st["lv"] % 5 == 0) || ($st["lv"] == 1)) {
 		echo "<tr><td>".$st["lv"]."</td><td>".$st["hp"]."</td><td>".$st["sp"]."</td><td>".$st["str"]."</td><td>".$st["vit"]."</td><td>".$st["dex"]."</td><td>".$st["agi"]."</td><td>".$st["wis"]."</td><td>".$st["wil"]."</td></tr>";
@@ -102,7 +102,7 @@ while($st = $data->fetch()) {
 <hr class="normal">
 <ul id="footlink">
 <li><a href="../"<?=mbi_ack(8)?>><?=mbi("8.")?>クラスデータ</a></li>
-<li><a href="/database/"<?=mbi_ack(9)?>><?=mbi("9.")?>データベース</a></li>
+<li><a href="/db/"<?=mbi_ack(9)?>><?=mbi("9.")?>データベース</a></li>
 <li><a href="/"<?=mbi_ack(0)?>><?=mbi("0.")?>トップページ</a></li>
 </ul>
 <hr class="normal">

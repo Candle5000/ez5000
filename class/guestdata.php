@@ -26,9 +26,17 @@ class GuestData extends MySQL {
 	}
 	
 	//--------------------------
+	// 全件から指定数取得
+	//--------------------------
+	function select_all_l($data, $table, $start, $limit, $key, $order) {
+		$this->sql = "SELECT $data FROM $table ORDER BY $key $order LIMIT $start,$limit";
+		$this->query($this->sql);
+	}
+
+	//--------------------------
 	//id検索
 	//--------------------------
-	function search_id($table, $s_id) {
+	function select_id($table, $s_id) {
 		$hidden_text = $this->hide_data($table);
 		$this->sql = "SELECT * FROM $table WHERE id='$s_id'".$hidden_text;
 		$this->query($this->sql);
@@ -37,7 +45,7 @@ class GuestData extends MySQL {
 	//--------------------------
 	//範囲指定id検索
 	//--------------------------
-	function select_group($start, $end, $data, $table) {
+	function select_group($data, $table, $start, $end) {
 		$hidden_text = $this->hide_data($table);
 		if(preg_match("/[A-Z]+/", $table)) {
 			$s_id = "lv";
@@ -45,6 +53,20 @@ class GuestData extends MySQL {
 			$s_id = "id";
 		}
 		$this->sql = "SELECT $data FROM $table WHERE $s_id BETWEEN '$start' AND '$end'".$hidden_text." ORDER BY $s_id";
+		$this->query($this->sql);
+	}
+	
+	//--------------------------
+	//制限つき範囲指定id検索
+	//--------------------------
+	function select_group_l($data, $table, $start, $end, $limit_start, $limit) {
+		$hidden_text = $this->hide_data($table);
+		if(preg_match("/[A-Z]+/", $table)) {
+			$s_id = "lv";
+		} else {
+			$s_id = "id";
+		}
+		$this->sql = "SELECT $data FROM $table WHERE $s_id BETWEEN '$start' AND '$end'".$hidden_text." ORDER BY $s_id LIMIT $limit_start,$limit";
 		$this->query($this->sql);
 	}
 	
@@ -57,10 +79,10 @@ class GuestData extends MySQL {
 	}
 
 	//--------------------------
-	// 全件から指定数取得
+	// 制限つきカラム条件検索
 	//--------------------------
-	function select_id_desc($data, $table, $start, $limit, $key, $order) {
-		$this->sql = "SELECT $data FROM $table LIMIT $start,$limit ORDER BY $key $order";
+	function select_column_l($data, $table, $column, $value, $limit_start, $limit) {
+		$this->sql = "SELECT $data FROM $table WHERE $column='$value' LIMIT $limit_start,$limit";
 		$this->query($this->sql);
 	}
 
@@ -167,7 +189,7 @@ class GuestData extends MySQL {
 				$link_text = $row["name"];
 				$replace_pattern = "/##".$tbl[1].$id[1]."##/";
 			}
-			$replacement = '<a href="/database/'.$link_name.'/data/?id='.$id[1].'">'.$link_text.'</a>';
+			$replacement = '<a href="/db/'.$link_name.'/data/?id='.$id[1].'">'.$link_text.'</a>';
 			$str = preg_replace($replace_pattern, $replacement, $str);
 		}
 		return($str);

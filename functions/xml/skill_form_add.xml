@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form>
+	<part head="ID" part="input" type="text" name="new_id" value="" size="4" tail=" " />
+	<part head="Name" part="input" type="text" name="new_name" value="" size="20" tail=" " />
+	<part head="Category" part="input" type="text" name="new_category" value="" size="3" br="1" />
+	<part head="Learning" part="textarea" name="new_learning" cols="48" rows="2" br="1" />
+	<part head="Cost" part="input" type="text" name="new_cost" value="" size="3" tail=" " />
+	<part head="Recast" part="input" type="text" name="new_recast" value="" size="6" tail=" " />
+	<part head="Cast" part="input" type="text" name="new_cast" value="" size="6" br="1" />
+	<part part="textarea" name="new_text" cols="48" rows="2" br="1" />
+	<part part="textarea" name="new_note" cols="48" rows="2" br="1" />
+	<part head="Enhance : EP" part="input" type="text" name="new_ep" value="" size="3" br="1" />
+	<part part="textarea" name="new_enhance" cols="48" rows="2" br="1" />
+	<part part="input" type="submit" name="submit_add" value="追加" />
+</form>

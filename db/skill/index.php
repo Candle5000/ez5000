@@ -107,11 +107,11 @@ foreach($categories->category as $category) {
 <?
 }
 ?>
-<li><a href="/database/"<?=mbi_ack(9)?>><?=mbi("9.")?>データベース</a></li>
+<li><a href="/db/"<?=mbi_ack(9)?>><?=mbi("9.")?>データベース</a></li>
 <li><a href="/"<?=mbi_ack(0)?>><?=mbi("0.")?>トップページ</a></li>
 </ul>
 <?
-$data->search_id("accesscount", $PAGE_ID);
+$data->select_id("accesscount", $PAGE_ID);
 $c_data = $data->fetch();
 pagefoot($data->access_count("accesscount", $PAGE_ID, $c_data["count"]));
 ?>
