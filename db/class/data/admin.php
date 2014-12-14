@@ -2,13 +2,19 @@
 //=====================================
 // 管理者用 クラスステータスデータ 追加 更新 削除
 //=====================================
-mb_regex_encoding("UTF-8");
-require_once("../../../class/mysql.php");
-require_once("../../../class/statusdata.php");
-require_once("../../../functions/form.php");
-require_once("../../../functions/class.php");
+require_once("/var/www/class/mysql.php");
+require_once("/var/www/class/guestdata.php");
+require_once("/var/www/class/admindata.php");
+require_once("/var/www/class/form.php");
+require_once("/var/www/functions/template.php");
+require_once("/var/www/functions/class.php");
+require_once("/var/www/functions/xml/status_form_upd.php");
+$form_login_xml = "/var/www/functions/xml/admin_login_form.xml";
+$form_add_xml = "/var/www/functions/xml/status_form_add.xml";
 
 session_start();
+
+//ログイン
 if(isset($_SERVER["REQUEST_METHOD"]) == "POST") {
 	if(isset($_POST["submit_login"])) {
 		$_SESSION["user"] = $_POST["user"];
@@ -16,170 +22,111 @@ if(isset($_SERVER["REQUEST_METHOD"]) == "POST") {
 	}
 }
 
-$table = "FIG";
-if(isset($_POST["class"])) {
-	$table = $_POST["class"];
+$form = new Form($_SERVER["PHP_SELF"], "POST", "multipart/form-data");
+if(isset($_SESSION["user"]) && isset($_SESSION["pass"])) {
+	$data = new AdminData($_SESSION["user"], $_SESSION["pass"], "ezdata");
+	$table = isset($_POST["table"]) ? $_POST["table"] : "FIG";
+	$data->select_all("class");
+	$select_part = array('part' => 'select', 'name' => 'table', 'selected' => $table);
+	while($row = $data->fetch()) {
+		$select_part["option"]["{$row["nameS"]}"] = $row["name"];
+	}
 }
 
-//管理ログイン
-if(!isset($_SESSION["user"]) || !isset($_SESSION["pass"])) {
+if(isset($_SERVER["REQUEST_METHOD"]) == "POST") {
+
+	// ログアウト
+	if(isset($_POST["submit_logout"])) {
+		session_destroy();
+		selfpage();
+	}
+
+	// 新規作成
+	if(isset($_POST["submit_add"])) {
+		$cols = array("lv","hp","sp","str","vit","dex","agi","wis","wil");
+		foreach($cols as $col) {
+			$values[] = isset($_POST["new_".$col]) ? "'".$_POST["new_".$col]."'" : 0;
+		}
+		$cols = implode(",", $cols);
+		$values = implode(",", $values);
+		$data->insert_data($table, $cols, $values);
+		$data->timestamp("class", "nameS='$table'");
+	}
+
+	// 範囲指定新規作成
+	if(isset($_POST["submit_addmulti"])) {
+		for($lv = $_POST["start"]; $lv <= $_POST["end"]; $lv++) {
+			$data->insert_data($table, "lv", $lv);
+		}
+		$data->timestamp("class", "nameS='$table'");
+	}
+
+	// 変更
+	if(isset($_POST["submit_upd"])) {
+		$lv = key($_POST["submit_upd"]);
+		$target = "lv=".$lv;
+		$cols = array("hp","sp","str","vit","dex","agi","wis","wil");
+		foreach($cols as $col) {
+			$values[] = isset($_POST[$col][$id]) ? preg_replace("/[\r][\n]/", "\n", $_POST[$col][$id]) : 0;
+		}
+		$data->update_data($table, $cols, $values, $target);
+		$data->timestamp("class", "nameS='$table'");
+	}
+}
 ?>
 <html>
 <head>
-<meta http-equiv="Content-type" content="text/html; charset=utf-8">
-<title>管理者用 追加・更新・削除</title>
+<?=admin_pagehead()?>
 </head>
 <body>
-<form action="<?=$_SERVER["PHP_SELF"]?>" method="POST" enctype="multipart/form-data">
-ユーザー名<input type="text" name="user" value="" size="10"><br />
-パスワード<input type="password" name="pass" value="" size="10"><br />
-<input type="submit" name="submit_login" value="ログイン"><br />
-</form>
+<?php
+if(!isset($_SESSION["user"]) || !isset($_SESSION["pass"])) {
+//管理ログイン
+?>
+<?=$form->start()?>
+<?=$form->load_xml_file($form_login_xml)?>
+<?=$form->close()?>
 管理者ユーザー名とパスワードを入力してください
 </body>
 </html>
 <?php
 } else {
 //ログイン済
-
-	$status = new StatusData($_SESSION["user"], $_SESSION["pass"], "ezdata", $table);
-
-	//-----------------------------
-	// POSTされたとき
-	//-----------------------------
-	if($_SERVER["REQUEST_METHOD"] == "POST") {
-		
-		//-----------------------------
-		// ログアウト
-		//-----------------------------
-		if(isset($_POST["submit_logout"])) {
-			session_destroy();
-		}
-		
-		//-----------------------------
-		// 範囲指定新規作成
-		//-----------------------------
-		if(isset($_POST["submit_addempty"])) {
-			$status->add_empty($_POST["start"], $_POST["end"]);
-		}
-		
-		//-----------------------------
-		// 新規作成
-		//-----------------------------
-		if(isset($_POST["submit_add"])) {
-			$status->read_data($_POST["new_lv"], $_POST["new_hp"], $_POST["new_sp"], $_POST["new_str"], $_POST["new_vit"], $_POST["new_dex"], $_POST["new_agi"], $_POST["new_wis"], $_POST["new_wil"]);
-			$status->add_data();
-		}
-		
-		//--------------------------------
-		// 変更
-		//--------------------------------
-		if (isset($_POST["submit_upd"])) {
-			$lv = key($_POST["submit_upd"]);
-			$status->read_data($lv, $_POST["hp"][$lv], $_POST["sp"][$lv], $_POST["str"][$lv], $_POST["vit"][$lv], $_POST["dex"][$lv], $_POST["agi"][$lv], $_POST["wis"][$lv], $_POST["wil"][$lv]);
-			$status->update_data();
-		}
-		
-		//--------------------------------
-		// 削除
-		//--------------------------------
-		if (isset($_POST["submit_del"])) {
-			$lv = key($_POST["submit_del"]);
-			$status->delete_data($lv);
-		}
-	}
 ?>
-<html>
-<head>
-<meta http-equiv="Content-type" content="text/html; charset=utf-8">
-<title>管理者用 追加・更新・削除</title>
-</head>
-<body>
-<?$status->print_error()?>
 <h3>* * Status Data * *</h3>
-<form action="<?=$_SERVER["PHP_SELF"]?>" method="POST" enctype="multipart/form-data">
-<input type="submit" name="submit_logout" value="ログアウト">
-<hr>
-<div>
-Lv<input type="text" name="start" value="" size="1">から 
-Lv<input type="text" name="end" value="" size="1"> まで 
-<input type="submit" name="submit_addempty" value="追加">
-</div>
+<?=$form->start()?>
+<?=$form->submit("logout", "ログアウト")?>
 <hr>
 <div>
 ステータスデータに新規追加<br>
-Lv<input type="text" name="new_lv" value="" size="1"> 
-HP<input type="text" name="new_hp" value="" size="2"> 
-SP<input type="text" name="new_sp" value="" size="2"> 
-STR<input type="text" name="new_str" value="" size="1"> 
-VIT<input type="text" name="new_vit" value="" size="1"> 
-DEX<input type="text" name="new_dex" value="" size="1"> 
-AGI<input type="text" name="new_agi" value="" size="1"> 
-WIS<input type="text" name="new_wis" value="" size="1"> 
-WIL<input type="text" name="new_wil" value="" size="1"> 
-<input type="submit" name="submit_add" value="追加">
+<?=$form->load_xml_file($form_add_xml)?>
 </div>
 <hr>
 <div>
-<select name="class">
-<option <?= form_selected("FIG", $table) ?>>ファイター</option>
-<option <?= form_selected("MAG", $table) ?>>メイジ</option>
-<option <?= form_selected("CLR", $table) ?>>クレリック</option>
-<option <?= form_selected("SCO", $table) ?>>スカウト</option>
-<option <?= form_selected("WAR", $table) ?>>ウォーリア</option>
-<option <?= form_selected("GRD", $table) ?>>ガーディアン</option>
-<option <?= form_selected("SOR", $table) ?>>ソーサラー</option>
-<option <?= form_selected("WLK", $table) ?>>ウォーロック</option>
-<option <?= form_selected("TMP", $table) ?>>テンプラー</option>
-<option <?= form_selected("BIS", $table) ?>>ビショップ</option>
-<option <?= form_selected("RNG", $table) ?>>レンジャー</option>
-<option <?= form_selected("ROG", $table) ?>>ローグ</option>
-</select>
-<input type="submit" name="submit_select" value="表示">
+<?=$form->build($select_part)?>
+<?=$form->submit("table", "表示")?>
 </div>
 <hr>
 <?php
-	//----------------------------------------	
-	// テーブルからデータを読む
-	//----------------------------------------
-	$status->select_all();
-	while($row = $status->fetch()) {
-		$lv = num_length($row["lv"]);
-		$hp = $row["hp"];
-		$sp = $row["sp"];
-		$str = $row["str"];
-		$vit = $row["vit"];
-		$dex = $row["dex"];
-		$agi = $row["agi"];
-		$wis = $row["wis"];
-		$wil = $row["wil"];
+	$data->select_all($table);
+	$count = $data->rows();
+	while($row = $data->fetch()) {
+		$row["lv"] = num_length($row["lv"]);
 ?>
 <div>
-Lv<?=$lv?>:
-HP<input type="text" name="hp[<?=$lv?>]" value="<?=$hp?>" size="2">
-SP<input type="text" name="sp[<?=$lv?>]" value="<?=$sp?>" size="2">
-STR<input type="text" name="str[<?=$lv?>]" value="<?=$str?>" size="1">
-VIT<input type="text" name="vit[<?=$lv?>]" value="<?=$vit?>" size="1">
-DEX<input type="text" name="dex[<?=$lv?>]" value="<?=$dex?>" size="1">
-AGI<input type="text" name="agi[<?=$lv?>]" value="<?=$agi?>" size="1">
-WIS<input type="text" name="wis[<?=$lv?>]" value="<?=$wis?>" size="1">
-WIL<input type="text" name="wil[<?=$lv?>]" value="<?=$wil?>" size="1">
-<input type="submit" name="submit_upd[<?=$lv?>]" value="変更">
-<input type="submit" name="submit_del[<?=$lv?>]" value="削除">
+<?=$form->load_xml_string(xml_status_form_upd($row))?>
 </div>
 <?php
-		if(($lv % 5) == 0) {
+		if(($row["lv"] % 5) == 0) {
 			echo "<hr>\n";
 		}
 	}
-	//ここまでwhileループ[終了の閉じカッコ]
 ?>
 <hr>
-<?=$status->rows()?>件ヒット
+<?=$count?>件ヒット
 <?php
 }
 ?>
 </form>
 </body>
 </html>
-

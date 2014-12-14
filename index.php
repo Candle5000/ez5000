@@ -2,10 +2,10 @@
 //=====================================
 // トップページ
 //=====================================
-require_once("./class/mysql.php");
-require_once("./class/guestdata.php");
-require_once("./functions/template.php");
-require_once("./functions/item.php");
+require_once("/var/www/class/mysql.php");
+require_once("/var/www/class/guestdata.php");
+require_once("/var/www/functions/template.php");
+require_once("/var/www/functions/item.php");
 
 $PAGE_ID = 10000;
 $title = "EZ5000テストサイト";
