@@ -59,14 +59,14 @@ class GuestData extends MySQL {
 	//--------------------------
 	//制限つき範囲指定id検索
 	//--------------------------
-	function select_group_l($data, $table, $start, $end, $limitStart, $limit) {
+	function select_group_l($data, $table, $start, $end, $limit_start, $limit) {
 		$hidden_text = $this->hide_data($table);
 		if(preg_match("/[A-Z]+/", $table)) {
 			$s_id = "lv";
 		} else {
 			$s_id = "id";
 		}
-		$this->sql = "SELECT $data FROM $table WHERE $s_id BETWEEN '$start' AND '$end'".$hidden_text." ORDER BY $s_id LIMIT $limitStart,$limit";
+		$this->sql = "SELECT $data FROM $table WHERE $s_id BETWEEN '$start' AND '$end'".$hidden_text." ORDER BY $s_id LIMIT $limit_start,$limit";
 		$this->query($this->sql);
 	}
 	
@@ -75,6 +75,14 @@ class GuestData extends MySQL {
 	//--------------------------
 	function select_column($data, $table, $column, $value) {
 		$this->sql = "SELECT $data FROM $table WHERE $column='$value'";
+		$this->query($this->sql);
+	}
+
+	//--------------------------
+	// 制限つきカラム条件検索
+	//--------------------------
+	function select_column_l($data, $table, $column, $value, $limit_start, $limit) {
+		$this->sql = "SELECT $data FROM $table WHERE $column='$value' LIMIT $limit_start,$limit";
 		$this->query($this->sql);
 	}
 

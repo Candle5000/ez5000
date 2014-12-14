@@ -31,8 +31,6 @@ if(isset($_SERVER["REQUEST_METHOD"]) == "POST") {
 $form = new Form($_SERVER["PHP_SELF"], "POST", "multipart/form-data");
 if(isset($_SESSION["user"]) && isset($_SESSION["pass"])) {
 	$data = new AdminData($_SESSION["user"], $_SESSION["pass"], "ezdata");
-	$data->select_group("id", $table, $group_id, item_group_end($group_id));
-	$count = $data->rows();	
 }
 
 if(isset($_SERVER["REQUEST_METHOD"]) == "POST") {
@@ -72,6 +70,8 @@ if(isset($_SERVER["REQUEST_METHOD"]) == "POST") {
 
 	//グループの選択
 	if(isset($_POST["group"])) $group_id = $_POST["group"];
+	$data->select_group("id", $table, $group_id, item_group_end($group_id));
+	$count = $data->rows();	
 
 	//ページの選択
 	if(isset($_POST["page"])) $page = $_POST["page"];
