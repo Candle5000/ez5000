@@ -8,6 +8,7 @@ require_once("/var/www/functions/template.php");
 require_once("/var/www/functions/item.php");
 
 $PAGE_ID = 10000;
+$PAGESIZE = 10;
 $title = "EZ5000テストサイト";
 //$user_file = "../../../../etc/mysql-user/user5000.ini";
 $user_file = "/etc/mysql-user/user5000.ini";
@@ -20,6 +21,7 @@ if($fp_user = fopen($user_file, "r")) {
 }
 $data = new GuestData($userName, $password, $database, 0);
 $count = $data->top_count();
+$rows = $data->select_all_l("*", "info", 0, $PAGESIZE, "id", "desc");
 ?>
 <html>
 <head>
@@ -46,75 +48,24 @@ $count = $data->top_count();
 </table>
 </div>
 <hr class="normal">
+<ul id="linklist">
+<li><a href="./info/">インフォメーション</a></li>
+</ul>
+<?php
+if($rows > 0) {
+	while($row = $data->fetch()) {
+?>
 <div id="infobox">
-	<div id="date">2014/12/07</div>
-	<ul id="info">
-		<li id="boxtitle">スキルデータの作成完了</li>
-		<li>スキルデータのデータ入力完了</li>
-		<li>不明な点の情報提供と間違いの修正にご協力お願いします</li>
-	</ul>
+<div id="date"><?=preg_replace("/-/", "/", $row["id"])?></div>
+<p>
+<span id="boxtitle">■<?=$row["subject"]?></span><br />
+<?=nl2br($row["info"])?>
+</p>
 </div>
-<div id="infobox">
-	<div id="date">2014/11/10</div>
-	<ul id="info">
-		<li id="boxtitle">更新のお知らせ</li>
-		<li>スキルデータをテスト公開</li>
-		<li>中身は順次更新していきます。</li>
-	</ul>
-</div>
-<div id="infobox">
-	<div id="date">2014/10/29</div>
-	<ul id="info">
-		<li id="boxtitle">検索機能の不具合修正</li>
-		<li>auフィーチャーフォンでアイテムデータの検索機能が正常に使用できない不具合を修正</li>
-		<li>一部ページデザインを修正</li>
-	</ul>
-</div>
-<div id="infobox">
-	<div id="date">2014/10/26</div>
-	<ul id="info">
-		<li id="boxtitle">新機能のテスト実装</li>
-		<li>アイテムデータに検索フォームをテスト実装</li>
-		<li>スマートフォン閲覧時のリンクの幅を調整</li>
-	</ul>
-</div>
-<div id="infobox">
-	<div id="date">2014/10/23</div>
-	<ul id="info">
-		<li id="boxtitle">更新とお知らせ</li>
-		<li>トップページの日毎のアクセスカウンターを実装</li>
-		<li><span class="nm">10/24 11:00～11:30</span>の間、<span class="nm">サーバーメンテナンス</span>を行います。メンテナンス中はサイトへのアクセスができません。</li>
-		<li>追記:10/24 11:15 メンテナンスは終了しました。ご協力いただきありがとうございました。</li>
-	</ul>
-</div>
-<div id="infobox">
-	<div id="date">2014/10/20</div>
-	<ul id="info">
-		<li id="boxtitle">フィーチャーフォン向け更新</li>
-		<li>フィーチャーフォン向けのデザインを変更</li>
-		<li>アクセスキー対応化</li>
-		<li>全体のデザインの不備を修正</li>
-		<li>その他細かい点の修正</li>
-	</ul>
-</div>
-<div id="infobox">
-	<div id="date">2014/10/17</div>
-	<ul id="info">
-		<li id="boxtitle">デザインの更新</li>
-		<li>スマートフォンとタブレット向けのデザインを変更</li>
-		<li>その他細かいデザインを修正</li>
-	</ul>
-</div>
-<div id="infobox">
-	<div id="date">2014/09/18</div>
-	<ul id="info">
-		<li id="boxtitle">色々更新</li>
-		<li>クラスデータをテスト公開</li>
-		<li>全ページのアクセスカウントをデータベースに変更</li>
-		<li>トップページとデータベースのトップを追加</li>
-		<li>テストサイトの情報は今後こちらに掲載します</li>
-	</ul>
-</div>
+<?php
+	}
+}
+?>
 <ul id="footlink">
 <li><a href="http://5000.sameha.org/">本家5000に帰る</a></li>
 </ul>
@@ -126,4 +77,3 @@ pagefoot($data->access_count("accesscount", $PAGE_ID, $c_data["count"]));
 </div>
 </body>
 </html>
-

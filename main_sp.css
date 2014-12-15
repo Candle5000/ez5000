@@ -16,6 +16,10 @@ div#infobox div#date {
 	padding:2px 4px;
 	width:70%;
 }
+div#infobox p {
+	margin:0px 4px;
+	padding:0px;
+}
 h1 {
 	border:solid 3px #E60;
 	border-left:solid 12px #E60;

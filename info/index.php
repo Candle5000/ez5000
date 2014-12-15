@@ -64,8 +64,10 @@ if($rows > 0) {
 ?>
 <div id="infobox">
 <div id="date"><?=preg_replace("/-/", "/", $row["id"])?></div>
-<div id="boxtitle">■<?=$row["subject"]?></div>
+<p>
+<span id="boxtitle">■<?=$row["subject"]?></span><br />
 <?=nl2br($row["info"])?>
+</p>
 </div>
 <?php
 	}
