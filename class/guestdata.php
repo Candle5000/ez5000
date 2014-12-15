@@ -23,14 +23,20 @@ class GuestData extends MySQL {
 	function select_all($table) {
 		$this->sql = "SELECT * FROM $table";
 		$this->query($this->sql);
+		return($this->rows());
 	}
 	
 	//--------------------------
 	// 全件から指定数取得
 	//--------------------------
 	function select_all_l($data, $table, $start, $limit, $key, $order) {
+		$s_id = preg_match("/[A-Z]+/", $table) ? "lv" : "id";
+		$this->sql = "SELECT $s_id FROM $table";
+		$this->query($this->sql);
+		$r = $this->rows();
 		$this->sql = "SELECT $data FROM $table ORDER BY $key $order LIMIT $start,$limit";
 		$this->query($this->sql);
+		return($r);
 	}
 
 	//--------------------------
@@ -47,11 +53,7 @@ class GuestData extends MySQL {
 	//--------------------------
 	function select_group($data, $table, $start, $end) {
 		$hidden_text = $this->hide_data($table);
-		if(preg_match("/[A-Z]+/", $table)) {
-			$s_id = "lv";
-		} else {
-			$s_id = "id";
-		}
+		$s_id = preg_match("/[A-Z]+/", $table) ? "lv" : "id";
 		$this->sql = "SELECT $data FROM $table WHERE $s_id BETWEEN '$start' AND '$end'".$hidden_text." ORDER BY $s_id";
 		$this->query($this->sql);
 	}
