@@ -159,16 +159,11 @@ div#infobox div#date {
 	background-color:#F0CD96;
 	font-weight:bold;
 }
-div#infobox ul#info {
-	margin:0 0 0 2em;
-	padding:0px;
-}
-div#infobox ul#info li {
+div#infobox p {
 	margin:0px;
-	list-style-type:disc;
 	padding:0px;
 }
-div#infobox ul#info li#boxtitle {
+div#infobox #boxtitle {
 	color:#F80;
 	font-weight:bold;
 	list-style-type:circle;

@@ -41,6 +41,7 @@ if(isset($_SERVER["REQUEST_METHOD"]) == "POST") {
 	// 新規作成
 	if(isset($_POST["submit_add"])) {
 		$cols = array("id","subject","info");
+		$_POST["new_id"] = preg_replace("/[\/]/", "-", $_POST["new_id"]);
 		foreach($cols as $col) {
 			$values[] = isset($_POST["new_".$col]) ? "'".$_POST["new_".$col]."'" : 0;
 		}
@@ -52,7 +53,7 @@ if(isset($_SERVER["REQUEST_METHOD"]) == "POST") {
 	// 変更
 	if(isset($_POST["submit_upd"])) {
 		$id = key($_POST["submit_upd"]);
-		$target = "id=".$id;
+		$target = "id='$id'";
 		$cols = array("subject","info");
 		foreach($cols as $col) {
 			$values[] = isset($_POST[$col][$id]) ? preg_replace("/[\r][\n]/", "\n", $_POST[$col][$id]) : 0;

@@ -90,11 +90,13 @@ class Form {
 	function build_select_page($count, $size, $selected) {
 		$form = "";
 		$part = array('part' => 'select', 'name' => 'page', 'selected' => $selected);
-		for($page = 0; $page < $count; $page += $size) {
-			$part["option"]["$page"] = ($page + 1)."-".($page + $size);
+		if($count > 0) {
+			for($page = 0; $page < $count; $page += $size) {
+				$part["option"]["$page"] = ($page + 1)."-".($page + $size);
+			}
+			$form .= $this->build($part);
+			$form .= $this->submit("page", "表示");
 		}
-		$form .= $this->build($part);
-		$form .= $this->submit("page", "表示");
 		return($form);
 	}
 
