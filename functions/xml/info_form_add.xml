@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form>
+	<part head="DATE" part="input" type="text" name="new_id" value="" size="20" br="1" />
+	<part head="SUBJECT" part="input" type="text" name="new_subject" value="" size="32" br="1" />
+	<part part="textarea" name="new_info" cols="48" rows="4" br="1" />
+	<part part="input" type="submit" name="submit_add" value="追加" />
+</form>
