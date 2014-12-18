@@ -69,8 +69,10 @@ if(isset($_SERVER["REQUEST_METHOD"]) == "POST") {
 
 	//グループの選択
 	if(isset($_POST["group"])) $group_id = $_POST["group"];
-	$data->select_column("id", $table, "category", $group_id);
-	$count = $data->rows();	
+	if(isset($data)) {
+		$data->select_column("id", $table, "category", $group_id);
+		$count = $data->rows();	
+	}
 
 	//ページの選択
 	if(isset($_POST["page"])) $page = $_POST["page"];
