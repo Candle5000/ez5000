@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<categories>
+	<category>
+		<group id="0" name="未分類" />
+		<group id="100" name="人間" />
+		<group id="101" name="ナメクジ" />
+		<group id="102" name="ゴブリン" />
+		<group id="103" name="ドレイク" />
+		<group id="104" name="狼" />
+		<group id="105" name="ヘビ" />
+		<group id="106" name="花" />
+		<group id="107" name="ゴースト" />
+		<group id="108" name="ロック" />
+		<group id="109" name="スケルトン" />
+		<group id="110" name="羽虫" />
+		<group id="111" name="オーガ" />
+		<group id="112" name="ドラゴン" />
+		<group id="113" name="ビートル" />
+		<group id="114" name="タウルス" />
+		<group id="115" name="マンベスタ" />
+		<group id="116" name="象" />
+		<group id="117" name="鳥" />
+		<group id="118" name="#" />
+		<group id="119" name="#" />
+		<group id="120" name="蛇女" />
+		<group id="121" name="ガルーダ" />
+		<group id="122" name="スプーカ" />
+		<group id="123" name="アシュラ" />
+		<group id="124" name="#見張り台" />
+		<group id="125" name="#見張り台" />
+		<group id="126" name="#見張り台" />
+		<group id="127" name="#見張り台" />
+		<group id="128" name="門" />
+		<group id="129" name="#獄長" />
+		<group id="130" name="#獄長" />
+		<group id="131" name="ウサギ" />
+		<group id="132" name="虎" />
+		<group id="133" name="魔術師" />
+		<group id="134" name="ベヒーモス" />
+		<group id="135" name="ユニコーン" />
+		<group id="136" name="#ビッグゴブリン" />
+		<group id="137" name="リザードマン" />
+		<group id="138" name="#グレートゴブリン" />
+		<group id="139" name="#バルチャー" />
+		<group id="140" name="サソリ" />
+		<group id="141" name="亀" />
+		<group id="142" name="リヴァイアサン" />
+		<group id="143" name="#" />
+		<group id="144" name="悪魔" />
+		<group id="145" name="キングドレイク" />
+		<group id="146" name="ミミック" />
+		<group id="147" name="モルヴァ" />
+		<group id="148" name="#" />
+		<group id="149" name="ゴーレム" />
+		<group id="150" name="クマ" />
+		<group id="151" name="#ウサギ" />
+		<group id="152" name="闘士" />
+		<group id="153" name="#火の鳥" />
+		<group id="154" name="#" />
+		<group id="155" name="#" />
+		<group id="156" name="#" />
+		<group id="157" name="#" />
+		<group id="158" name="#" />
+		<group id="159" name="#" />
+	</category>
+</categories>

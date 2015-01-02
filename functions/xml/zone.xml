@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<categories>
+	<category>
+		<group id="1" name="バスカル マナ区" />
+		<group id="2" name="バスカル アック区" />
+		<group id="3" name="バスカル ザガ区" />
+		<group id="4" name="西グリディアナ樹海" />
+		<group id="5" name="東グリディアナ樹海" />
+		<group id="6" name="南フラップ草原" />
+		<group id="7" name="北フラップ草原" />
+		<group id="8" name="クルート高原" />
+		<group id="9" name="ラプト" />
+		<group id="10" name="ザイン" />
+		<group id="11" name="オールドラプト" />
+		<group id="12" name="ジュラの魔窟上層" />
+		<group id="13" name="ジュラの魔窟中層" />
+		<group id="14" name="ジュラの魔窟下層" />
+		<group id="15" name="リフェール練兵所" />
+		<group id="16" name="プラッツ雪原" />
+		<group id="17" name="８カラット草原" />
+		<group id="18" name="エイヌ荒野" />
+		<group id="19" name="スナンタウン" />
+		<group id="20" name="エルト湿地" />
+		<group id="21" name="サキレス岩礁" />
+		<group id="22" name="ガルダル峡谷" />
+		<group id="23" name="メノアム地区" />
+		<group id="24" name="赤竜洞 B1F" />
+		<group id="25" name="チェスカフ" />
+		<group id="26" name="赤竜洞 B2F" />
+		<group id="27" name="ダラッカ森林" />
+		<group id="28" name="カラッカ森林" />
+		<group id="29" name="バージル原野" />
+		<group id="30" name="マロニア隧道" />
+		<group id="31" name="西キュキヌ砂漠" />
+		<group id="32" name="コト" />
+		<group id="33" name="イスコ島嶼" />
+		<group id="34" name="グリディアナ街道" />
+		<group id="35" name="ホープル村" />
+		<group id="36" name="グリディアナ樹海奥" />
+		<group id="37" name="グラダール峻岳" />
+		<group id="38" name="ドロセア幽谷" />
+		<group id="39" name="カランリク羨道" />
+		<group id="40" name="地下都市ゴライエ" />
+		<group id="41" name="仮面祭広場" />
+		<group id="42" name="メノアム城牢獄" />
+		<group id="43" name="メノアム城下層" />
+		<group id="44" name="闘技カジノ" />
+		<group id="45" name="バスカル コスタ区" />
+		<group id="46" name="東キュキヌ砂漠" />
+		<group id="47" name="アトニア海" />
+		<group id="48" name="バスカル コスタ区" />
+		<group id="49" name="イスコ礁湖" />
+		<group id="50" name="スタルド修練所" />
+		<group id="51" name="アトニア海" />
+		<group id="201" name="ジュラの魔窟上層 P" />
+		<group id="202" name="ジュラの魔窟中層 P" />
+		<group id="203" name="ジュラの魔窟下層 P" />
+		<group id="204" name="オールドラプト P" />
+		<group id="205" name="ジュラの魔窟下層 P" />
+		<group id="206" name="ダラッカ森林 P" />
+		<group id="207" name="エイヌ荒野 P" />
+		<group id="208" name="ガルダル峡谷 P" />
+		<group id="209" name="闘技場 P" />
+		<group id="210" name="ドロセア森砦 P" />
+		<group id="211" name="ゴライエ牢獄 P" />
+		<group id="212" name="クルート高原 P" />
+		<group id="213" name="メノアム城中層" />
+		<group id="214" name="メノアム城上層" />
+		<group id="215" name="バスカル ザガ区 P" />
+		<group id="216" name="グリディアナ樹海奥" />
+		<group id="217" name="プラッツ雪原 P" />
+		<group id="218" name="11神の神殿 P" />
+		<group id="219" name="グラダール峻岳 P" />
+		<group id="220" name="メノアム城 B1F P" />
+		<group id="221" name="ホープル村 P" />
+		<group id="222" name="北フラップ草原 P" />
+		<group id="223" name="東キュキヌ砂漠 P" />
+		<group id="224" name="ジュラの魔窟中層 T" />
+		<group id="225" name="ピグラスの塔 P" />
+		<group id="226" name="試練の間" />
+		<group id="227" name="地下都市ゴライエ P" />
+		<group id="255" name="アルダイル監獄" />
+	</category>
+</categories>

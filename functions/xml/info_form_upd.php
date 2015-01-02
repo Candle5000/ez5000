@@ -1,4 +1,5 @@
 <?php
+//インフォメーション管理 データ変更フォーム
 function xml_info_form_upd($row) {
 	foreach($row as $key=>$r) $row[$key] = preg_replace("/[\r][\n]/", "##br##", $r);
 	foreach($row as $key=>$r) $row[$key] = htmlspecialchars(preg_replace("/[\n]/", "##br##", $r));
