@@ -16,9 +16,6 @@ $PAGESIZE = 8;
 $table = "monster";
 $zone = "zone";
 
-$zone_id = 1;
-$page = 0;
-
 session_start();
 
 //ログイン
@@ -42,9 +39,25 @@ if(isset($_SERVER["REQUEST_METHOD"]) == "POST") {
 		selfpage();
 	}
 
+	// 最初のページ
+	if(isset($_POST["submit_group"])) $_POST["page"] = 0;
+
+	// ゾーンの選択
+	if(isset($_POST["submit_group"])) {
+		$zone_id = $_POST["group"];
+	} else if(isset($_POST["zone"])) {
+		$zone_id = $_POST["zone"];
+	} else {
+		$zone_id = 1;
+	}
+
+	// ページの選択
+	$page = isset($_POST["page"]) ? $_POST["page"] : 0;
+
 	// 新規作成
 	if(isset($_POST["submit_add"])) {
-		$cols = array("id","name","nm","category","image","walkspeed","delay","search","follow","link","maxlevel","minlevel","repop","maxpop","skill","dropitem","soul","steal","note");
+		$_POST["new_zone"] = $zone_id;
+		$cols = array("zone","id","name","nm","category","image","walkspeed","delay","search","follow","link","maxlevel","minlevel","repop","maxpop","skill","dropitem","soul","steal","note","event");
 		foreach($cols as $col) {
 			$values[] = isset($_POST["new_".$col]) ? "'".$_POST["new_".$col]."'" : 0;
 		}
@@ -57,8 +70,8 @@ if(isset($_SERVER["REQUEST_METHOD"]) == "POST") {
 	// 変更
 	if(isset($_POST["submit_upd"])) {
 		$id = key($_POST["submit_upd"]);
-		$target = "id=".$id;
-		$cols = array("name","nm","category","image","walkspeed","delay","search","follow","link","maxlevel","minlevel","repop","maxpop","skill","dropitem","soul","steal","note");
+		$target = "zone=".$zone_id." AND id=".$id;
+		$cols = array("name","nm","category","image","walkspeed","delay","search","follow","link","maxlevel","minlevel","repop","maxpop","skill","dropitem","soul","steal","note","event");
 		foreach($cols as $col) {
 			$values[] = isset($_POST[$col][$id]) ? preg_replace("/[\r][\n]/", "\n", $_POST[$col][$id]) : 0;
 		}
@@ -66,19 +79,11 @@ if(isset($_SERVER["REQUEST_METHOD"]) == "POST") {
 		$data->timestamp($table, $target);
 	}
 
-	// 最初のページ
-	if(isset($_POST["submit_group"])) $_POST["page"] = 0;
-
-	//ゾーンの選択
-	if(isset($_POST["group"])) $zone_id = $_POST["group"];
-	$group_id = $zone_id * 100 + 1;
+	// 登録件数
 	if(isset($_SESSION["user"]) && isset($_SESSION["pass"])) {
-		$data->select_group("id", $table, $group_id, ($group_id + 99));
+		$data->select_column("id", $table, "zone", $zone_id);
 		$count = $data->rows();
 	}
-
-	// ページの選択
-	if(isset($_POST["page"])) $page = $_POST["page"];
 }
 ?>
 <html>
@@ -99,6 +104,7 @@ if(!isset($_SESSION["user"]) || !isset($_SESSION["pass"])) {
 <?php
 } else {
 //ログイン済
+	$part_hidden = array('part' => 'input', 'type' => 'hidden', 'name' => 'zone', 'value' => $zone_id);
 	$data->select_all($zone);
 	$part = array('part' => 'select', 'name' => 'group', 'selected' => $zone_id);
 	while($row = $data->fetch()) {
@@ -107,6 +113,7 @@ if(!isset($_SESSION["user"]) || !isset($_SESSION["pass"])) {
 ?>
 <h3>* * Monster List * *</h3>
 <?=$form->start()?>
+<?=$form->build($part_hidden)?>
 <?=$form->submit("logout", "ログアウト")?>
 <div>
 モンスターリストに新規追加<br>
@@ -123,7 +130,7 @@ if(!isset($_SESSION["user"]) || !isset($_SESSION["pass"])) {
 <?=$form->build_select_page($count, $PAGESIZE, $page)?>
 <hr>
 <?php
-	$data->select_group_l("*", $table, $group_id, ($group_id + 99), $page, $PAGESIZE);
+	$data->select_column_l("*", $table, "zone", $zone_id, $page, $PAGESIZE);
 	while($row = $data->fetch()){
 ?>
 <hr>
