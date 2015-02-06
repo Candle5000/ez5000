@@ -43,33 +43,56 @@ if($id != -1) {
 ?>
 <h1>モンスターデータ</h1>
 <hr class="normal">
+<?php
+	for($i = 0; $i < 2; $i++) {
+		if($i == 0) {
+?>
 <h2><?=$cname[$id]?></h2>
+<?php
+		} else {
+?>
+<h2>イベントモンスター</h2>
+<?php
+		}
+?>
 <ul id="linklist">
 <?php
-	if($id == 0) {
-		$data->select_group_by("category", "monster", "", "category", "HAVING COUNT(id) < 5");
-		while($rows = $data->fetch()) {
-			$categories[] = $rows["category"];
+		$flag = 0;
+		if($id == 0) {
+			$data->select_group_by("category", "monster", "", "category", "HAVING COUNT(id) < 5");
+			while($rows = $data->fetch()) {
+				$categories[] = $rows["category"];
+			}
+		} else {
+			$categories[] = $id;
 		}
-	} else {
-		$categories[] = $id;
-	}
-	foreach($categories as $category) {
-		$data->select_column("zone,id,name,nm", "monster", "category", $category);
-		while($row = $data->fetch()) {
-			$id = $row["zone"].str_pad($row["id"], 4, "0", STR_PAD_LEFT);
-			$name = $row["name"];
-			if($row["nm"]) $name = '<span class="nm">'.$name.'</span>';
+		foreach($categories as $category) {
+			$column = array("category", "event");
+			$value = array($category, $i);
+			$data->select_column("zone,id,name,nm", "monster", $column, $value);
+			while($row = $data->fetch()) {
+				$flag = 1;
+				$id = $row["zone"].str_pad($row["id"], 4, "0", STR_PAD_LEFT);
+				$name = $row["name"];
+				if($row["nm"]) $name = '<span class="nm">'.$name.'</span>';
 ?>
 <li><a href="/db/monster/data/?id=<?=$id?>"><?=$name?></a></li>
 <?php
+			}
 		}
-	}
+		if($flag == 0) {
+?>
+<li>特に無し</li>
+<?php
+		}
 ?>
 </ul>
+<?php
+	}
+?>
 <hr class="normal">
 <ul id="footlink">
-<li><a href="./"<?=mbi_ack(9)?>><?=mbi("9.")?>アイテムデータ</a></li>
+<li><a href="./"<?=mbi_ack(9)?>><?=mbi("9.")?>モンスターデータ</a></li>
 <?php
 } else {
 //一覧表示

@@ -76,7 +76,15 @@ class GuestData extends MySQL {
 	// 任意のカラム条件を検索
 	//--------------------------
 	function select_column($data, $table, $column, $value) {
-		$this->sql = "SELECT $data FROM $table WHERE $column='$value'";
+		if(is_array($column) && is_array($value)) {
+			foreach($column as $key => $col) {
+				$match[] = $col."='".$value[$key]."'";
+			}
+			$match = implode(" AND ", $match);
+		} else {
+			$match = $column."='".$value."'";
+		}
+		$this->sql = "SELECT $data FROM $table WHERE $match";
 		$this->query($this->sql);
 	}
 
@@ -84,7 +92,15 @@ class GuestData extends MySQL {
 	// 制限つきカラム条件検索
 	//--------------------------
 	function select_column_l($data, $table, $column, $value, $limit_start, $limit) {
-		$this->sql = "SELECT $data FROM $table WHERE $column='$value' LIMIT $limit_start,$limit";
+		if(is_array($column) && is_array($value)) {
+			foreach($column as $key => $col) {
+				$match[] = $col."='".$value[$key]."'";
+			}
+			$match = implode(" AND ", $match);
+		} else {
+			$match = $column."='".$value."'";
+		}
+		$this->sql = "SELECT $data FROM $table WHERE $match LIMIT $limit_start,$limit";
 		$this->query($this->sql);
 	}
 
