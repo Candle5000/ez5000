@@ -89,6 +89,14 @@ class GuestData extends MySQL {
 	}
 
 	//--------------------------
+	// グループ化検索
+	//--------------------------
+	function select_group_by($data, $table, $where, $group, $having) {
+		$this->sql = "SELECT $data FROM $table $where GROUP BY $group $having";
+		$this->query($this->sql);
+	}
+
+	//--------------------------
 	// 自由入力検索
 	//--------------------------
 	function search_words($input, $table, $mode, $start) {
