@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <categories>
 	<category>
-		<group id="0" name="その他" />
 		<group id="100" name="人間" />
 		<group id="101" name="ナメクジ" />
 		<group id="102" name="ゴブリン" />
@@ -62,5 +61,6 @@
 		<group id="157" name="#" />
 		<group id="158" name="#" />
 		<group id="159" name="#" />
+		<group id="900" name="その他" />
 	</category>
 </categories>

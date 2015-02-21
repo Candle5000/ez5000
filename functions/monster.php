@@ -74,4 +74,81 @@ function monster_delay($dly) {
 			return($dly);
 	}
 }
+
+//----------------------------------------
+// 索敵
+//----------------------------------------
+function monster_search() {
+	$ws = array(
+		-1 => '不明',
+		0  => 'なし',
+		1  => 'なし(聴覚)',
+		2  => '視覚',
+		3  => '聴覚',
+		4  => '聴覚(やや広)',
+		5  => '聴覚(広範囲)',
+		6  => '視覚(見破り)',
+		7  => '視覚(周囲+ハイド無効)',
+		8  => '視覚(前長距離+周囲+ハイド無効)',
+	);
+	return($ws);
+}
+
+//----------------------------------------
+// レベル
+//----------------------------------------
+function monster_level($max, $min) {
+	if($max == -1 || $min == -1) {
+		return("不明");
+	} else if($max == $min) {
+		return($max);
+	} else if($max < $min && $max == 0) {
+		return($min."以上");
+	} else {
+		return($m_level = $min."～".$max);
+	}
+}
+
+//----------------------------------------
+// ドロップ
+//----------------------------------------
+function monster_drop($drop) {
+	$drop = preg_split("/(\n|\r\n)/", $drop);
+	$i = 0;
+	foreach($drop as $dropitem) {
+		if(preg_match("/##(x?[0-9]#)*x?[0-9]##/", $dropitem)) {
+			$head = explode("#", $dropitem);
+			foreach($head as $h) {
+				if(preg_match("/x[0-9]/", $h)) {
+					$droplist["head"][preg_replace("/x/", "", $h)] = 2;
+				} else {
+					$droplist["head"][$h] = 1;
+				}
+			}
+		} else if($dropitem == "##") {
+			$i++;
+		} else {
+			$droplist["list"][$i][] = $dropitem;
+		}
+	}
+	for($i = 0; isset($droplist["list"][$i]); $i++) {
+		$droplist["list"][$i] = implode("<br />\n", $droplist["list"][$i]);
+	}
+	return(isset($droplist) ? $droplist : -1);
+}
+
+//----------------------------------------
+// スティール/ソウル
+//----------------------------------------
+function monster_item($id) {
+	if($id == -1) {
+		return("不明");
+	} else if($id == 0) {
+		return("なし");
+	} else {
+		$data->select_id("items", $id);
+		$item = $data->fetch();
+		return($data->rows() ? "<a href=\"{$item["id"]}\">{$item["name"]}</a>" : "ERROR:未登録ID");
+	}
+}
 ?>

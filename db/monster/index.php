@@ -20,8 +20,9 @@ if($fp_user = fopen($user_file, "r")) {
 }
 $data = new GuestData($userName, $password, $database, 0);
 
+//種族個体数チェック
 $data->select_column("id", "monster", "category", $id);
-if($data->rows() < 5 && $id != 0) $id = -1;
+if($data->rows() < 5 && $id != 900) $id = -1;
 
 if($id != -1) {
 	$title = "モンスターデータ ".$cname[$id];
@@ -58,7 +59,9 @@ if($id != -1) {
 <ul id="linklist">
 <?php
 		$flag = 0;
-		if($id == 0) {
+
+		//種族ID取得
+		if($id == 900) {
 			$data->select_group_by("category", "monster", "", "category", "HAVING COUNT(id) < 5");
 			while($rows = $data->fetch()) {
 				$categories[] = $rows["category"];
@@ -66,6 +69,8 @@ if($id != -1) {
 		} else {
 			$categories[] = $id;
 		}
+
+		//検索出力
 		foreach($categories as $category) {
 			$column = array("category", "event");
 			$value = array($category, $i);
@@ -80,6 +85,8 @@ if($id != -1) {
 <?php
 			}
 		}
+
+		//ヒット件数0
 		if($flag == 0) {
 ?>
 <li>特に無し</li>
@@ -108,7 +115,7 @@ if($id != -1) {
 <?php
 	}
 ?>
-<li><a href="/db/monster/?id=0"><?=$cname[0]?></a></li>
+<li><a href="/db/monster/?id=900"><?=$cname[900]?></a></li>
 </ul>
 <hr class="normal">
 <ul id="footlink">
