@@ -88,7 +88,7 @@
 
 /* Color:Other */
 .nm {
-	color:#F00;
+	color:#E00;
 }
 .plus {
 	color:#C20;
@@ -107,6 +107,9 @@
 }
 .bol {
 	color:#62C;
+}
+.rare {
+	background-color:#CFC;
 }
 
 /* Other */

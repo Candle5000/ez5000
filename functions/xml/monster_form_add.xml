@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form>
+	<part part="input" type="text" name="new_id" value="" size="4" />
+	<part part="input" type="text" name="new_name" value="" size="20" br="1" />
+	<part part="input" type="checkbox" name="new_nm" value="1" tail="NM" />
+	<part head="種族" part="input" type="text" name="new_category" value="" size="4" />
+	<part head="画像" part="input" type="text" name="new_image" value="0" size="4" br="1" />
+	<part head="移動" part="input" type="text" name="new_walkspeed" value="-1" size="4" />
+	<part head="攻速" part="input" type="text" name="new_delay" value="-8" size="4" />
+	<part head="索敵" part="input" type="text" name="new_search" value="-1" size="4" br="1" />
+	<part part="text" head="追従/リンク" br="1" />
+	<part part="textarea" name="new_follow" cols="48" rows="1" br="1" />
+	<part part="textarea" name="new_link" cols="48" rows="2" br="1" />
+	<part head="Lv" part="input" type="text" name="new_minlevel" value="-1" size="3" />
+	<part head="～" part="input" type="text" name="new_maxlevel" value="-1" size="3" br="1" />
+	<part part="text" head="再出現" br="1" />
+	<part part="textarea" name="new_repop" cols="48" rows="2" br="1" />
+	<part head="最大出現数" part="input" type="text" name="new_maxpop" value="-1" size="4" br="1" />
+	<part part="text" head="使用スキル" br="1" />
+	<part part="textarea" name="new_skill" cols="48" rows="2" br="1" />
+	<part part="text" head="ドロップアイテム" br="1" />
+	<part part="textarea" name="new_dropitem" cols="48" rows="2" br="1" />
+	<part part="text" head="備考" br="1" />
+	<part part="textarea" name="new_note" cols="48" rows="2" br="1" />
+	<part part="input" type="checkbox" name="new_event" value="1" tail="イベント" />
+	<part part="input" type="submit" name="submit_add" value="追加" />
+</form>
