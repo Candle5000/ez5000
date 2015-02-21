@@ -76,7 +76,23 @@ class GuestData extends MySQL {
 	// 任意のカラム条件を検索
 	//--------------------------
 	function select_column($data, $table, $column, $value) {
-		$this->sql = "SELECT $data FROM $table WHERE $column='$value'";
+		if(is_array($column) && is_array($value)) {
+			foreach($column as $key => $col) {
+				$match[] = $col."='".$value[$key]."'";
+			}
+			$match = implode(" AND ", $match);
+		} else {
+			$match = $column."='".$value."'";
+		}
+		$this->sql = "SELECT $data FROM $table WHERE $match";
+		$this->query($this->sql);
+	}
+
+	//--------------------------
+	// 任意の条件を検索
+	//--------------------------
+	function select_column_a($data, $table, $match) {
+		$this->sql = "SELECT $data FROM $table WHERE $match";
 		$this->query($this->sql);
 	}
 
@@ -84,7 +100,23 @@ class GuestData extends MySQL {
 	// 制限つきカラム条件検索
 	//--------------------------
 	function select_column_l($data, $table, $column, $value, $limit_start, $limit) {
-		$this->sql = "SELECT $data FROM $table WHERE $column='$value' LIMIT $limit_start,$limit";
+		if(is_array($column) && is_array($value)) {
+			foreach($column as $key => $col) {
+				$match[] = $col."='".$value[$key]."'";
+			}
+			$match = implode(" AND ", $match);
+		} else {
+			$match = $column."='".$value."'";
+		}
+		$this->sql = "SELECT $data FROM $table WHERE $match LIMIT $limit_start,$limit";
+		$this->query($this->sql);
+	}
+
+	//--------------------------
+	// グループ化検索
+	//--------------------------
+	function select_group_by($data, $table, $where, $group, $having) {
+		$this->sql = "SELECT $data FROM $table $where GROUP BY $group $having";
 		$this->query($this->sql);
 	}
 
@@ -140,9 +172,13 @@ class GuestData extends MySQL {
 	//idの存在を確認
 	//--------------------------
 	function is_added($table, $s_id) {
-		$hidden_text = $this->hide_data($table);
-		$this->sql = "SELECT id FROM $table WHERE id='$s_id'".$hidden_text;
-		$this->query($this->sql);
+		if($table == "monster") {
+			$column = array("zone", "id");
+			$value = array(floor($s_id / 10000), $s_id % 10000);
+			$this->select_column("id", $table, $column, $value);
+		} else {
+			$this->select_id($table, $s_id);
+		}
 		$result = $this->rows();
 		$this->free();
 		return($result);
@@ -241,7 +277,13 @@ class GuestData extends MySQL {
 	function access_count($table, $id, $count) {
 		if($this->is_added($table, $id)) {
 			$count++;
-			$this->sql = "UPDATE $table SET count=$count WHERE id=$id";
+			if($table == "monster") {
+				$zone = floor($id / 10000);
+				$id = $id % 10000;
+				$this->sql = "update $table set count=$count where zone=$zone and id=$id";
+			} else {
+				$this->sql = "update $table set count=$count where id=$id";
+			}
 			$this->query($this->sql);
 			return($count);
 		} else {
