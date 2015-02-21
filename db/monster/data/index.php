@@ -91,7 +91,7 @@ $title = "モンスターデータ $m_name";
 <?php
 if($m_dropitem == "") {
 ?>
-<tr><td class="cnt"></td><td>不明</td></tr>
+<tr><td colspan="2">不明</td></tr>
 <?php
 } else if($m_dropitem == -1 || !isset($m_dropitem["list"][0])) {
 ?>
@@ -106,7 +106,7 @@ if($m_dropitem == "") {
 } else {
 	for($i = 0; isset($m_dropitem["list"][$i]); $i++) {
 		$trclass = isset($m_dropitem["head"][$i]) ? " class=\"rare\"" : "";
-		$frame = (isset($m_dropitem["head"][$i]) && $m_dropitem["head"][$i] == 2) ? "特殊枠".($i + 1) : "枠".($i + 1);
+		$frame = (isset($m_dropitem["head"][$i]) && $m_dropitem["head"][$i] == 2) ? "特殊".($i + 1) : "枠".($i + 1);
 ?>
 <tr><td class="cnt"><?=$frame?></td><td<?=$trclass?>>
 <?=$m_dropitem["list"][$i]?>
