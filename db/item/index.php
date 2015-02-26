@@ -91,6 +91,9 @@ if(device_info() == 'mb') {
 ?>
 <input type="submit" value="検索">
 </form>
+<ul id="linklist">
+<li><a href="/db/item/updinfo.php">更新履歴</a></li>
+</ul>
 <?php
 if(device_info() == 'mb') {
 ?>

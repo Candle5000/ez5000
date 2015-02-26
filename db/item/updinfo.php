@@ -49,12 +49,12 @@ if(isset($_GET["page"])) {
 $rows = $data->select_all_l("id,name,updated", "items", $page * $LIMIT, $LIMIT, "updated", "desc");
 
 if(($page > 0) && ($rows > 0)) {
-	$pagelink = "<a href=\"./search.php?page=".($page - 1)."\"".mbi_ack("*").">".mbi("*.")."前のページ</a> | ";
+	$pagelink = "<a href=\"./updinfo.php?page=".($page - 1)."\"".mbi_ack("*").">".mbi("*.")."前のページ</a> | ";
 } else {
 	$pagelink = mbi("*.")."前のページ | ";
 }
 if((($page + 1) * 50) < $rows) {
-	$pagelink .= "<a href=\"./search.php?page=".($page + 1)."\"".mbi_ack("#").">".mbi("#.")."次のページ</a>";
+	$pagelink .= "<a href=\"./updinfo.php?page=".($page + 1)."\"".mbi_ack("#").">".mbi("#.")."次のページ</a>";
 } else {
 	$pagelink .= mbi("#.")."次のページ";
 }
