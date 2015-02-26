@@ -21,7 +21,8 @@ class GuestData extends MySQL {
 	// 全件選択
 	//--------------------------
 	function select_all($table) {
-		$this->sql = "SELECT * FROM $table";
+		$hidden_text = ($table == "items" && $this->i_hidden) ? " WHERE hidden=0" : "";
+		$this->sql = "SELECT * FROM $table".$hidden_text;
 		$this->query($this->sql);
 		return($this->rows());
 	}
@@ -30,11 +31,12 @@ class GuestData extends MySQL {
 	// 全件から指定数取得
 	//--------------------------
 	function select_all_l($data, $table, $start, $limit, $key, $order) {
+		$hidden_text = ($table == "items" && $this->i_hidden) ? " WHERE hidden=0" : "";
 		$s_id = preg_match("/[A-Z]+/", $table) ? "lv" : "id";
-		$this->sql = "SELECT $s_id FROM $table";
+		$this->sql = "SELECT $s_id FROM $table".$hidden_text;
 		$this->query($this->sql);
 		$r = $this->rows();
-		$this->sql = "SELECT $data FROM $table ORDER BY $key $order LIMIT $start,$limit";
+		$this->sql = "SELECT $data FROM $table $hidden_text ORDER BY $key $order LIMIT $start,$limit";
 		$this->query($this->sql);
 		return($r);
 	}
