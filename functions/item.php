@@ -47,17 +47,23 @@ function item_category($id) {
 //----------------------------------------
 // アイテムグループ名
 //----------------------------------------
-function item_group($id) {
+function item_group() {
 	$xml = "/var/www/functions/xml/item_group.xml";
 	$categories = simplexml_load_file($xml);
 	foreach($categories->category as $category) {
 		foreach($category->group as $group) {
-			if($group["id"] == $id) {
+			if(func_num_args() == 1 && $group["id"] == func_get_arg(0)) {
 				return($group["name"]);
+			} else if(func_num_args() == 0) {
+				$groupList["{$group["id"]}"] = $group["name"];
 			}
 		}
 	}
-	return(-1);
+	if(isset($groupList)) {
+		return($groupList);
+	} else {
+		return(-1);
+	}
 }
 
 //----------------------------------------
