@@ -114,7 +114,7 @@ function monster_level($max, $min) {
 //----------------------------------------
 function monster_drop($drop) {
 	$drop = preg_split("/(\n|\r\n)/", $drop);
-	$i = 0;
+	$i = -1;
 	foreach($drop as $dropitem) {
 		if(preg_match("/##(x?[0-9]#)*x?[0-9]##/", $dropitem)) {
 			$head = explode("#", $dropitem);
@@ -125,12 +125,14 @@ function monster_drop($drop) {
 					$droplist["head"][$h] = 1;
 				}
 			}
+			$i++;
 		} else if($dropitem == "##") {
 			$i++;
 		} else {
 			$droplist["list"][$i][] = $dropitem;
 		}
 	}
+	if(isset($droplist["list"][-1])) $droplist["list"][-1] = implode("<br />\n", $droplist["list"][-1]);
 	for($i = 0; isset($droplist["list"][$i]); $i++) {
 		$droplist["list"][$i] = implode("<br />\n", $droplist["list"][$i]);
 	}
