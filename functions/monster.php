@@ -150,7 +150,7 @@ function monster_item($data, $id) {
 	} else {
 		$data->select_id("items", $id);
 		$item = $data->fetch();
-		return($data->rows() ? "<a href=\"{$item["id"]}\">{$item["name"]}</a>" : "ERROR:未登録ID");
+		return($data->rows() ? "<a href=\"/db/item/data/?id={$item["id"]}\">{$item["name"]}</a>" : "ERROR:未登録ID");
 	}
 }
 ?>
