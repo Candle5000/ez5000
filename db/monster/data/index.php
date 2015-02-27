@@ -54,8 +54,8 @@ if($data->rows()) {
 	$m_repop = ($monster["repop"] == "") ? "不明" : $data->data_link(nl2br($monster["repop"]));
 	$m_skill = ($monster["skill"] == "") ? "不明" : $data->data_link(nl2br($monster["skill"]));
 	$m_dropitem = ($monster["dropitem"] == "") ? "" : monster_drop($data->data_link($monster["dropitem"]));
-	$m_soul = monster_item($monster["soul"]);
-	$m_steal = monster_item($monster["steal"]);
+	$m_soul = monster_item($data, $monster["soul"]);
+	$m_steal = monster_item($data, $monster["steal"]);
 	$m_note = ($monster["note"] == "") ? "特になし" : $data->data_link(nl2br($monster["note"]));
 	$m_event = $monster["event"];
 	$m_updated = $monster["updated"];

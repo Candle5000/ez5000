@@ -142,7 +142,7 @@ function monster_drop($drop) {
 //----------------------------------------
 // スティール/ソウル
 //----------------------------------------
-function monster_item($id) {
+function monster_item($data, $id) {
 	if($id == -1) {
 		return("不明");
 	} else if($id == 0) {
