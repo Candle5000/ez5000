@@ -17,9 +17,11 @@
 	<part part="textarea" name="new_repop" cols="48" rows="2" br="1" />
 	<part head="最大出現数" part="input" type="text" name="new_maxpop" value="-1" size="4" br="1" />
 	<part part="text" head="使用スキル" br="1" />
-	<part part="textarea" name="new_skill" cols="48" rows="2" br="1" />
+	<part part="textarea" name="new_skill" cols="48" rows="4" br="1" />
 	<part part="text" head="ドロップアイテム" br="1" />
-	<part part="textarea" name="new_dropitem" cols="48" rows="2" br="1" />
+	<part part="textarea" name="new_dropitem" cols="48" rows="6" br="1" />
+	<part head="ソウル" part="input" type="text" name="new_soul" value="-1" size="3" />
+	<part head="スティール" part="input" type="text" name="new_steal" value="-1" size="3" br="1" />
 	<part part="text" head="備考" br="1" />
 	<part part="textarea" name="new_note" cols="48" rows="2" br="1" />
 	<part part="input" type="checkbox" name="new_event" value="1" tail="イベント" />
