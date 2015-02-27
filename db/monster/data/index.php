@@ -93,14 +93,14 @@ if($m_dropitem == "") {
 ?>
 <tr><td colspan="2">不明</td></tr>
 <?php
-} else if($m_dropitem == -1 || !isset($m_dropitem["list"][0])) {
+} else if($m_dropitem == -1 || (!isset($m_dropitem["list"][-1]) && !isset($m_dropitem["list"][0]))) {
 ?>
 <tr><td class="cnt"></td><td>ERROR:データ読込に失敗</td></tr>
 <?php
-} else if(count($m_dropitem["list"]) == 1) {
+} else if(count($m_dropitem["list"]) == 1 && isset($m_dropitem["list"][-1])) {
 ?>
 <tr><td class="cnt">枠不明</td><td>
-<?=$m_dropitem["list"][0]?>
+<?=$m_dropitem["list"][-1]?>
 </td></tr>
 <?php
 } else {
