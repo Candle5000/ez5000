@@ -22,9 +22,11 @@ function xml_monster_form_upd($row) {
 	<part part="textarea" name="repop[{$row["id"]}]" value="{$row["repop"]}" cols="48" rows="2" br="1" />
 	<part head="最大出現数" part="input" type="text" name="maxpop[{$row["id"]}]" value="{$row["maxpop"]}" size="4" br="1" />
 	<part part="text" head="使用スキル" br="1" />
-	<part part="textarea" name="skill[{$row["id"]}]" value="{$row["skill"]}" cols="48" rows="2" br="1" />
+	<part part="textarea" name="skill[{$row["id"]}]" value="{$row["skill"]}" cols="48" rows="4" br="1" />
 	<part part="text" head="ドロップアイテム" br="1" />
-	<part part="textarea" name="dropitem[{$row["id"]}]" value="{$row["dropitem"]}" cols="48" rows="2" br="1" />
+	<part part="textarea" name="dropitem[{$row["id"]}]" value="{$row["dropitem"]}" cols="48" rows="6" br="1" />
+	<part head="ソウル" part="input" type="text" name="soul[{$row["id"]}]" value="{$row["soul"]}" size="5" />
+	<part head="スティール" part="input" type="text" name="steal[{$row["id"]}]" value="{$row["steal"]}" size="5" br="1" />
 	<part part="text" head="備考" br="1" />
 	<part part="textarea" name="note[{$row["id"]}]" value="{$row["note"]}" cols="48" rows="2" br="1" />
 	<part part="input" type="checkbox" name="event[{$row["id"]}]" value="1" checked="{$row["event"]}" tail="イベント" />
