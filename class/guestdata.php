@@ -201,11 +201,13 @@ class GuestData extends MySQL {
 	// データリンク変換
 	//----------------------------------------
 	function data_link($str) {
-		$pattern = "/##([cis][0-9]+[^0-9#]*)##/";
+		$pattern = "/##([cims][0-9]+[^0-9#]*)##/";
 		while(preg_match($pattern, $str, $match)) {
-			preg_match("/([cis])/", $match[1], $tbl);
+			preg_match("/([cims])/", $match[1], $tbl);
 			preg_match("/([0-9]+)/", $match[1], $id);
-			$name_str = preg_replace("/[cis0-9#]+/", "", $match[1]);
+			$name_str = preg_replace("/[cims0-9#]+/", "", $match[1]);
+			$col = "id";
+			$val = $id[1];
 			switch($tbl[1]) {
 				case 'c':
 					$table = "class";
@@ -214,6 +216,12 @@ class GuestData extends MySQL {
 				case 'i':
 					$table = "items";
 					$link_name = "item";
+					break;
+				case 'm':
+					$table = "monster";
+					$link_name = "monster";
+					$col = array("zone", "id");
+					$val = array(floor($id[1] / 10000), $id[1] % 10000);
 					break;
 				case 's':
 					$table = "skill";
@@ -224,7 +232,7 @@ class GuestData extends MySQL {
 				$link_text = $name_str;
 				$replace_pattern = "/##".$tbl[1].$id[1].$name_str."##/";
 			} else {
-				$this->select_column("name", $table, "id", $id[1]);
+				$this->select_column("name", $table, $col, $val);
 				$row = $this->fetch();
 				$link_text = $row["name"];
 				$replace_pattern = "/##".$tbl[1].$id[1]."##/";
