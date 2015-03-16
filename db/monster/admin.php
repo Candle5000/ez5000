@@ -108,7 +108,7 @@ if(!isset($_SESSION["user"]) || !isset($_SESSION["pass"])) {
 	$data->select_all($zone);
 	$part = array('part' => 'select', 'name' => 'group', 'selected' => $zone_id);
 	while($row = $data->fetch()) {
-		$part["option"]["{$row["id"]}"] = $row["name"];
+		$part["option"]["{$row["id"]}"] = str_pad($row["id"], 3, "0", STR_PAD_LEFT).":".$row["name"];
 	}
 ?>
 <h3>* * Monster List * *</h3>
