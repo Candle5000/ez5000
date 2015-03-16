@@ -45,7 +45,7 @@ if(isset($_GET["page"])) {
 	$page = 0;
 }
 
-$rows = $data->select_all_l("zone,id,name,updated", "monster", $page * $LIMIT, $LIMIT, "updated", "desc");
+$rows = $data->select_all_l("zone,id,name,nm,updated", "monster", $page * $LIMIT, $LIMIT, "updated", "desc");
 
 if(($page > 0) && ($rows > 0)) {
 	$pagelink = "<a href=\"./updinfo.php?page=".($page - 1)."\"".mbi_ack("*").">".mbi("*.")."前のページ</a> | ";
@@ -68,13 +68,25 @@ if((($page + 1) * 50) < $rows) {
 <hr class="normal">
 <div class="cnt"><?=$pagelink?></div>
 <hr class="normal">
-<ul id="linklist">
 <?php
 if($rows > 0) {
+	$upd = 0;
 	while($row = $data->fetch()) {
 		$id = $row["zone"].str_pad($row["id"], 4, "0", STR_PAD_LEFT);
 		$name = $row["name"];
-		$upd = $row["updated"];
+		if($row["nm"]) $name = '<span class="nm">'.$name.'</span>';
+		if($updflag = ($upd != $row["updated"])) {
+			if($upd != 0) {
+?>
+</ul>
+<?php
+			}
+			$upd = $row["updated"];
+?>
+<h2><?=$upd?></h2>
+<ul id="linklist">
+<?php
+		}
 ?>
 <li><?=$upd?> <a href="/db/monster/data/?id=<?=$id?>"><?=$name?></a></li>
 <?php

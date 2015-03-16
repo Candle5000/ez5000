@@ -69,16 +69,27 @@ if((($page + 1) * 50) < $rows) {
 <hr class="normal">
 <div class="cnt"><?=$pagelink?></div>
 <hr class="normal">
-<ul id="linklist">
 <?php
 if($rows > 0) {
+	$upd = 0;
 	while($row = $data->fetch()) {
 		$id = $row["id"];
 		$groupName = $group[item_group_id($id)];
 		$name = $row["name"];
-		$upd = $row["updated"];
+		if($updflag = ($upd != $row["updated"])) {
+			if($upd != 0) {
 ?>
-<li><?=$upd?> <a href="/db/item/data/?id=<?=$id?>"><?=$name?></a>(<?=$groupName?>)</li>
+</ul>
+<?php
+			}
+			$upd = $row["updated"];
+?>
+<h2><?=$upd?></h2>
+<ul id="linklist">
+<?php
+		}
+?>
+<li><a href="/db/item/data/?id=<?=$id?>"><?=$name?></a>(<?=$groupName?>)</li>
 <?php
 	}
 }
