@@ -88,7 +88,7 @@ if($rows > 0) {
 <?php
 		}
 ?>
-<li><?=$upd?> <a href="/db/monster/data/?id=<?=$id?>"><?=$name?></a></li>
+<li><a href="/db/monster/data/?id=<?=$id?>"><?=$name?></a></li>
 <?php
 	}
 }
