@@ -232,9 +232,10 @@ class GuestData extends MySQL {
 				$link_text = $name_str;
 				$replace_pattern = "/##".$tbl[1].$id[1].$name_str."##/";
 			} else {
-				$this->select_column("name", $table, $col, $val);
+				$s_data = ($table != "monster") ? "name" : "name,nm";
+				$this->select_column($s_data, $table, $col, $val);
 				$row = $this->fetch();
-				$link_text = $row["name"];
+				$link_text = ($table == "monster" && $row["nm"] == 1) ? "<span class=\"nm\">".$row["name"]."</span>" : $row["name"];
 				$replace_pattern = "/##".$tbl[1].$id[1]."##/";
 			}
 			$replacement = '<a href="/db/'.$link_name.'/data/?id='.$id[1].'">'.$link_text.'</a>';
