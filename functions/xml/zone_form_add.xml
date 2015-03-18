@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form>
+	<part head="ID" part="input" type="text" name="new_id" value="" size="4" />
+	<part head="NAME" part="input" type="text" name="new_name" value="" size="20" br="1" />
+	<part head="E_NAME" part="input" type="text" name="new_nameE" value="" size="20" />
+	<part head="S_NAME" part="input" type="text" name="new_nameS" value="" size="10" br="1" />
+	<part part="input" type="checkbox" name="new_event" value="1" tail="イベント" br="1" />
+	<part part="input" type="submit" name="submit_add" value="追加" />
+</form>
