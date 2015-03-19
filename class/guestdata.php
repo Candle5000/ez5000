@@ -99,6 +99,20 @@ class GuestData extends MySQL {
 	}
 
 	//--------------------------
+	// 任意の条件を検索Plus
+	//--------------------------
+	function select_column_p($data, $table, $match, $start, $limit, $order) {
+		$t = preg_replace("/,.+/", "", $table);
+		$this->sql = "SELECT $t.id FROM $table WHERE $match";
+		$this->query($this->sql);
+		$count = $this->rows();
+		$l = ($limit > 0) ? "LIMIT $start,$limit" : "";
+		$this->sql = "SELECT $data FROM $table WHERE $match ORDER BY $order $l";
+		$this->query($this->sql);
+		return($count);
+	}
+
+	//--------------------------
 	// 制限つきカラム条件検索
 	//--------------------------
 	function select_column_l($data, $table, $column, $value, $limit_start, $limit) {
