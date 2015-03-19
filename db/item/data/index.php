@@ -39,39 +39,39 @@ if($data->is_added("items", $id)) {
 
 	$i = 0;
 	//ドロップ
-	$data->select_column_a("zone,id,name,nm", "monster", "dropitem like '%##i$id##%' and event=0");
+	$data->select_column_a("zone,monster.id,monster.name,nm,nameS", "zone,monster", "dropitem like '%##i$id##%' and monster.event=0 and zone.id=zone");
 	if($data->rows()) {
 		$i_get[$i]["label"] = "ﾄﾞﾛｯﾌﾟ";
 		while($monster = $data->fetch()) {
 			$m_id = $monster["zone"] * 10000 + $monster["id"];
 			$m_name = $monster["nm"] ? "<span class=\"nm\">".$monster["name"]."</span>" : $monster["name"];
-			$m_drop[] = "・<a href=\"/db/monster/data/?id=$m_id\">$m_name</a>";
+			$m_drop[] = "<a href=\"/db/monster/data/?id=$m_id\">$m_name@{$monster["nameS"]}</a>";
 		}
 		$i_get[$i]["data"] = implode("<br />\n", $m_drop);
 		$i++;
 	}
 
 	//ソウル
-	$data->select_column_a("zone,id,name,nm", "monster", "soul=$id and event=0");
+	$data->select_column_a("zone,monster.id,monster.name,nm,nameS", "zone,monster", "soul=$id and monster.event=0 and zone.id=zone");
 	if($data->rows()) {
 		$i_get[$i]["label"] = "捕獲";
 		while($monster = $data->fetch()) {
 			$m_id = $monster["zone"] * 10000 + $monster["id"];
 			$m_name = $monster["nm"] ? "<span class=\"nm\">".$monster["name"]."</span>" : $monster["name"];
-			$m_soul[] = "・<a href=\"/db/monster/data/?id=$m_id\">$m_name</a>";
+			$m_soul[] = "<a href=\"/db/monster/data/?id=$m_id\">$m_name@{$monster["nameS"]}</a>";
 		}
 		$i_get[$i]["data"] = implode("<br />\n", $m_soul);
 		$i++;
 	}
 
 	//スティール
-	$data->select_column_a("zone,id,name,nm", "monster", "steal=$id and event=0");
+	$data->select_column_a("zone,monster.id,monster.name,nm,nameS", "zone,monster", "steal=$id and monster.event=0 and zone.id=zone");
 	if($data->rows()) {
 		$i_get[$i]["label"] = "ｽﾃｨｰﾙ";
 		while($monster = $data->fetch()) {
 			$m_id = $monster["zone"] * 10000 + $monster["id"];
 			$m_name = $monster["nm"] ? "<span class=\"nm\">".$monster["name"]."</span>" : $monster["name"];
-			$m_steal[] = "・<a href=\"/db/monster/data/?id=$m_id\">$m_name</a>";
+			$m_steal[] = "<a href=\"/db/monster/data/?id=$m_id\">$m_name@{$monster["nameS"]}</a>";
 		}
 		$i_get[$i]["data"] = implode("<br />\n", $m_steal);
 		$i++;
@@ -81,39 +81,39 @@ if($data->is_added("items", $id)) {
 		//イベント限定入手
 
 		//ドロップ
-		$data->select_column_a("zone,id,name,nm", "monster", "dropitem like '%##i$id##%' and event=1");
+		$data->select_column_a("zone,monster.id,monster.name,nm,nameS", "zone,monster", "dropitem like '%##i$id##%' and monster.event=1 and zone.id=zone");
 		if($data->rows()) {
 			$i_get[$i]["label"] = "ﾄﾞﾛｯﾌﾟ";
 			while($monster = $data->fetch()) {
 				$m_id = $monster["zone"] * 10000 + $monster["id"];
 				$m_name = $monster["nm"] ? "<span class=\"nm\">".$monster["name"]."</span>" : $monster["name"];
-				$m_drop[] = "・<a href=\"/db/monster/data/?id=$m_id\">$m_name</a>";
+			$m_drop[] = "<a href=\"/db/monster/data/?id=$m_id\">$m_name@{$monster["nameS"]}</a>";
 			}
 			$i_get[$i]["data"] = implode("<br />\n", $m_drop);
 			$i++;
 		}
 
 		//ソウル
-		$data->select_column_a("zone,id,name,nm", "monster", "soul=$id and event=1");
+		$data->select_column_a("zone,monster.id,monster.name,nm,nameS", "zone,monster", "soul=$id and monster.event=1 and zone.id=zone");
 		if($data->rows()) {
 			$i_get[$i]["label"] = "捕獲";
 			while($monster = $data->fetch()) {
 				$m_id = $monster["zone"] * 10000 + $monster["id"];
 				$m_name = $monster["nm"] ? "<span class=\"nm\">".$monster["name"]."</span>" : $monster["name"];
-				$m_soul[] = "・<a href=\"/db/monster/data/?id=$m_id\">$m_name</a>";
+				$m_soul[] = "<a href=\"/db/monster/data/?id=$m_id\">$m_name@{$monster["nameS"]}</a>";
 			}
 			$i_get[$i]["data"] = implode("<br />\n", $m_soul);
 			$i++;
 		}
 
 		//スティール
-		$data->select_column_a("zone,id,name,nm", "monster", "steal=$id and event=1");
+		$data->select_column_a("zone,monster.id,monster.name,nm,nameS", "zone,monster", "steal=$id and monster.event=0 and zone.id=zone");
 		if($data->rows()) {
 			$i_get[$i]["label"] = "ｽﾃｨｰﾙ";
 			while($monster = $data->fetch()) {
 				$m_id = $monster["zone"] * 10000 + $monster["id"];
 				$m_name = $monster["nm"] ? "<span class=\"nm\">".$monster["name"]."</span>" : $monster["name"];
-				$m_steal[] = "・<a href=\"/db/monster/data/?id=$m_id\">$m_name</a>";
+				$m_steal[] = "<a href=\"/db/monster/data/?id=$m_id\">$m_name@{$monster["nameS"]}</a>";
 			}
 			$i_get[$i]["data"] = implode("<br />\n", $m_steal);
 			$i++;
