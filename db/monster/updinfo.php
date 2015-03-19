@@ -45,7 +45,7 @@ if(isset($_GET["page"])) {
 	$page = 0;
 }
 
-$rows = $data->select_all_l("zone,id,name,nm,updated", "monster", $page * $LIMIT, $LIMIT, "updated", "desc");
+$rows = $data->select_column_p("zone,monster.id,monster.name,nm,nameS,monster.updated", "zone,monster", "zone.id=zone", $page * $LIMIT, $LIMIT, "monster.updated desc,zone,monster.id");
 
 if(($page > 0) && ($rows > 0)) {
 	$pagelink = "<a href=\"./updinfo.php?page=".($page - 1)."\"".mbi_ack("*").">".mbi("*.")."前のページ</a> | ";
@@ -88,7 +88,7 @@ if($rows > 0) {
 <?php
 		}
 ?>
-<li><a href="/db/monster/data/?id=<?=$id?>"><?=$name?></a></li>
+<li><a href="/db/monster/data/?id=<?=$id?>"><?=$name?>@<?=$row["nameS"]?></a></li>
 <?php
 	}
 }

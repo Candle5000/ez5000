@@ -74,14 +74,14 @@ if($id != -1) {
 		foreach($categories as $category) {
 			$column = array("category", "event");
 			$value = array($category, $i);
-			$data->select_column("zone,id,name,nm", "monster", $column, $value);
+			$data->select_column_p("zone,monster.id,monster.name,nm,nameS", "zone,monster", "category=$category and monster.event=$i and zone.id=zone", 0, 0, "zone,monster.id");
 			while($row = $data->fetch()) {
 				$flag = 1;
 				$id = $row["zone"].str_pad($row["id"], 4, "0", STR_PAD_LEFT);
 				$name = $row["name"];
 				if($row["nm"]) $name = '<span class="nm">'.$name.'</span>';
 ?>
-<li><a href="/db/monster/data/?id=<?=$id?>"><?=$name?></a></li>
+<li><a href="/db/monster/data/?id=<?=$id?>"><?=$name?>@<?=$row["nameS"]?></a></li>
 <?php
 			}
 		}
