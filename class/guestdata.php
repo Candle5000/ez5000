@@ -46,38 +46,16 @@ class GuestData extends MySQL {
 	}
 	
 	//--------------------------
-	//範囲指定id検索
-	//--------------------------
-	function select_group($data, $table, $start, $end) {
-		$s_id = preg_match("/[A-Z]+/", $table) ? "lv" : "id";
-		$this->sql = "SELECT $data FROM $table WHERE $s_id BETWEEN '$start' AND '$end' ORDER BY $s_id";
-		$this->query($this->sql);
-	}
-	
-	//--------------------------
-	//制限つき範囲指定id検索
-	//--------------------------
-	function select_group_l($data, $table, $start, $end, $limit_start, $limit) {
-		if(preg_match("/[A-Z]+/", $table)) {
-			$s_id = "lv";
-		} else {
-			$s_id = "id";
-		}
-		$this->sql = "SELECT $data FROM $table WHERE $s_id BETWEEN '$start' AND '$end' ORDER BY $s_id LIMIT $limit_start,$limit";
-		$this->query($this->sql);
-	}
-	
-	//--------------------------
 	// 任意のカラム条件を検索
 	//--------------------------
 	function select_column($data, $table, $column, $value) {
 		if(is_array($column) && is_array($value)) {
 			foreach($column as $key => $col) {
-				$match[] = $col."='".$value[$key]."'";
+				$match[] = preg_match("/^BETWEEN [0-9]+ AND [0-9]+/", $value[$key]) ? $col." ".$value[$key] : $col."='".$value[$key]."'";
 			}
 			$match = implode(" AND ", $match);
 		} else {
-			$match = $column."='".$value."'";
+			$match = preg_match("/^BETWEEN [0-9]+ AND [0-9]+/", $value) ? $column." ".$value : $column."='".$value."'";
 		}
 		$this->sql = "SELECT $data FROM $table WHERE $match";
 		$this->query($this->sql);
@@ -96,7 +74,8 @@ class GuestData extends MySQL {
 	//--------------------------
 	function select_column_p($data, $table, $match, $start, $limit, $order) {
 		$t = preg_replace("/,.+/", "", $table);
-		$this->sql = "SELECT $t.id FROM $table WHERE $match";
+		$id = preg_match("/[A-Z]{3}/", $t) ? "lv" : "id";
+		$this->sql = "SELECT $t.$id FROM $table WHERE $match";
 		$this->query($this->sql);
 		$count = $this->rows();
 		$l = ($limit > 0) ? "LIMIT $start,$limit" : "";

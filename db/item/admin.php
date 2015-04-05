@@ -71,8 +71,8 @@ if(isset($_SERVER["REQUEST_METHOD"]) == "POST") {
 	//グループの選択
 	if(isset($_POST["group"])) $group_id = $_POST["group"];
 	if(isset($data)) {
-		$data->select_group("id", $table, $group_id, item_group_end($group_id));
-		$count = $data->rows();	
+		$data->select_column("id", $table, "id", "BETWEEN $group_id AND ".item_group_end($group_id));
+		$count = $data->rows();
 	}
 
 	//ページの選択
@@ -115,7 +115,7 @@ if(!isset($_SESSION["user"]) || !isset($_SESSION["pass"])) {
 <?=$form->build_select_page($count, $PAGESIZE, $page)?>
 <hr>
 <?php
-	$data->select_group_l("*", $table, $group_id, item_group_end($group_id), $page, $PAGESIZE);
+	$data->select_column_p("*", $table, "id BETWEEN $group_id AND ".item_group_end($group_id), $page, $PAGESIZE, "id");
 	while($row = $data->fetch()){
 ?>
 <hr>

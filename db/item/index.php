@@ -46,7 +46,7 @@ if(item_group($id) != -1) {
 <h2><?=item_category(item_category_id($id))?> <?=item_group($id)?></h2>
 <ul id="linklist">
 <?php
-	$data->select_group("id,name", "items", $id+1, item_group_end($id));
+	$data->select_column("id,name", "items", "id", "BETWEEN ".($id + 1)." AND ".item_group_end($id));
 	while($row = $data->fetch()){
 		$id = $row["id"];
 		$name = $row["name"];
