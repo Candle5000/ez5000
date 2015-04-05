@@ -20,7 +20,7 @@ if($fp_user = fopen($user_file, "r")) {
 } else {
 	die("接続設定の読み込みに失敗しました");
 }
-$data = new GuestData($userName, $password, $database, 0);
+$data = new GuestData($userName, $password, $database);
 
 $title = "クラスデータ ";
 if($data->is_added("class", $id)) {
@@ -67,7 +67,7 @@ if(isset($class)) {
 	} else {
 		$classtype = "上級ｸﾗｽ";
 		$classid = $id * 2;
-		$data->select_group("id,name", "class", ($classid - 1), $classid);
+		$data->select_column("id,name", "class", "id", "BETWEEN ".($classid - 1)." AND $classid");
 		$c1 = $data->fetch();
 		$c2 = $data->fetch();
 		$classlist = "<a href=\"./?id=".$c1["id"]."\">".$c1["name"]."</a><br />\n<a href=\"./?id=".$c2["id"]."\">".$c2["name"]."</a>";
@@ -89,7 +89,7 @@ if(isset($class)) {
 <tr><th colspan="9">ステータス</td></tr>
 <tr class="small"><td>Lv</td><td width="14%">HP</td><td width="14%">SP</td><td width="11%">STR</td><td width="11%">VIT</td><td width="11%">DEX</td><td width="11%">AGI</td><td width="11%">WIS</td><td width="11%">WIL</td></tr>
 <?php
-$data->select_group("*", $nameS, 1, $MAX_Lv);
+$data->select_column("*", $nameS, "lv", "BETWEEN 1 AND $MAX_Lv");
 while($st = $data->fetch()) {
 	if(($st["lv"] % 5 == 0) || ($st["lv"] == 1)) {
 		echo "<tr><td>".$st["lv"]."</td><td>".$st["hp"]."</td><td>".$st["sp"]."</td><td>".$st["str"]."</td><td>".$st["vit"]."</td><td>".$st["dex"]."</td><td>".$st["agi"]."</td><td>".$st["wis"]."</td><td>".$st["wil"]."</td></tr>";

@@ -11,19 +11,6 @@ require_once("/var/www/functions/item.php");
 $PAGE_ID = 20020;
 $LIMIT = 50;
 $group = item_group();
-
-$hidden = 1;
-if(isset($_GET['hidden'])) {
-	if($_GET['hidden'] == 0) {
-		setcookie("hidden", 0, time() + 86400);
-	} else {
-		setcookie("hidden", 0, time() - 3600);
-	}
-}
-if(isset($_COOKIE['hidden'])) {
-	$hidden = $_COOKIE['hidden'];
-}
-
 $title = "アイテムデータ更新履歴";
 
 $user_file = "/etc/mysql-user/user5000.ini";
@@ -34,7 +21,7 @@ if($fp_user = fopen($user_file, "r")) {
 } else {
 	die("接続設定の読み込みに失敗しました");
 }
-$data = new GuestData($userName, $password, $database, $hidden);
+$data = new GuestData($userName, $password, $database);
 
 if(isset($_GET["page"])) {
 	if(preg_match("/[^0-9]/", $_GET["page"])) {
@@ -46,7 +33,7 @@ if(isset($_GET["page"])) {
 	$page = 0;
 }
 
-$rows = $data->select_all_l("id,name,updated", "items", $page * $LIMIT, $LIMIT, "updated", "desc");
+$rows = $data->select_all_l("id,name,updated,hidden", "items", $page * $LIMIT, $LIMIT, "updated", "desc");
 
 if(($page > 0) && ($rows > 0)) {
 	$pagelink = "<a href=\"./updinfo.php?page=".($page - 1)."\"".mbi_ack("*").">".mbi("*.")."前のページ</a> | ";
@@ -75,7 +62,7 @@ if($rows > 0) {
 	while($row = $data->fetch()) {
 		$id = $row["id"];
 		$groupName = $group[item_group_id($id)];
-		$name = $row["name"];
+		$name = $row["hidden"] ? "<span class=\"nm\">".$row["name"]."</span>" : $row["name"];
 		if($updflag = ($upd != $row["updated"])) {
 			if($upd != 0) {
 ?>

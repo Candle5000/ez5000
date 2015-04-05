@@ -13,18 +13,6 @@ if(isset($_GET['id'])) {
 	$id = $_GET['id'];
 }
 
-$hidden = 1;
-if(isset($_GET['hidden'])) {
-	if($_GET['hidden'] == 0) {
-		setcookie("hidden", 0, time() + 86400);
-	} else {
-		setcookie("hidden", 0, time() - 3600);
-	}
-}
-if(isset($_COOKIE['hidden'])) {
-	$hidden = $_COOKIE['hidden'];
-}
-
 if(item_group($id) != -1) {
 	$title = "アイテムデータ ".item_category(item_category_id($id))." ".item_group($id);
 	$PAGE_ID = 20000 + (int)($id / 10);
@@ -41,7 +29,7 @@ if($fp_user = fopen($user_file, "r")) {
 } else {
 	die("接続設定の読み込みに失敗しました");
 }
-$data = new GuestData($userName, $password, $database, $hidden);
+$data = new GuestData($userName, $password, $database);
 ?>
 <html>
 <head>
@@ -58,12 +46,30 @@ if(item_group($id) != -1) {
 <h2><?=item_category(item_category_id($id))?> <?=item_group($id)?></h2>
 <ul id="linklist">
 <?php
-	$data->select_group("id,name", "items", $id+1, item_group_end($id));
+	$data->select_column("id,name", "items", array("id", "hidden"), array("BETWEEN ".($id + 1)." AND ".item_group_end($id), "0"));
 	while($row = $data->fetch()){
-		$id = $row["id"];
-		$name = $row["name"];
+		$i_id = $row["id"];
+		$i_name = $row["name"];
 ?>
-<li><a href="/db/item/data/?id=<?=$id?>"><?=$name?></a></li>
+<li><a href="/db/item/data/?id=<?=$i_id?>"><?=$i_name?></a></li>
+<?php
+	}
+?>
+</ul>
+<h2>未実装</h2>
+<ul id="linklist">
+<?php
+	$data->select_column("id,name", "items", array("id", "hidden"), array("BETWEEN ".($id + 1)." AND ".item_group_end($id), "1"));
+	while($row = $data->fetch()){
+		$i_id = $row["id"];
+		$i_name = $row["name"];
+?>
+<li><a href="/db/item/data/?id=<?=$i_id?>"><span class="nm"><?=$i_name?></span></a></li>
+<?php
+	}
+	if($data->rows() == 0) {
+?>
+<li>特に無し</li>
 <?php
 	}
 ?>
