@@ -7,22 +7,19 @@ class GuestData extends MySQL {
 	//--------------------------
 	//変数の宣言
 	//--------------------------
-	public $i_hidden;
 	
 	//--------------------------
 	//コンストラクタ
 	//--------------------------
 	function GuestData($userName, $password, $database, $hidden) {
 		parent::MySQL($userName, $password, $database);
-		$this->i_hidden = $hidden;
 	}
 	
 	//--------------------------
 	// 全件選択
 	//--------------------------
 	function select_all($table) {
-		$hidden_text = ($table == "items" && $this->i_hidden) ? " WHERE hidden=0" : "";
-		$this->sql = "SELECT * FROM $table".$hidden_text;
+		$this->sql = "SELECT * FROM $table";
 		$this->query($this->sql);
 		return($this->rows());
 	}
@@ -31,12 +28,11 @@ class GuestData extends MySQL {
 	// 全件から指定数取得
 	//--------------------------
 	function select_all_l($data, $table, $start, $limit, $key, $order) {
-		$hidden_text = ($table == "items" && $this->i_hidden) ? " WHERE hidden=0" : "";
 		$s_id = preg_match("/[A-Z]+/", $table) ? "lv" : "id";
-		$this->sql = "SELECT $s_id FROM $table".$hidden_text;
+		$this->sql = "SELECT $s_id FROM $table";
 		$this->query($this->sql);
 		$r = $this->rows();
-		$this->sql = "SELECT $data FROM $table $hidden_text ORDER BY $key $order LIMIT $start,$limit";
+		$this->sql = "SELECT $data FROM $table ORDER BY $key $order LIMIT $start,$limit";
 		$this->query($this->sql);
 		return($r);
 	}
@@ -45,8 +41,7 @@ class GuestData extends MySQL {
 	//id検索
 	//--------------------------
 	function select_id($table, $s_id) {
-		$hidden_text = $this->hide_data($table);
-		$this->sql = "SELECT * FROM $table WHERE id='$s_id'".$hidden_text;
+		$this->sql = "SELECT * FROM $table WHERE id='$s_id'";
 		$this->query($this->sql);
 	}
 	
@@ -54,9 +49,8 @@ class GuestData extends MySQL {
 	//範囲指定id検索
 	//--------------------------
 	function select_group($data, $table, $start, $end) {
-		$hidden_text = $this->hide_data($table);
 		$s_id = preg_match("/[A-Z]+/", $table) ? "lv" : "id";
-		$this->sql = "SELECT $data FROM $table WHERE $s_id BETWEEN '$start' AND '$end'".$hidden_text." ORDER BY $s_id";
+		$this->sql = "SELECT $data FROM $table WHERE $s_id BETWEEN '$start' AND '$end' ORDER BY $s_id";
 		$this->query($this->sql);
 	}
 	
@@ -64,13 +58,12 @@ class GuestData extends MySQL {
 	//制限つき範囲指定id検索
 	//--------------------------
 	function select_group_l($data, $table, $start, $end, $limit_start, $limit) {
-		$hidden_text = $this->hide_data($table);
 		if(preg_match("/[A-Z]+/", $table)) {
 			$s_id = "lv";
 		} else {
 			$s_id = "id";
 		}
-		$this->sql = "SELECT $data FROM $table WHERE $s_id BETWEEN '$start' AND '$end'".$hidden_text." ORDER BY $s_id LIMIT $limit_start,$limit";
+		$this->sql = "SELECT $data FROM $table WHERE $s_id BETWEEN '$start' AND '$end' ORDER BY $s_id LIMIT $limit_start,$limit";
 		$this->query($this->sql);
 	}
 	
@@ -176,7 +169,7 @@ class GuestData extends MySQL {
 			$this->sql = "SELECT id FROM ".$table." WHERE (".implode(") ".$mode." (",$tmp0).")".$this->hide_data($table);
 			$this->query($this->sql);
 			$count = $this->rows();
-			$this->sql = "SELECT id,name FROM ".$table." WHERE ((".implode(") ".$mode." (",$tmp0)."))".$this->hide_data($table)." ORDER BY id LIMIT ".$start.", 50";
+			$this->sql = "SELECT id,name FROM ".$table." WHERE (".implode(") ".$mode." (",$tmp0).") ORDER BY id LIMIT ".$start.", 50";
 			$this->query($this->sql);
 			return($count);
 		} else {
@@ -198,17 +191,6 @@ class GuestData extends MySQL {
 		$result = $this->rows();
 		$this->free();
 		return($result);
-	}
-	
-	//--------------------------
-	//未実装データを隠す
-	//--------------------------
-	function hide_data($table) {
-		if($table == "items" && $this->i_hidden) {
-			return(" AND hidden='0'");
-		} else {
-			return("");
-		}
 	}
 	
 	//----------------------------------------
