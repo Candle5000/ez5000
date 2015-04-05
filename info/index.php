@@ -32,7 +32,7 @@ if(isset($_GET["page"])) {
 	$page = 0;
 }
 
-$data = new GuestData($userName, $password, $database, 0);
+$data = new GuestData($userName, $password, $database);
 $rows = $data->select_all_l("*", "info", ($page * $PAGESIZE), $PAGESIZE, "id", "desc");
 
 if(($page > 0) && ($rows > 0)) {

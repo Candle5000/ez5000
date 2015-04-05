@@ -20,7 +20,7 @@ if($fp_user = fopen($user_file, "r")) {
 } else {
 	die("接続設定の読み込みに失敗しました");
 }
-$data = new GuestData($userName, $password, $database, 0);
+$data = new GuestData($userName, $password, $database);
 
 $title = "クラスデータ ";
 if($data->is_added("class", $id)) {

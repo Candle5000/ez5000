@@ -9,19 +9,6 @@ require_once("/var/www/functions/form.php");
 require_once("/var/www/functions/item.php");
 
 $PAGE_ID = 20010;
-
-$hidden = 1;
-if(isset($_GET['hidden'])) {
-	if($_GET['hidden'] == 0) {
-		setcookie("hidden", 0, time() + 86400);
-	} else {
-		setcookie("hidden", 0, time() - 3600);
-	}
-}
-if(isset($_COOKIE['hidden'])) {
-	$hidden = $_COOKIE['hidden'];
-}
-
 $title = "アイテム検索";
 
 $user_file = "/etc/mysql-user/user5000.ini";
@@ -32,7 +19,7 @@ if($fp_user = fopen($user_file, "r")) {
 } else {
 	die("接続設定の読み込みに失敗しました");
 }
-$data = new GuestData($userName, $password, $database, $hidden);
+$data = new GuestData($userName, $password, $database);
 
 if(isset($_GET["mode"])) {
 	if($_GET["mode"] == "OR") {

@@ -13,18 +13,6 @@ if(isset($_GET['id'])) {
 	$id = $_GET['id'];
 }
 
-$hidden = 1;
-if(isset($_GET['hidden'])) {
-	if($_GET['hidden'] == 0) {
-		setcookie("hidden", 0, time() + 86400);
-	} else {
-		setcookie("hidden", 0, time() - 3600);
-	}
-}
-if(isset($_COOKIE['hidden'])) {
-	$hidden = $_COOKIE['hidden'];
-}
-
 if(item_group($id) != -1) {
 	$title = "アイテムデータ ".item_category(item_category_id($id))." ".item_group($id);
 	$PAGE_ID = 20000 + (int)($id / 10);
@@ -41,7 +29,7 @@ if($fp_user = fopen($user_file, "r")) {
 } else {
 	die("接続設定の読み込みに失敗しました");
 }
-$data = new GuestData($userName, $password, $database, $hidden);
+$data = new GuestData($userName, $password, $database);
 ?>
 <html>
 <head>

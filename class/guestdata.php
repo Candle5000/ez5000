@@ -11,7 +11,7 @@ class GuestData extends MySQL {
 	//--------------------------
 	//コンストラクタ
 	//--------------------------
-	function GuestData($userName, $password, $database, $hidden) {
+	function GuestData($userName, $password, $database) {
 		parent::MySQL($userName, $password, $database);
 	}
 	

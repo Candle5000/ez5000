@@ -8,7 +8,6 @@ require_once("../../functions/template.php");
 require_once("../../functions/skill.php");
 $xml = "/var/www/functions/xml/skill_group.xml";
 
-$hidden = 1;
 $id = 0;
 if(isset($_GET['id'])) {
 	$id = $_GET['id'];
@@ -40,7 +39,7 @@ if($fp_user = fopen($user_file, "r")) {
 } else {
 	die("接続設定の読み込みに失敗しました");
 }
-$data = new GuestData($userName, $password, $database, $hidden);
+$data = new GuestData($userName, $password, $database);
 ?>
 <html>
 <head>

@@ -8,7 +8,7 @@ class AdminData extends GuestData {
 	//コンストラクタ
 	//--------------------------
 	function AdminData($userName, $password, $database) {
-		parent::GuestData($userName, $password, $database, 0);
+		parent::GuestData($userName, $password, $database);
 		if($userName != "admin") {
 			die("ERROR:管理者権限がありません\n");
 			session_destroy();

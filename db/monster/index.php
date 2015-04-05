@@ -18,7 +18,7 @@ if($fp_user = fopen($user_file, "r")) {
 } else {
 	die("接続設定の読み込みに失敗しました");
 }
-$data = new GuestData($userName, $password, $database, 0);
+$data = new GuestData($userName, $password, $database);
 
 //種族個体数チェック
 $data->select_column("id", "monster", "category", $id);
