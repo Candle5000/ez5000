@@ -46,12 +46,30 @@ if(item_group($id) != -1) {
 <h2><?=item_category(item_category_id($id))?> <?=item_group($id)?></h2>
 <ul id="linklist">
 <?php
-	$data->select_column("id,name", "items", "id", "BETWEEN ".($id + 1)." AND ".item_group_end($id));
+	$data->select_column("id,name", "items", array("id", "hidden"), array("BETWEEN ".($id + 1)." AND ".item_group_end($id), "0"));
 	while($row = $data->fetch()){
-		$id = $row["id"];
-		$name = $row["name"];
+		$i_id = $row["id"];
+		$i_name = $row["name"];
 ?>
-<li><a href="/db/item/data/?id=<?=$id?>"><?=$name?></a></li>
+<li><a href="/db/item/data/?id=<?=$i_id?>"><?=$i_name?></a></li>
+<?php
+	}
+?>
+</ul>
+<h2>未実装</h2>
+<ul id="linklist">
+<?php
+	$data->select_column("id,name", "items", array("id", "hidden"), array("BETWEEN ".($id + 1)." AND ".item_group_end($id), "1"));
+	while($row = $data->fetch()){
+		$i_id = $row["id"];
+		$i_name = $row["name"];
+?>
+<li><a href="/db/item/data/?id=<?=$i_id?>"><span class="nm"><?=$i_name?></span></a></li>
+<?php
+	}
+	if($data->rows() == 0) {
+?>
+<li>特に無し</li>
 <?php
 	}
 ?>

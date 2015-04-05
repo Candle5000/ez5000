@@ -33,7 +33,7 @@ if(isset($_GET["page"])) {
 	$page = 0;
 }
 
-$rows = $data->select_all_l("id,name,updated", "items", $page * $LIMIT, $LIMIT, "updated", "desc");
+$rows = $data->select_all_l("id,name,updated,hidden", "items", $page * $LIMIT, $LIMIT, "updated", "desc");
 
 if(($page > 0) && ($rows > 0)) {
 	$pagelink = "<a href=\"./updinfo.php?page=".($page - 1)."\"".mbi_ack("*").">".mbi("*.")."前のページ</a> | ";
@@ -62,7 +62,7 @@ if($rows > 0) {
 	while($row = $data->fetch()) {
 		$id = $row["id"];
 		$groupName = $group[item_group_id($id)];
-		$name = $row["name"];
+		$name = $row["hidden"] ? "<span class=\"nm\">".$row["name"]."</span>" : $row["name"];
 		if($updflag = ($upd != $row["updated"])) {
 			if($upd != 0) {
 ?>
