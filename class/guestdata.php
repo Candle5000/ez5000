@@ -146,10 +146,11 @@ class GuestData extends MySQL {
 
 		if(count($tmp0) > 0) {
 			// AND なり OR で連結してWHERE を作成
-			$this->sql = "SELECT id FROM ".$table." WHERE (".implode(") ".$mode." (",$tmp0).")".$this->hide_data($table);
+			$h = ($table == "items") ? " AND hidden=0" : "";
+			$this->sql = "SELECT id FROM ".$table." WHERE ((".implode(") ".$mode." (",$tmp0)."))".$h;
 			$this->query($this->sql);
 			$count = $this->rows();
-			$this->sql = "SELECT id,name FROM ".$table." WHERE (".implode(") ".$mode." (",$tmp0).") ORDER BY id LIMIT ".$start.", 50";
+			$this->sql = "SELECT id,name FROM ".$table." WHERE ((".implode(") ".$mode." (",$tmp0)."))$h ORDER BY id LIMIT ".$start.", 50";
 			$this->query($this->sql);
 			return($count);
 		} else {
