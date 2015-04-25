@@ -33,6 +33,9 @@ if(isset($_GET["page"])) {
 }
 
 $data = new GuestData($userName, $password, $database);
+if(mysqli_connect_error()) {
+	die("データベースの接続に失敗しました");
+}
 $rows = $data->select_all_l("*", "info", ($page * $PAGESIZE), $PAGESIZE, "id", "desc");
 
 if(($page > 0) && ($rows > 0)) {

@@ -27,8 +27,6 @@ class MySQL extends mysqli {
 
 		//データベースへ接続
 		$this->m_Con = mysqli_connect($this->m_HostName, $this->m_UserName, $this->m_Password, $this->m_Database);
-
-		return($this->m_Con ? 0 : -1);
 	}
 
 	//--------------------------

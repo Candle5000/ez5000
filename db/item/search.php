@@ -20,6 +20,9 @@ if($fp_user = fopen($user_file, "r")) {
 	die("接続設定の読み込みに失敗しました");
 }
 $data = new GuestData($userName, $password, $database);
+if(mysqli_connect_error()) {
+	die("データベースの接続に失敗しました");
+}
 
 if(isset($_GET["mode"])) {
 	if($_GET["mode"] == "OR") {
