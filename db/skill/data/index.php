@@ -69,7 +69,7 @@ $title = "スキルデータ $s_name";
 ?>
 <html>
 <head>
-<?pagehead($title)?>
+<?=pagehead($title)?>
 </head>
 <body>
 <div id="all">
@@ -108,7 +108,7 @@ if(strlen($s_enhance)) {
 <li><a href="/db/"<?=mbi_ack(9)?>><?=mbi("9.")?>データベース</a></li>
 <li><a href="/"<?=mbi_ack(0)?>><?=mbi("0.")?>トップページ</a></li>
 </ul>
-<?pagefoot($s_count)?>
+<?=pagefoot($s_count)?>
 </div>
 </body>
 </html>

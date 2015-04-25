@@ -25,7 +25,7 @@ $rows = $data->select_all_l("*", "info", 0, $PAGESIZE, "id", "desc");
 ?>
 <html>
 <head>
-<?pagehead($title)?>
+<?=pagehead($title)?>
 <meta name="robots" content="index" />
 <meta name="Keywords" content="オンラインRPG,MMORPG,エターナルゾーン,攻略情報,データベース,蛭注意,EZ5000,5分戦闘,五千" />
 <meta name="description" content="【オンラインRPG】エターナルゾーンの攻略サイト開発スペース。テスト公開中。" />
@@ -69,7 +69,7 @@ if($rows > 0) {
 <ul id="footlink">
 <li><a href="http://5000.sameha.org/">本家5000に帰る</a></li>
 </ul>
-<?
+<?php
 $data->select_id("accesscount", $PAGE_ID);
 $c_data = $data->fetch();
 pagefoot($data->access_count("accesscount", $PAGE_ID, $c_data["count"]));

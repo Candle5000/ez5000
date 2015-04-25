@@ -67,7 +67,7 @@ $title = "モンスターデータ $m_name";
 ?>
 <html>
 <head>
-<?pagehead($title)?>
+<?=pagehead($title)?>
 </head>
 <body>
 <div id="all">
@@ -128,7 +128,7 @@ if($m_dropitem == "") {
 <li><a href="/db/"<?=mbi_ack(9)?>><?=mbi("9.")?>データベース</a></li>
 <li><a href="/"<?=mbi_ack(0)?>><?=mbi("0.")?>トップページ</a></li>
 </ul>
-<?pagefoot($m_count)?>
+<?=pagefoot($m_count)?>
 </div>
 </body>
 </html>

@@ -129,7 +129,7 @@ $title = "アイテムデータ $i_name";
 ?>
 <html>
 <head>
-<?pagehead($title)?>
+<?=pagehead($title)?>
 </head>
 <body>
 <div id="all">
@@ -169,7 +169,7 @@ if(!isset($i_get)) {
 <li><a href="/db/"<?=mbi_ack(9)?>><?=mbi("9.")?>データベース</a></li>
 <li><a href="/"<?=mbi_ack(0)?>><?=mbi("0.")?>トップページ</a></li>
 </ul>
-<?pagefoot($i_count)?>
+<?=pagefoot($i_count)?>
 </div>
 </body>
 </html>
