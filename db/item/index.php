@@ -2,11 +2,13 @@
 //=====================================
 // アイテムデータ リスト閲覧用
 //=====================================
-require_once("../../class/mysql.php");
-require_once("../../class/guestdata.php");
-require_once("../../functions/template.php");
-require_once("../../functions/item.php");
+require_once("/var/www/class/mysql.php");
+require_once("/var/www/class/guestdata.php");
+require_once("/var/www/class/admindata.php");
+require_once("/var/www/functions/template.php");
+require_once("/var/www/functions/item.php");
 $xml_file = "/var/www/functions/xml/item_group.xml";
+session_start();
 
 $id = 0;
 if(isset($_GET['id'])) {
@@ -29,11 +31,22 @@ if($fp_user = fopen($user_file, "r")) {
 } else {
 	die("接続設定の読み込みに失敗しました");
 }
-$data = new GuestData($userName, $password, $database);
+if(isset($_SESSION["user"]) && isset($_SESSION["pass"])) {
+	$data = new AdminData($_SESSION["user"], $_SESSION["pass"], "ezdata");
+	if(!$data->is_admin) {
+		session_destroy();
+		die("データベースの接続に失敗しました");
+	}
+} else {
+	$data = new GuestData($userName, $password, $database);
+}
+if(mysqli_connect_error()) {
+	die("データベースの接続に失敗しました");
+}
 ?>
 <html>
 <head>
-<?pagehead($title)?>
+<?=pagehead($title)?>
 </head>
 <body>
 <div id="all">
@@ -56,24 +69,30 @@ if(item_group($id) != -1) {
 	}
 ?>
 </ul>
+<?php
+	if(isset($data->is_admin)) {
+?>
 <h2>未実装</h2>
 <ul id="linklist">
 <?php
-	$data->select_column("id,name", "items", array("id", "hidden"), array("BETWEEN ".($id + 1)." AND ".item_group_end($id), "1"));
-	while($row = $data->fetch()){
-		$i_id = $row["id"];
-		$i_name = $row["name"];
+		$data->select_column("id,name", "items", array("id", "hidden"), array("BETWEEN ".($id + 1)." AND ".item_group_end($id), "1"));
+		while($row = $data->fetch()){
+			$i_id = $row["id"];
+			$i_name = $row["name"];
 ?>
 <li><a href="/db/item/data/?id=<?=$i_id?>"><span class="nm"><?=$i_name?></span></a></li>
 <?php
-	}
-	if($data->rows() == 0) {
+		}
+		if($data->rows() == 0) {
 ?>
 <li>特に無し</li>
 <?php
-	}
+		}
 ?>
 </ul>
+<?php
+	}
+?>
 <hr class="normal">
 <ul id="footlink">
 <li><a href="./"<?=mbi_ack(9)?>><?=mbi("9.")?>アイテムデータ</a></li>
@@ -129,13 +148,13 @@ foreach($categories->category as $category) {
 ?>
 <hr class="normal">
 <ul id="footlink">
-<?
+<?php
 }
 ?>
 <li><a href="/db/"<?=mbi_ack(9)?>><?=mbi("9.")?>データベース</a></li>
 <li><a href="/"<?=mbi_ack(0)?>><?=mbi("0.")?>トップページ</a></li>
 </ul>
-<?
+<?php
 $data->select_id("accesscount", $PAGE_ID);
 $c_data = $data->fetch();
 pagefoot($data->access_count("accesscount", $PAGE_ID, $c_data["count"]));

@@ -138,7 +138,7 @@ class GuestData extends MySQL {
 			} else {
 				$tmp1 = array();
 				foreach($columns as $cl) {
-					$tmp1[] = " ".$cl." LIKE '%".mb_ereg_replace('_', '\\\\_', mb_ereg_replace('%', '\\\\%', mysql_real_escape_string($kw)))."%' ";
+					$tmp1[] = " ".$cl." LIKE '%".mb_ereg_replace('_', '\\\\_', mb_ereg_replace('%', '\\\\%', mysqli_real_escape_string($this->m_Con, $kw)))."%' ";
 				}
 				$tmp0[] = implode("OR", $tmp1);
 			}
