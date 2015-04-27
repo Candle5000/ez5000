@@ -28,6 +28,9 @@ if($fp_user = fopen($user_file, "r")) {
 	die("接続設定の読み込みに失敗しました");
 }
 $data = new GuestData($userName, $password, $database);
+if(mysqli_connect_error()) {
+	die("データベースの接続に失敗しました");
+}
 
 $m_name = "";
 $column = array("zone", "id");
@@ -67,7 +70,7 @@ $title = "モンスターデータ $m_name";
 ?>
 <html>
 <head>
-<?pagehead($title)?>
+<?=pagehead($title)?>
 </head>
 <body>
 <div id="all">
@@ -128,7 +131,7 @@ if($m_dropitem == "") {
 <li><a href="/db/"<?=mbi_ack(9)?>><?=mbi("9.")?>データベース</a></li>
 <li><a href="/"<?=mbi_ack(0)?>><?=mbi("0.")?>トップページ</a></li>
 </ul>
-<?pagefoot($m_count)?>
+<?=pagefoot($m_count)?>
 </div>
 </body>
 </html>

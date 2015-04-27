@@ -28,9 +28,13 @@ if(isset($_SERVER["REQUEST_METHOD"]) == "POST") {
 $form = new Form($_SERVER["PHP_SELF"], "POST", "multipart/form-data");
 if(isset($_SESSION["user"]) && isset($_SESSION["pass"])) {
 	$data = new AdminData($_SESSION["user"], $_SESSION["pass"], "ezdata");
+	if(!$data->is_admin || mysqli_connect_error()) {
+		session_destroy();
+		$login_err = "<div style=\"color:#F00;\">ログイン情報が間違っています</div>";
+	}
 }
 
-if(isset($_SERVER["REQUEST_METHOD"]) == "POST") {
+if(isset($_SERVER["REQUEST_METHOD"]) == "POST" && !isset($login_err)) {
 
 	// ログアウト
 	if(isset($_POST["submit_logout"])) {
@@ -71,8 +75,9 @@ if(isset($_SERVER["REQUEST_METHOD"]) == "POST") {
 </head>
 <body>
 <?php
-if(!isset($_SESSION["user"]) || !isset($_SESSION["pass"])) {
+if(!isset($_SESSION["user"]) || !isset($_SESSION["pass"]) || isset($login_err)) {
 //管理ログイン
+if(isset($login_err)) echo $login_err;
 ?>
 <?=$form->start()?>
 <?=$form->load_xml_file($form_login_xml)?>
