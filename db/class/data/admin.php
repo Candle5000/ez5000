@@ -71,7 +71,7 @@ if(isset($_SERVER["REQUEST_METHOD"]) == "POST" && !isset($login_err)) {
 		$target = "lv=".$lv;
 		$cols = array("hp","sp","str","vit","dex","agi","wis","wil");
 		foreach($cols as $col) {
-			$values[] = isset($_POST[$col][$id]) ? preg_replace("/[\r][\n]/", "\n", $_POST[$col][$id]) : 0;
+			$values[] = isset($_POST[$col][$lv]) ? preg_replace("/[\r][\n]/", "\n", $_POST[$col][$lv]) : 0;
 		}
 		$data->update_data($table, $cols, $values, $target);
 		$data->timestamp("class", "nameS='$table'");
