@@ -1,6 +1,6 @@
 <?php
 //=====================================
-// アイテムデータ データ検索
+// アイテムデータ 装備データ検索
 //=====================================
 require_once("/var/www/class/mysql.php");
 require_once("/var/www/class/guestdata.php");
@@ -11,6 +11,7 @@ require_once("/var/www/functions/item.php");
 $PAGE_ID = 20030;
 $title = "装備アイテム検索";
 $MAX_LV = "60";
+$error = false;
 
 $user_file = "/etc/mysql-user/user5000.ini";
 if($fp_user = fopen($user_file, "r")) {
@@ -25,7 +26,26 @@ if(mysqli_connect_error()) {
 	die("データベースの接続に失敗しました");
 }
 
-$eqType = array("短剣", "長剣", "斧", "槌", "杖", "弓", "矢", "盾", "書物", "頭", "胴", "脚", "足", "首", "腰", "背", "装飾品", "魂");
+$eqType = array(
+	20 => "短剣",
+	21 => "長剣",
+	22 => "斧",
+	23 => "槌",
+	24 => "杖",
+	25 => "弓",
+	30 => "矢",
+	31 => "盾",
+	32 => "書物",
+	40 => "頭",
+	41 => "胴",
+	42 => "脚",
+	43 => "足",
+	44 => "首",
+	45 => "腰",
+	46 => "背",
+	48 => "装飾品",
+	49 => "魂"
+);
 $maxLv = 60;
 $status = array(
 	0 => "指定なし",
@@ -135,6 +155,166 @@ $status = array(
 	515 => "矢強化",
 	516 => "EXPUP"
 );
+
+// 装備種別フォーム入力取得
+if(!$error) {
+	if(isset($_GET["category"]) && count($_GET["category"]) <= count($eqType)) {
+		foreach($_GET["category"] as $categoryID) {
+			if(isset($eqType[$categoryID])) {
+				$which_category[] = "id BETWEEN ".($categoryID * 1000)." AND ".($categoryID * 1000 + 999);
+			} else {
+				$error = true;
+				break;
+			}
+		}
+		if(!$error) $sql_which[] = implode($which_category, " OR ");
+	} else {
+		$sql_which[] = "id BETWEEN 20000 AND 49999";
+	}
+}
+
+// 装備レベルフォーム入力取得
+if(!$error) {
+	//MAX Lv
+	if(isset($_GET["max_lv"])) {
+		if(is_numeric($_GET["max_lv"]) && $_GET["max_lv"] <= $MAX_LV && $_GET["max_lv"] >= 1) {
+			$lv_max = $_GET["max_lv"];
+		} else {
+			$error = true;
+		}
+	} else {
+		$lv_max = $MAX_LV;
+	}
+
+	//MIN Lv
+	if(isset($_GET["min_lv"])) {
+		if(is_numeric($_GET["min_lv"]) && $_GET["min_lv"] <= $MAX_LV && $_GET["min_lv"] >= 1) {
+			$lv_min = $_GET["min_lv"];
+		} else {
+			$error = true;
+		}
+	} else {
+		$lv_min = 1;
+	}
+}
+
+// 属性フォーム入力取得
+if(!$error) {
+	// Based on Lv
+	if(isset($_GET["bol"])) {
+		if($_GET["bol"] == 0 || $_GET["bol"] == 1 || $_GET["bol"] == 2) {
+			$bol = $_GET["bol"];
+		} else {
+			$error = true;
+		}
+	} else {
+		$bol = 0;
+	}
+
+	// RARE
+	if(isset($_GET["rare"])) {
+		if($_GET["rare"] == 0 || $_GET["rare"] == 1 || $_GET["rare"] == 2) {
+			$rare = $_GET["rare"];
+		} else {
+			$error = true;
+		}
+	} else {
+		$rare = 0;
+	}
+
+	// NOTRADE
+	if(isset($_GET["notrade"])) {
+		if($_GET["notrade"] == 0 || $_GET["notrade"] == 1 || $_GET["notrade"] == 2) {
+			$notrade = $_GET["notrade"];
+		} else {
+			$error = true;
+		}
+	} else {
+		$notrade = 0;
+	}
+}
+
+// 金属値フォーム入力取得
+if(!$error) {
+	if(isset($_GET["metal"])) {
+		if($_GET["metal"] == 0 || $_GET["metal"] == 1 || $_GET["metal"] == 2 || $_GET["metal"] == 3) {
+			$metal = $_GET["metal"];
+		} else {
+			$error = true;
+		}
+	} else {
+		$metal = 0;
+	}
+}
+
+// ステータスフォーム入力取得
+if(!$error) {
+	if(isset($_GET["status1"])) {
+		if(isset($status[$_GET["status1"]])) {
+			$status1 = $_GET["status1"];
+		} else {
+			$error = true;
+		}
+	} else {
+		$status1 = 0;
+	}
+
+	if(isset($_GET["sort1"])) {
+		if($_GET["sort1"] == 0 || $_GET["sort1"] == 1) {
+			$sort1 = $_GET["sort1"];
+		} else {
+			$error = true;
+		}
+	} else {
+		$sort1 = 0;
+	}
+
+	if(isset($_GET["status2"])) {
+		if(isset($status[$_GET["status2"]])) {
+			$status2 = $_GET["status2"];
+		} else {
+			$error = true;
+		}
+	} else {
+		$status2 = 0;
+	}
+
+	if(isset($_GET["sort2"])) {
+		if($_GET["sort2"] == 0 || $_GET["sort2"] == 1) {
+			$sort2 = $_GET["sort2"];
+		} else {
+			$error = true;
+		}
+	} else {
+		$sort2 = 0;
+	}
+}
+
+// 合計値ソートフォーム入力取得
+if(!$error) {
+	if(isset($_GET["sum_sort"])) {
+		if($_GET["sum_sort"] == 0 || $_GET["sum_sort"] == 1 || $_GET["sum_sort"] == 2) {
+			$sum_sort = $_GET["sum_sort"];
+		} else {
+			$error = true;
+		}
+	} else {
+		$sum_sort = 0;
+	}
+}
+
+// ページ入力取得
+if(!$error) {
+	if(isset($_GET["page"])) {
+		if(is_numeric($_GET["page"]) && $_GET["page"] > 0) {
+			$page = $_GET["page"];
+		} else {
+			$error = true;
+		}
+	} else {
+		$page = 0;
+	}
+}
 ?>
 <html>
 <head>
@@ -144,29 +324,20 @@ $status = array(
 <div id="all">
 <h1><?=$title?></h1>
 <hr class="normal">
-<form action="./eqresult.php" method="GET" enctype="multipart/form-data">
-<input type="checkbox" name="category" value="20">短剣
-<input type="checkbox" name="category" value="21">長剣
-<input type="checkbox" name="category" value="22">斧
-<input type="checkbox" name="category" value="23">槌
-<input type="checkbox" name="category" value="24">杖
-<input type="checkbox" name="category" value="25">弓
-<input type="checkbox" name="category" value="30">矢
-<input type="checkbox" name="category" value="31">盾
-<input type="checkbox" name="category" value="32">書物<br />
-<input type="checkbox" name="category" value="40">頭
-<input type="checkbox" name="category" value="41">胴
-<input type="checkbox" name="category" value="42">脚
-<input type="checkbox" name="category" value="43">足
-<input type="checkbox" name="category" value="44">首
-<input type="checkbox" name="category" value="45">腰
-<input type="checkbox" name="category" value="46">背
-<input type="checkbox" name="category" value="48">装飾品
-<input type="checkbox" name="category" value="49">魂<br />
+<form action="<?=$_SERVER["PHP_SELF"]?>" method="GET" enctype="multipart/form-data">
+<?php
+foreach($eqType as $t_id => $type) {
+	$br = ($t_id == 32) ? "<br />" : "";
+?>
+<input type="checkbox" name="category[]" value="<?=$t_id?>" checked><?=$type?><?=$br?>
+<?php
+}
+?>
+<br />
 Lv
 <?php
 for($i = 0; $i < 2; $i++) {
-	$lv_name = ($i == 0) ? "max_lv" : "min_lv";
+	$lv_name = ($i == 0) ? "min_lv" : "max_lv";
 ?>
 <select name="<?=$lv_name?>">
 <?php
@@ -202,10 +373,6 @@ for($i = 0; $i < 3; $i++) {
 			$select_label = "NOTRADE属性";
 			$select_name = "notrade";
 			break;
-		default:
-			$select_label = "";
-			$select_name = "";
-			break;
 	}
 ?>
 <?=$select_label?><select name="<?=$select_name?>">
@@ -216,8 +383,7 @@ for($i = 0; $i < 3; $i++) {
 <?php
 }
 ?>
-金属値
-<select name="metal">
+金属値<select name="metal">
 <option value="0">指定なし</option>
 <option value="1">1以上</option>
 <option value="2">0以下</option>
@@ -226,7 +392,7 @@ for($i = 0; $i < 3; $i++) {
 <?php
 for($i = 1; $i <= 2; $i++) {
 ?>
-ステータス1
+ステータス<?=$i?>
 <select name="status<?=$i?>">
 <?php
 	foreach($status as $st_id => $st_label) {
