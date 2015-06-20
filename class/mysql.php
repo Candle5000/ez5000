@@ -86,14 +86,14 @@ class MySQL extends mysqli {
 	//エラーメッセージ
 	//--------------------------
 	function errors() {
-		return(mysqli_errno().":".mysqli_error());
+		return(mysqli_errno($this->m_Con).":".mysqli_error($this->m_Con));
 	}
 
 	//--------------------------
 	//エラーナンバー
 	//--------------------------
 	function errorno() {
-		return(mysqli_errno());
+		return(mysqli_errno($this->m_Con));
 	}
 
 	//--------------------------
