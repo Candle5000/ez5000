@@ -118,6 +118,7 @@ if(device_info() == 'mb') {
 </form>
 <ul id="linklist">
 <li><a href="/db/item/updinfo.php">更新履歴</a></li>
+<li><a href="/db/item/eqsearch.php">装備アイテム検索</a></li>
 </ul>
 <?php
 if(device_info() == 'mb') {
