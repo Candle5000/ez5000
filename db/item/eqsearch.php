@@ -13,6 +13,7 @@ $title = "装備アイテム検索";
 $MAX_LV = "60";
 $PAGE_SIZE = 50;
 $error = false;
+$mb = (device_info() == "mb" || device_info() == "sp") ? true : false;
 
 $user_file = "/etc/mysql-user/user5000.ini";
 if($fp_user = fopen($user_file, "r")) {
@@ -288,6 +289,13 @@ if(!$error && $st1 == 0) {
 	$sort2 = 0;
 }
 
+// Max Lv < Min Lv の場合
+if(!$error && $lv_max < $lv_min) {
+	$buf = $lv_max;
+	$lv_max = $lv_min;
+	$lv_min = $buf;
+}
+
 // 合計値ソートフォーム入力取得
 if(!$error) {
 	if(isset($_GET["sum_sort"])) {
@@ -400,8 +408,8 @@ if(!$error) {
 <?php
 $i = 0;
 foreach($eqType as $t_id => $type) {
-	$br = ($t_id == 32) ? "<br />" : "";
-	if(isset($eq_list)) {
+	$br = ($t_id == 32 || ($mb && ($t_id == 22 || $t_id == 25 || $t_id == 43 || $t_id == 46))) ? "<br />" : "";
+	if(isset($eq_list[$i])) {
 		$checked = (!$error && $t_id == $eq_list[$i]) ? " checked" : "";
 		if(!$error && $t_id == $eq_list[$i] && isset($eq_list[$i + 1])) $i++;
 	} else {
@@ -470,6 +478,11 @@ for($i = 0; $i < 3; $i++) {
 ?>
 </select>
 <?php
+	if($mb) {
+?>
+<br />
+<?php
+	}
 }
 $option_label = array("指定なし", "非金属のみ", "金属製のみ");
 ?>
@@ -488,6 +501,13 @@ $option_label = array("降順", "昇順");
 for($i = 1; $i <= 2; $i++) {
 ?>
 ステータス<?=$i?>
+<?php
+	if($mb) {
+?>
+<br />
+<?php
+	}
+?>
 <select name="status<?=$i?>">
 <?php
 	foreach($status as $st_id => $st_data) {
@@ -523,6 +543,13 @@ foreach($option_label as $val => $label) {
 }
 ?>
 </select>
+<?php
+if($mb) {
+?>
+<br />
+<?php
+}
+?>
 <input type="hidden" name="page" value="0">
 <input type="submit" value="検索">
 </form>
@@ -582,6 +609,14 @@ if(!$error) {
 	}
 ?>
 </ul>
+<?php
+}
+?>
+<?php
+if(!$error) {
+?>
+<hr class="normal">
+<div class="cnt"><?=$pagelink?></div>
 <?php
 }
 ?>
