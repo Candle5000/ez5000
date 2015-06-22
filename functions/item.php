@@ -107,4 +107,32 @@ function item_group_end($start) {
 	}
 }
 
+//----------------------------------------
+// SQL用ステータス数値(全体)
+//----------------------------------------
+function item_sql_stval($name) {
+	$name_l = mb_strlen($name);
+	$txtall = "concat(text, ' ', note)";
+	$text_f = "replace(concat($txtall, ' '), '\\n', ' ')";
+	$st_loc = "locate('$name', $txtall)";
+	$st_end = "locate(' ', $text_f, $st_loc)";
+	$st_txt = "substring($txtall, $st_loc, $st_end - $st_loc)";
+	$st_val = "substring($txtall, $st_loc, + $name_l, $st_end - $st_loc - $name_l)";
+	return($st_val);
+}
+
+//----------------------------------------
+// SQL用ステータス数値(最大値のみ)
+//----------------------------------------
+function item_sql_stmax($name) {
+	$name_l = mb_strlen($name) + 1;
+	$txtall = "concat(text, ' ', note, ' ')";
+	$text_f = "replace($txtall, '\\n', ' ')";
+	$st_loc = "locate(' $name', $text_f)";
+	$st_end = "locate(' ', $text_f, $st_loc + 1)";
+	$st_txt = "substring($text_f, $st_loc, $st_end - $st_loc)";
+	$st_val = "substring($text_f, $st_loc + $name_l, $st_end - $st_loc - $name_l)";
+	$st_max = "case when $st_txt like '%～%' then substring($st_val, locate('～', $st_val) + 1) else replace(replace($st_val, '+', ''), '%', '') end";
+	return($st_max);
+}
 ?>
