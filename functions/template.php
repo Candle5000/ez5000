@@ -58,14 +58,15 @@ function device_info() {
 			if (preg_match($str,$ua)) {
 				if ($str === '/Android/i') {
 					if (!preg_match("/Mobile/i", $ua)) {
-						$device_info = 'tb'; 
+						//$device_info = 'tb'; 
+						$device_info = 'sp';
 					}
 					else {
 						$device_info = 'sp';
 					}
 				}
 				else {
-//					$device_info = 'tb';
+					//$device_info = 'tb';
 					$device_info = 'sp';
 				}
 			}
