@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form>
+	<part head="Lv" part="input" type="text" name="start" value="" size="3" tail="から" />
+	<part head="Lv" part="input" type="text" name="end" value="" size="3" tail="まで" />
+	<part part="input" type="submit" name="submit_addmulti" value="追加" br="1" />
+	<part head="Lv" part="input" type="text" name="new_id" value="" size="2" />
+	<part head="S" part="input" type="text" name="new_hp" value="" size="3" />
+	<part head="A" part="input" type="text" name="new_sp" value="" size="3" />
+	<part head="B" part="input" type="text" name="new_str" value="" size="3" />
+	<part head="C" part="input" type="text" name="new_vit" value="" size="3" />
+	<part head="D" part="input" type="text" name="new_dex" value="" size="3" />
+	<part head="E" part="input" type="text" name="new_agi" value="" size="3" />
+	<part head="F" part="input" type="text" name="new_wis" value="" size="3" />
+	<part part="input" type="submit" name="submit_add" value="追加" />
+</form>
