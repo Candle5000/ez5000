@@ -33,19 +33,21 @@ $data->select_all($table);
 <div id="all">
 <h1>戦闘/属性スキル</h1>
 <hr class="normal">
+<p>レベル毎の各ランクでの上限値は以下の表のとおり(情報募集中)。各クラスでのランクはクラスの詳細データを参照。</p>
+<hr class="normal">
 <div class="cnt">
 <table border="1" id="bmskill">
 <tr class="ocb"><td>Lv</td><td>S</td><td>A</td><td>B</td><td>C</td><td>D</td><td>E</td><td>F</td></tr>
 <?php
 while($row = $data->fetch()) {
 	$lv = $row["id"];
-	$S = $row["S"];
-	$A = $row["A"];
-	$B = $row["B"];
-	$C = $row["C"];
-	$D = $row["D"];
-	$E = $row["E"];
-	$F = $row["F"];
+	$S = ($row["S"] != 0) ? $row["S"] : "?";
+	$A = ($row["A"] != 0) ? $row["A"] : "?";
+	$B = ($row["B"] != 0) ? $row["B"] : "?";
+	$C = ($row["C"] != 0) ? $row["C"] : "?";
+	$D = ($row["D"] != 0) ? $row["D"] : "?";
+	$E = ($row["E"] != 0) ? $row["E"] : "?";
+	$F = ($row["F"] != 0) ? $row["F"] : "?";
 ?>
 <tr><td class="ocb"><?=$lv?></td><td><?=$S?></td><td><?=$A?></td><td><?=$B?></td><td><?=$C?></td><td><?=$D?></td><td><?=$E?></td><td><?=$F?></td></tr>
 <?php
