@@ -43,7 +43,7 @@ if(isset($_SERVER["REQUEST_METHOD"]) == "POST" && !isset($login_err)) {
 	if(isset($_POST["submit_add"])) {
 		$cols = array("id","name","nameE","nameS","event");
 		foreach($cols as $col) {
-			$values[] = isset($_POST["new_".$col]) ? "'".mysql_real_escape_string($_POST["new_".$col])."'" : 0;
+			$values[] = isset($_POST["new_".$col]) ? "'".mysqli_real_escape_string($data->m_Con, $_POST["new_".$col])."'" : 0;
 		}
 		$cols = implode(",", $cols);
 		$values = implode(",", $values);
@@ -57,7 +57,7 @@ if(isset($_SERVER["REQUEST_METHOD"]) == "POST" && !isset($login_err)) {
 		$target = "id=".$id;
 		$cols = array("name","nameE","nameS","event");
 		foreach($cols as $col) {
-			$values[] = isset($_POST[$col][$id]) ? mysql_real_escape_string(preg_replace("/[\r][\n]/", "\n", $_POST[$col][$id])) : 0;
+			$values[] = isset($_POST[$col][$id]) ? mysqli_real_escape_string($data->m_Con, preg_replace("/[\r][\n]/", "\n", $_POST[$col][$id])) : 0;
 		}
 		$data->update_data($table, $cols, $values, $target);
 		$data->timestamp($table, $target);
