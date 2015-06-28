@@ -47,6 +47,12 @@ table th {
 table tr.small {
 	font-size:x-small;
 }
+table#bmskill {
+	width:100%;
+}
+table#bmskill td {
+	font-size:small;
+}
 table#status {
 	width:100%;
 }

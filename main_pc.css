@@ -46,6 +46,9 @@ table th {
 table#status {
 	width:640px;
 }
+table#bmskill {
+	width:640px;
+}
 table#topcount {
 	width:720;
 }

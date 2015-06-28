@@ -31,6 +31,10 @@ if(mysqli_connect_error()) {
 <h1>クラスデータ</h1>
 <hr class="normal">
 <ul id="linklist">
+<li><a href="./skill/">戦闘スキル/属性スキル</a></li>
+</ul>
+<hr class="normal">
+<ul id="linklist">
 <?php
 $data->select_all("class");
 while($row = $data->fetch()) {

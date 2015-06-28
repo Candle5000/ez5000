@@ -122,6 +122,12 @@
 .rgt {
 	text-align:right;
 }
+.ocb {
+	background-color:#FFB43C;
+	color:#420;
+	text-align:center;
+	font-weight:bold;
+}
 
 /* Tag */
 a:active,a:hover,a:link,a:visited {
@@ -211,6 +217,12 @@ table th {
 	font-weight:bold;
 	text-align:left;
 }
+table#bmskill {
+	table-layout:fixed;
+}
+table#bmskill td {
+	text-align:right;
+}
 table#status td {
 	text-align:right;
 }
@@ -241,4 +253,3 @@ ul#footlink {
 	margin:0px;
 	padding:0px;
 }
-
