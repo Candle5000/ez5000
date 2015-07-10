@@ -40,6 +40,17 @@ if($data->is_added("items", $id)) {
 	$i_stack = $item["stack"];
 	$i_note = nl2br($item["note"]);
 
+	//D/D計算
+	if($flag = preg_match("/DMG([0-9]+(～[0-9]+)?).*?DLY([0-9]+)/ms", $i_text, $val)) {
+		if(preg_match("/^([0-9]+)～([0-9]+)/", $val[1], $dmg)) {
+			$min = sprintf("%0.3f", round(($dmg[1] / $val[3]), 3));
+			$max = sprintf("%0.3f", round(($dmg[2] / $val[3]), 3));
+			$dpd = $min." ～ ".$max;
+		} else {
+			$dpd = sprintf("%0.3f", round(($val[1] / $val[3]), 3));
+		}
+	}
+
 	$i = 0;
 	//ドロップ
 	$data->select_column_a("zone,monster.id,monster.name,nm,nameS", "zone,monster", "dropitem like '%##i$id##%' and monster.event=0 and zone.id=zone");
@@ -143,6 +154,13 @@ $title = "アイテムデータ $i_name";
 <tr><th colspan="2"><?=$i_name?></th></tr>
 <tr><td class="cnt" width="18%">分類</td><td><?=$categoryName?>:<?=$groupName?></td></tr>
 <tr><td colspan="2"><?=$i_text?></td></tr>
+<?php
+if($flag) {
+?>
+<tr><td class="cnt">D/D</td><td><?=$dpd?></td></tr>
+<?php
+}
+?>
 <tr><td colspan="2"><span class="<?=$i_rare?>">RARE</span> <span class="<?=$i_notrade?>">NOTRADE</span></td></tr>
 <tr><td class="cnt">売却</td><td><?=$i_price?></td></tr>
 <tr><td class="cnt">ｽﾀｯｸ</td><td><?=$i_stack?></td></tr>
