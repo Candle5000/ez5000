@@ -6,8 +6,8 @@
 		<group id="11100" name="特殊回復" />
 		<group id="11200" name="ボックス" />
 		<group id="11300" name="魔法効果" />
-		<group id="11400" name="黄金のリンゴ" />
-		<group id="11500" name="包帯" />
+		<group id="11400" name="EP・APリセット" />
+		<group id="11500" name="包帯・丸薬" />
 		<group id="11600" name="聖水・聖酒" />
 		<group id="11699" name="ソウルストーン" />
 		<group id="11800" name="ガチャ用" />
