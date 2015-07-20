@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<categories>
+	<category>
+		<group id="10000" name="ショップ" />
+		<group id="16000" name="宝箱" />
+		<group id="18000" name="製作" />
+		<group id="20000" name="製作詳細" />
+		<group id="30000" name="経験値クエスト" />
+		<group id="36000" name="プライベートゾーン" />
+		<group id="40000" name="一般クエスト" />
+		<group id="60000" name="イベント" />
+	</category>
+</categories>
