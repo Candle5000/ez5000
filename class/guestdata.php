@@ -179,7 +179,7 @@ class GuestData extends MySQL {
 	//----------------------------------------
 	function data_link($str) {
 		$pattern = "/##([cimsq][0-9]+[^0-9#]*)##(pri[0-9]+##)?/";
-		$str = preg_replace("/##(get|use)/", "", $str);
+		$str = preg_replace("/##(get|use|end##)/", "", $str);
 		while(preg_match($pattern, $str, $match)) {
 			preg_match("/([cimsq])/", $match[1], $tbl);
 			preg_match("/([0-9]+)/", $match[1], $id);

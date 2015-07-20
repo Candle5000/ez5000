@@ -51,10 +51,8 @@ $title = "クエストデータ $q_name";
 <body>
 <div id="all">
 <h1>クエストデータ</h1>
-<h2><?=$q_name?></h2>
+<h2><?=$q_name?>:<?=$category_name?></h2>
 <p>
-分類:<?=$category_name?><br />
-<br />
 <?=$q_note?>
 </p>
 <hr class="normal">
