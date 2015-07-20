@@ -36,7 +36,7 @@ if(mysqli_connect_error()) {
 <li><a href="./item/"<?=mbi_ack(2)?>><?=mbi("2.")?>アイテムデータ</a></li>
 <li>　</li>
 <li><a href="./monster/"<?=mbi_ack(4)?>><?=mbi("4.")?>モンスターデータ</a></li>
-<li>　</li>
+<li><a href="./quest/"<?=mbi_ack(5)?>><?=mbi("5.")?>クエストデータ</a></li>
 <li><a href="./class/"<?=mbi_ack(6)?>><?=mbi("6.")?>クラスデータ</a></li>
 <li><a href="./skill/"<?=mbi_ack(7)?>><?=mbi("7.")?>スキルデータ</a></li>
 <li>　</li>
