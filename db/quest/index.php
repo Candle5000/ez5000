@@ -17,7 +17,7 @@ if($id == 0) {
 	$PAGE_ID = 40000;
 } else {
 	$title = "クエストデータ ".$category[$id];
-	$PAGE_ID = 40000 + ($id * 100);
+	$PAGE_ID = 40000 + (int)($id / 10);
 }
 
 $user_file = "/etc/mysql-user/user5000.ini";
