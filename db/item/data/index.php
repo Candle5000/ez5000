@@ -51,7 +51,128 @@ if($data->is_added("items", $id)) {
 		}
 	}
 
+	/* 使用 */
+
+	//スキル習得
+	$data->select_column_a("id,name", "skill", "learning LIKE '%##use##i".$id."魔法書##%'");
+	if($data->rows()) {
+		while($learn = $data->fetch()) {
+			$l_id = $learn["id"];
+			$l_name = $learn["name"];
+			$i_use[] = "<a href=\"/db/skill/data/?id=$l_id\">$l_name</a>の習得";
+		}
+	}
+
+	//モンスター出現
+	$data->select_column_a("zone,monster.id,monster.name,nm,nameS", "zone,monster", "repop LIKE '%##use##i$id##%' AND monster.event=0 AND zone.id=zone");
+	if($data->rows()) {
+		while($repop = $data->fetch()) {
+			$r_id = $repop["zone"] * 10000 + $repop["id"];
+			$r_name = $repop["nm"] ? "<span class=\"nm\">".$repop["name"]."</span>" : $repop["name"];
+			$i_use[] = "<a href=\"/db/monster/data/?id=$r_id\">$r_name@{$repop["nameS"]}</a>の出現";
+		}
+	}
+
+	//宝箱
+	$data->select_column_a("id,name", "quest", "note LIKE '%##use##i$id##%' AND id BETWEEN 20000 AND 30000");
+	if($data->rows()) {
+		while($chest = $data->fetch()) {
+			$c_id = $chest["id"];
+			$c_name = $chest["name"];
+			$i_use[] = "<a href=\"/db/quest/data/?id=$c_id\">$c_name</a>の解錠";
+		}
+	}
+
+	//製作
+	$data->select_column_a("note", "quest", "note LIKE '%##use##i$id##%' AND id BETWEEN 30000 AND 40000");
+	if($data->rows()) {
+		while($product = $data->fetch()) {
+			$p_link = preg_match("/##get(##i[0-9]+##)pri[0-9]+##([^g]*?|[^g]*?g[^e]*?|[^g]*?ge[^t]*?)##use##i$id##([^g]*?|[^g]*?g[^e]*?|[^g]*?ge[^t]*?).*?##end##/s", $product["note"], $match) ? $match[1] : -1;
+			$i_use[] = ($p_link != -1) ? $p_link."の製作" : "";
+		}
+	}
+
+	//クエスト
+	$data->select_column_a("id,name", "quest", "note LIKE '%##use##i$id##%' AND id BETWEEN 50000 AND 90000");
+	if($data->rows()) {
+		while($quest = $data->fetch()) {
+			$q_id = $chest["id"];
+			$q_name = $chest["name"];
+			$i_use[] = "<a href=\"/db/quest/data/?id=$q_id\">$q_name</a>";
+		}
+	}
+
+	//イベント
+	if(!isset($i_use)) {
+
+		//モンスター出現
+		$data->select_column_a("zone,monster.id,monster.name,nm,nameS", "zone,monster", "repop LIKE '%##use##i$id##%' AND monster.event=1 AND zone.id=zone");
+		if($data->rows()) {
+			while($repop = $data->fetch()) {
+				$r_id = $repop["zone"] * 10000 + $repop["id"];
+				$r_name = $repop["nm"] ? "<span class=\"nm\">".$repop["name"]."</span>" : $repop["name"];
+				$i_use[] = "<a href=\"/db/monster/data/?id=$r_id\">$r_name@{$repop["nameS"]}</a>の出現";
+			}
+		}
+
+		//クエスト
+		$data->select_column_a("id,name", "quest", "note LIKE '%##use##i$id##%' AND id > 90000");
+		if($data->rows()) {
+			while($quest = $data->fetch()) {
+				$q_id = $chest["id"];
+				$q_name = $chest["name"];
+				$i_use[] = "<a href=\"/db/quest/data/?id=$q_id\">$q_name</a>";
+			}
+		}
+	}
+
+	$i_use = isset($i_use) ? $data->data_link(implode("<br />\n", $i_use)) : "特になし";
+
+	/* 入手 */
 	$i = 0;
+
+	//購入
+	$data->select_column_a("id,name,note", "quest", "note LIKE '%##get##i$id##%' AND id BETWEEN 10000 AND 20000");
+	if($data->rows()) {
+		$i_get[$i]["label"] = "購入";
+		while($buy = $data->fetch()) {
+			$b_id = $buy["id"];
+			$b_name = $buy["name"];
+			$b_price = preg_match("/##get##i$id##pri([0-9]+)##/", $buy["note"], $match) ? "({$match[1]} B)" : "";
+			$b_link[] = "<a href=\"/db/quest/data/?id=$b_id\">$b_name</a>$b_price";
+		}
+		$i_get[$i]["data"] = implode("<br />\n", $b_link);
+		$i++;
+	}
+
+	//宝箱
+	$data->select_column_a("id,name", "quest", "note LIKE '%##get##i$id##%' AND id BETWEEN 20000 AND 30000");
+	if($data->rows()) {
+		$i_get[$i]["label"] = "宝箱";
+		while($chest = $data->fetch()) {
+			$c_id = $chest["id"];
+			$c_name = $chest["name"];
+			$c_link[] = "<a href=\"/db/quest/data/?id=$c_id\">$c_name</a>";
+		}
+		$i_get[$i]["data"] = implode("<br />\n", $c_link);
+		$i++;
+	}
+
+	//製作
+	$data->select_column_a("id,name,note", "quest", "note LIKE '%##get##i$id##%' AND id BETWEEN 30000 AND 40000");
+	if($data->rows()) {
+		$i_get[$i]["label"] = "製作";
+		while($product = $data->fetch()) {
+			$p_id = $product["id"];
+			$p_name = $product["name"];
+			$p_price = preg_match("/##get##i$id##pri([0-9]+)##(.*?)##end##/s", $product["note"], $match) ? "({$match[1]} B)" : "";
+			$p_need = isset($match[2]) ? $data->data_link($match[2]) : "";
+			$p_text[] = nl2br("<a href=\"/db/quest/data/?id=$p_id\">$p_name</a>$p_price$p_need");
+		}
+		$i_get[$i]["data"] = implode("<hr class=\"normal\" />\n", $p_text);
+		$i++;
+	}
+
 	//ドロップ
 	$data->select_column_a("zone,monster.id,monster.name,nm,nameS", "zone,monster", "dropitem like '%##i$id##%' and monster.event=0 and zone.id=zone");
 	if($data->rows()) {
@@ -91,6 +212,19 @@ if($data->is_added("items", $id)) {
 		$i++;
 	}
 
+	//クエスト
+	$data->select_column_a("id,name", "quest", "note LIKE '%##get##i$id##%' AND id BETWEEN 50000 AND 90000");
+	if($data->rows()) {
+		$i_get[$i]["label"] = "ｸｴｽﾄ";
+		while($quest = $data->fetch()) {
+			$q_id = $quest["id"];
+			$q_name = $quest["name"];
+			$q_link[] = "<a href=\"/db/quest/data/?id=$q_id\">$q_name</a>";
+		}
+		$i_get[$i]["data"] = implode("<br />\n", $q_link);
+		$i++;
+	}
+
 	if(!isset($i_get)) {
 		//イベント限定入手
 
@@ -121,7 +255,7 @@ if($data->is_added("items", $id)) {
 		}
 
 		//スティール
-		$data->select_column_a("zone,monster.id,monster.name,nm,nameS", "zone,monster", "steal=$id and monster.event=0 and zone.id=zone");
+		$data->select_column_a("zone,monster.id,monster.name,nm,nameS", "zone,monster", "steal=$id and monster.event=1 and zone.id=zone");
 		if($data->rows()) {
 			$i_get[$i]["label"] = "ｽﾃｨｰﾙ";
 			while($monster = $data->fetch()) {
@@ -130,6 +264,19 @@ if($data->is_added("items", $id)) {
 				$m_steal[] = "<a href=\"/db/monster/data/?id=$m_id\">$m_name@{$monster["nameS"]}</a>";
 			}
 			$i_get[$i]["data"] = implode("<br />\n", $m_steal);
+			$i++;
+		}
+
+		//イベント
+		$data->select_column_a("id,name", "quest", "note LIKE '%##get##i$id##%' AND id > 90000");
+		if($data->rows()) {
+			$i_get[$i]["label"] = "ｲﾍﾞﾝﾄ";
+			while($event = $data->fetch()) {
+				$e_id = $event["id"];
+				$e_name = $event["name"];
+				$e_link[] = "<a href=\"/db/quest/data/?id=$e_id\">$e_name</a>";
+			}
+			$i_get[$i]["data"] = implode("<br />\n", $e_link);
 			$i++;
 		}
 	}
@@ -165,7 +312,7 @@ if($flag) {
 <tr><td class="cnt">売却</td><td><?=$i_price?></td></tr>
 <tr><td class="cnt">ｽﾀｯｸ</td><td><?=$i_stack?></td></tr>
 <tr><td class="cnt">備考</td><td><?=$i_note?></td></tr>
-<tr><td class="cnt">使用</td><td>準備中</td></tr>
+<tr><td class="cnt">使用</td><td><?=$i_use?></td></tr>
 <tr><td colspan="2">入手</th></tr>
 <?php
 if(!isset($i_get)) {
@@ -194,4 +341,3 @@ if(!isset($i_get)) {
 </div>
 </body>
 </html>
-

@@ -178,13 +178,16 @@ class GuestData extends MySQL {
 	// データリンク変換
 	//----------------------------------------
 	function data_link($str) {
-		$pattern = "/##([cims][0-9]+[^0-9#]*)##/";
+		$pattern = "/##([cimsq][0-9]+[^0-9#]*)##(pri[0-9]+##)?/";
+		$str = preg_replace("/##(get|use|end##)/", "", $str);
 		while(preg_match($pattern, $str, $match)) {
-			preg_match("/([cims])/", $match[1], $tbl);
+			preg_match("/([cimsq])/", $match[1], $tbl);
 			preg_match("/([0-9]+)/", $match[1], $id);
-			$name_str = preg_replace("/[cims0-9#]+/", "", $match[1]);
+			$name_str = preg_replace("/[cimsq0-9#]+/", "", $match[1]);
 			$col = "id";
 			$val = $id[1];
+
+			// データ種別
 			switch($tbl[1]) {
 				case 'c':
 					$table = "class";
@@ -200,22 +203,40 @@ class GuestData extends MySQL {
 					$col = array("zone", "id");
 					$val = array(floor($id[1] / 10000), $id[1] % 10000);
 					break;
+				case 'q':
+					$table = "quest";
+					$link_name = "quest";
+					break;
 				case 's':
 					$table = "skill";
 					$link_name = "skill";
 					break;
 			}
+
+			// 値段
+			if(isset($match[2])) {
+				preg_match("/^pri([0-9]+)##$/", $match[2], $price);
+				$price_pattern = "pri".$price[1]."##";
+				$price_text = "(".$price[1]." B)";
+			} else {
+				$price_pattern = "";
+				$price_text = "";
+			}
+
+			// 置換パターン設定
 			if(strlen($name_str)) {
 				$link_text = $name_str;
-				$replace_pattern = "/##".$tbl[1].$id[1].$name_str."##/";
+				$replace_pattern = "/##".$tbl[1].$id[1].$name_str."##".$price_pattern."/";
 			} else {
 				$s_data = ($table != "monster") ? "name" : "name,nm";
 				$this->select_column($s_data, $table, $col, $val);
 				$row = $this->fetch();
 				$link_text = ($table == "monster" && $row["nm"] == 1) ? "<span class=\"nm\">".$row["name"]."</span>" : $row["name"];
-				$replace_pattern = "/##".$tbl[1].$id[1]."##/";
+				$replace_pattern = "/##".$tbl[1].$id[1]."##".$price_pattern."/";
 			}
-			$replacement = '<a href="/db/'.$link_name.'/data/?id='.$id[1].'">'.$link_text.'</a>';
+
+			// 置換
+			$replacement = '<a href="/db/'.$link_name.'/data/?id='.$id[1].'">'.$link_text.'</a>'.$price_text;
 			$str = preg_replace($replace_pattern, $replacement, $str);
 		}
 		return($str);
