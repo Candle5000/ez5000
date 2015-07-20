@@ -53,6 +53,6 @@ function quest_category_end($category, $id) {
 			return(key($category));
 		}
 	}
-	return(65536);
+	return(9999);
 }
 ?>

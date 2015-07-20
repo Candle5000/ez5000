@@ -8,6 +8,7 @@ require_once("../../functions/template.php");
 require_once("../../functions/quest.php");
 $xml = "/var/www/functions/xml/quest_group.xml";
 
+$table = "quest";
 $category = quest_category_array();
 $id = (isset($_GET['id']) && isset($category[$_GET['id']])) ? $_GET['id'] : 0;
 
@@ -65,7 +66,7 @@ foreach($category as $c_id => $c_name) {
 <ul id="linklist">
 <?php
 	$end = quest_category_end($category, $id);
-	$data->select_column("id,name", "skill", "id", "BETWEEN $id AND $end");
+	$data->select_column("id,name", $table, "id", "BETWEEN $id AND $end");
 	while($row = $data->fetch()){
 		$q_id = $row["id"];
 		$q_name = $row["name"];
