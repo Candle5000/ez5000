@@ -61,7 +61,7 @@ if($id == 0) {
 		while($row = $data->fetch()){
 			$z_id = $row["id"];
 			$z_name = $row["name"];
-			if($flag && $id > 200) {
+			if($flag && $z_id > 200) {
 				$flag = false;
 				echo "<br />\n";
 			}
