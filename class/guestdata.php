@@ -43,6 +43,7 @@ class GuestData extends MySQL {
 	function select_id($table, $s_id) {
 		$this->sql = "SELECT * FROM $table WHERE id='$s_id'";
 		$this->query($this->sql);
+		return($this->rows());
 	}
 	
 	//--------------------------
@@ -52,7 +53,6 @@ class GuestData extends MySQL {
 		if(is_array($column) && is_array($value)) {
 			foreach($column as $key => $col) {
 				$match[] = preg_match("/^BETWEEN [0-9]+ AND [0-9]+/", $value[$key]) ? $col." ".$value[$key] : $col."='".$value[$key]."'";
-				echo "<!--{$value[$key]}-->\n";
 			}
 			$match = implode(" AND ", $match);
 		} else {
@@ -68,6 +68,7 @@ class GuestData extends MySQL {
 	function select_column_a($data, $table, $match) {
 		$this->sql = "SELECT $data FROM $table WHERE $match";
 		$this->query($this->sql);
+		return($this->rows());
 	}
 
 	//--------------------------
@@ -178,12 +179,12 @@ class GuestData extends MySQL {
 	// データリンク変換
 	//----------------------------------------
 	function data_link($str) {
-		$pattern = "/##([cimsq][0-9]+[^0-9#]*)##(pri[0-9]+##)?/";
+		$pattern = "/##([cimqsz][0-9]+[^0-9#]*)##(pri[0-9]+##)?/";
 		$str = preg_replace("/##(get|use|end##)/", "", $str);
 		while(preg_match($pattern, $str, $match)) {
-			preg_match("/([cimsq])/", $match[1], $tbl);
+			preg_match("/([cimqsz])/", $match[1], $tbl);
 			preg_match("/([0-9]+)/", $match[1], $id);
-			$name_str = preg_replace("/[cimsq0-9#]+/", "", $match[1]);
+			$name_str = preg_replace("/[cimqsz0-9#]+/", "", $match[1]);
 			$col = "id";
 			$val = $id[1];
 
@@ -211,6 +212,9 @@ class GuestData extends MySQL {
 					$table = "skill";
 					$link_name = "skill";
 					break;
+				case 'z':
+					$table = "zone";
+					$link_name = "zone";
 			}
 
 			// 値段
@@ -236,7 +240,11 @@ class GuestData extends MySQL {
 			}
 
 			// 置換
-			$replacement = '<a href="/db/'.$link_name.'/data/?id='.$id[1].'">'.$link_text.'</a>'.$price_text;
+			if($table == "zone") {
+				$replacement = '<a href="/db/'.$link_name.'/?id='.$id[1].'">'.$link_text.'</a>';
+			} else {
+				$replacement = '<a href="/db/'.$link_name.'/data/?id='.$id[1].'">'.$link_text.'</a>'.$price_text;
+			}
 			$str = preg_replace($replace_pattern, $replacement, $str);
 		}
 		return($str);

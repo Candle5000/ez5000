@@ -47,7 +47,7 @@ if($data->rows()) {
 	$m_categoryName = $category[$m_categoryId];
 	$data->select_column("id", "monster", "category", $m_categoryId);
 	$link_id = ($data->rows() < 5) ? 900 : $m_categoryId;
-	$m_image = $monster["image"];
+	$m_image = (file_exists("/var/www/img/monster/".sprintf("%03d", $monster["image"]).".gif")) ? sprintf("%5d", $monster["image"]) : "00000";
 	$m_walkspeed = $walkspeed[$monster["walkspeed"]];
 	$m_delay = monster_delay($monster["delay"]);
 	$m_search = $search[$monster["search"]];
@@ -79,8 +79,8 @@ $title = "モンスターデータ $m_name";
 <div class="cnt">
 <table border="1" id="item">
 <tr><th colspan="2"<?=$m_nm?>><?=$m_name?></th></tr>
-<tr><td class="cnt" colspan="2">画像:準備中</td></tr>
-<tr><td class="cnt" width="18%">ｿﾞｰﾝ</td><td><?=$zoneName?></td></tr>
+<tr><td class="img" colspan="2"><img src="/img/monster/<?=$m_image?>.gif" class="dot" /></td></tr>
+<tr><td class="cnt" width="18%">ｿﾞｰﾝ</td><td><a href="/db/zone/?id=<?=$zone?>&mode=2"><?=$zoneName?></a></td></tr>
 <tr><td class="cnt">種族</td><td><?=$m_categoryName?></td></tr>
 <tr><td class="cnt">移動</td><td><?=$m_walkspeed?></td></tr>
 <tr><td class="cnt">攻速</td><td><?=$m_delay?></td></tr>

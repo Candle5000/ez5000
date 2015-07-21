@@ -34,7 +34,7 @@ if(mysqli_connect_error()) {
 <ul id="dblink">
 <li>　</li>
 <li><a href="./item/"<?=mbi_ack(2)?>><?=mbi("2.")?>アイテムデータ</a></li>
-<li>　</li>
+<li><a href="./zone/"<?=mbi_ack(3)?>><?=mbi("3.")?>ゾーンデータ</a></li>
 <li><a href="./monster/"<?=mbi_ack(4)?>><?=mbi("4.")?>モンスターデータ</a></li>
 <li><a href="./quest/"<?=mbi_ack(5)?>><?=mbi("5.")?>クエストデータ</a></li>
 <li><a href="./class/"<?=mbi_ack(6)?>><?=mbi("6.")?>クラスデータ</a></li>
