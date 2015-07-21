@@ -111,6 +111,10 @@
 .rare {
 	background-color:#CFC;
 }
+.img {
+	background-color:#FFF;
+	text-align:center;
+}
 
 /* Other */
 .cnt {
@@ -252,4 +256,7 @@ ul#footlink {
 	list-style-type:none;
 	margin:0px;
 	padding:0px;
+}
+img.dot {
+	margin:10px 0px;
 }
