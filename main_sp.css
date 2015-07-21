@@ -66,12 +66,24 @@ ul#dblink li {
 	margin:5px;
 	padding:3px 12px;
 }
-ul#linklist {
+ul#linklist,ul#footlink {
 	line-height:2.0em;
 	list-style-type:square;
 }
+@media screen and (max-width: 440px) {
+	img.map {
+		zoom:1;
+	}
+}
+@media screen and (min-width: 440px) {
+	img.map {
+		zoom:2;
+	}
+}
 img.dot {
 	zoom:2;
+}
+img.dot,img.map {
 	-ms-interpolation-mode:nearest-neighbor;   /* IE8+ */
 	image-rendering:-webkit-optimize-contrast; /* Safari (WebKit) */
 	image-rendering:-moz-crisp-edges;          /* Firefox (Gecko) */

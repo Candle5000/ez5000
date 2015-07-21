@@ -1,6 +1,6 @@
 <?php
 //=====================================
-// スキルデータ リスト閲覧用
+// ゾーンデータ リスト閲覧用
 //=====================================
 require_once("../../class/mysql.php");
 require_once("../../class/guestdata.php");
@@ -26,12 +26,12 @@ if($id == 0) {
 	$title = "ゾーンデータ";
 	$PAGE_ID = 30000;
 } else {
-	$data->select_id("zone", $id);
+	if(!$data->select_id("zone", $id)) toppage();
 	$row = $data->fetch();
 	$name = $row["name"];
 	$nameE = $row["nameE"];
 	$event = $row["event"];
-	$image = file_exists("/var/www/img/zone/".sprintf("%3d", $id).$mode.".gif") ? sprintf("%3d", $id).$mode : "0000";
+	$image = file_exists("/var/www/img/zone/".sprintf("%03d", $id).$mode.".gif") ? sprintf("%03d", $id).$mode : "0000";
 	$z_count = $data-> access_count("zone", $id, $row["count"]);
 	$title = "ゾーンデータ $name";
 	if($mode == 1) $title .= " クエスト";
@@ -59,14 +59,14 @@ if($id == 0) {
 <?php
 		$data->select_column("id,name,enabled", "zone", array("event", "enabled"), array($i, 1));
 		while($row = $data->fetch()){
-			$id = $row["id"];
-			$name = $row["name"];
+			$z_id = $row["id"];
+			$z_name = $row["name"];
 			if($flag && $id > 200) {
 				$flag = false;
 				echo "<br />\n";
 			}
 ?>
-<li><a href="./?id=<?=$id?>"><?=$name?></a></li>
+<li><a href="./?id=<?=$z_id?>"><?=$z_name?></a></li>
 <?php
 		}
 ?>
@@ -83,9 +83,9 @@ if($id == 0) {
 <h1>ゾーンデータ</h1>
 <hr class="normal">
 <h2><?=$name?><br /><?=$nameE?></h2>
-<div class="img"><img src="/img/zone/<?=$image?>.gif" class="dot" /></div>
+<div class="img"><img src="/img/zone/<?=$image?>.gif" class="map" /></div>
 <h2>表示切替</h2>
-<ul>
+<ul id="linklist">
 <?php
 if($mode != 0) echo "<li><a href=\"./?id=$id\">総合情報</a></li>";
 if($mode != 1) echo "<li><a href=\"./?id=$id&mode=1\">クエスト情報</a></li>";
@@ -96,12 +96,12 @@ if($mode != 2) echo "<li><a href=\"./?id=$id&mode=2\">モンスター情報</a><
 	if($mode == 0) {
 ?>
 <h2>ショップ</h2>
-<ul>
+<ul id="linklist">
 <?php
 		if($data->select_column_a("id,name", "quest", "id BETWEEN 10000 AND 20000 AND note LIKE '%##z$id##%'")) {
 			while($row = $data->fetch()) {
 				$shop_id = $row["id"];
-				$shop_name = $preg_replace("^[^A-Z]+", "", $row["name"]);
+				$shop_name = preg_replace("/^[^A-Z]+/", "", $row["name"]);
 ?>
 <li><a href="/db/quest/data/?id=<?=$shop_id?>"><?=$shop_name?></a></li>
 <?php
@@ -113,29 +113,43 @@ if($mode != 2) echo "<li><a href=\"./?id=$id&mode=2\">モンスター情報</a><
 		}
 ?>
 </ul>
-<h2>製作</h2>
-<ul>
 <?php
 		if($data->select_column_a("id,name", "quest", "id BETWEEN 30000 AND 50000 AND note LIKE '%##z$id##%'")) {
+?>
+<h2>製作</h2>
+<ul id="linklist">
+<?php
 			while($row = $data->fetch()) {
 				$shop_id = $row["id"];
-				$shop_name = $preg_replace("^[^A-Z]+", "", $row["name"]);
+				$shop_name = preg_replace("/^[^A-Z]+/", "", $row["name"]);
 ?>
 <li><a href="/db/quest/data/?id=<?=$shop_id?>"><?=$shop_name?></a></li>
 <?php
 			}
-		} else {
-?>
-<li>特になし</li>
-<?php
-		}
 ?>
 </ul>
 <?php
+		}
+		if($data->select_column_a("id,name", "quest", "id BETWEEN 20000 AND 30000 AND note LIKE '%##z$id##%'")) {
+?>
+<h2>宝箱</h2>
+<ul id="linklist">
+<?php
+			while($row = $data->fetch()) {
+				$chest_id = $row["id"];
+				$chest_name = $row["name"];
+?>
+<li><a href="/db/quest/data/?id=<?=$chest_id?>"><?=$chest_name?></a></li>
+<?php
+			}
+?>
+</ul>
+<?php
+		}
 	} else if($mode == 1) {
 ?>
 <h2>クエスト</h2>
-<ul>
+<ul id="linklist">
 <?php
 		if($data->select_column_a("id,name", "quest", "id BETWEEN 50000 AND 90000 AND note LIKE '%##z$id##%'")) {
 			while($row = $data->fetch()) {
@@ -164,11 +178,11 @@ if($mode != 2) echo "<li><a href=\"./?id=$id&mode=2\">モンスター情報</a><
 	} else if($mode == 2) {
 ?>
 <h2>モンスター</h2>
-<ul>
+<ul id="linklist">
 <?php
 		if($data->select_column_a("id,name,nm", "monster", "zone=$id AND event=0")) {
 			while($row = $data->fetch()) {
-				$m_id = $id.sprintf("%4d", $row["id"]);
+				$m_id = $id.sprintf("%04d", $row["id"]);
 				$m_name = $row["name"];
 				if($row["nm"]) $m_name = "<span class=\"nm\">$m_name</span>";
 ?>
@@ -177,7 +191,7 @@ if($mode != 2) echo "<li><a href=\"./?id=$id&mode=2\">モンスター情報</a><
 			}
 		} else if($event && $data->select_column_a("id,name,nm", "monster", "zone=$id AND event=1")) {
 			while($row = $data->fetch()) {
-				$m_id = $id.sprintf("%4d", $row["id"]);
+				$m_id = $id.sprintf("%04d", $row["id"]);
 				$m_name = $row["name"];
 				if($row["nm"]) $m_name = "<span class=\"nm\">$m_name</span>";
 ?>
