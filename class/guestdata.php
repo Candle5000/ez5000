@@ -53,7 +53,6 @@ class GuestData extends MySQL {
 		if(is_array($column) && is_array($value)) {
 			foreach($column as $key => $col) {
 				$match[] = preg_match("/^BETWEEN [0-9]+ AND [0-9]+/", $value[$key]) ? $col." ".$value[$key] : $col."='".$value[$key]."'";
-				echo "<!--{$value[$key]}-->\n";
 			}
 			$match = implode(" AND ", $match);
 		} else {
