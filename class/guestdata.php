@@ -68,6 +68,7 @@ class GuestData extends MySQL {
 	function select_column_a($data, $table, $match) {
 		$this->sql = "SELECT $data FROM $table WHERE $match";
 		$this->query($this->sql);
+		return($this->rows());
 	}
 
 	//--------------------------
