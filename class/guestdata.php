@@ -297,9 +297,9 @@ class GuestData extends MySQL {
 			if($table == "monster") {
 				$zone = floor($id / 10000);
 				$id = $id % 10000;
-				$this->sql = "update $table set count=$count where zone=$zone and id=$id";
+				$this->sql = "update $table set count=$count where zone='$zone' and id='$id'";
 			} else {
-				$this->sql = "update $table set count=$count where id=$id";
+				$this->sql = "update $table set count=$count where id='$id'";
 			}
 			$this->query($this->sql);
 			return($count);
