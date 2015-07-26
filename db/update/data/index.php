@@ -9,8 +9,7 @@ require_once("/var/www/functions/template.php");
 if($id = isset($_GET['id']) && preg_match("/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/", $_GET["id"])) {
 	$id = $_GET['id'];
 } else {
-	//toppage();
-	die("0");
+	toppage();
 }
 
 $user_file = "/etc/mysql-user/user5000.ini";
@@ -34,8 +33,7 @@ if($data->select_id("updinfo", $id)) {
 	}
 	$count = $data->access_count("updinfo", $id, $updinfo["count"]);
 } else {
-	//toppage();
-	die("1");
+	toppage();
 }
 $title = "アプリ更新情報 $id";
 ?>
