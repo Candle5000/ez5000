@@ -18,6 +18,7 @@ function toppage() {
 function selfpage() {
 	$url = "http://".$_SERVER["HTTP_HOST"].$_SERVER["PHP_SELF"];
 	header("HTTP/1.1 301 Moved Permanently");
+	header("Pragma: no-cache");
 	header("Location: $url");
 }
 
