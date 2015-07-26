@@ -32,7 +32,7 @@ if(mysqli_connect_error()) {
 <h1>データベース</h1>
 <hr class="normal">
 <ul id="dblink">
-<li>　</li>
+<li><a href="./update/"<?=mbi_ack(1)?>><?=mbi("1.")?>アプリ更新情報</a></li>
 <li><a href="./item/"<?=mbi_ack(2)?>><?=mbi("2.")?>アイテムデータ</a></li>
 <li><a href="./zone/"<?=mbi_ack(3)?>><?=mbi("3.")?>ゾーンデータ</a></li>
 <li><a href="./monster/"<?=mbi_ack(4)?>><?=mbi("4.")?>モンスターデータ</a></li>
