@@ -88,6 +88,7 @@ function item_group_id($id) {
 			return($id - 1);
 		}
 	} else {
+		$id--;
 		$id -= $id % 1000;
 	}
 	return($id);
