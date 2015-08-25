@@ -2,11 +2,13 @@
 //=====================================
 // スキルデータ リスト閲覧用
 //=====================================
-require_once("../../class/mysql.php");
-require_once("../../class/guestdata.php");
-require_once("../../functions/template.php");
-require_once("../../functions/skill.php");
+require_once("/var/www/class/mysql.php");
+require_once("/var/www/class/guestdata.php");
+require_once("/var/www/class/admindata.php");
+require_once("/var/www/functions/template.php");
+require_once("/var/www/functions/skill.php");
 $xml = "/var/www/functions/xml/skill_group.xml";
+session_start();
 
 $id = 0;
 if(isset($_GET['id'])) {
@@ -39,7 +41,15 @@ if($fp_user = fopen($user_file, "r")) {
 } else {
 	die("接続設定の読み込みに失敗しました");
 }
-$data = new GuestData($userName, $password, $database);
+if(isset($_SESSION["user"]) && isset($_SESSION["pass"])) {
+	$data = new AdminData($_SESSION["user"], $_SESSION["pass"], "ezdata");
+	if(!$data->is_admin) {
+		session_destroy();
+		die("データベースの接続に失敗しました");
+	}
+} else {
+	$data = new GuestData($userName, $password, $database);
+}
 if(mysqli_connect_error()) {
 	die("データベースの接続に失敗しました");
 }
@@ -63,8 +73,9 @@ if(isset($name)) {
 	while($row = $data->fetch()){
 		$id = $row["id"];
 		$name = $row["name"];
+		$id_f = isset($data->is_admin) ? sprintf("%04d:", $id) : "";
 ?>
-<li><a href="./data/?id=<?=$id?>"><?=$name?></a></li>
+<li><?=$id_f?><a href="./data/?id=<?=$id?>"><?=$name?></a></li>
 <?php
 	}
 ?>
