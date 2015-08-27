@@ -2,11 +2,13 @@
 //=====================================
 // モンスターデータ リスト閲覧用
 //=====================================
-require_once("../../class/mysql.php");
-require_once("../../class/guestdata.php");
-require_once("../../functions/template.php");
-require_once("../../functions/monster.php");
+require_once("/var/www/class/mysql.php");
+require_once("/var/www/class/guestdata.php");
+require_once("/var/www/class/admindata.php");
+require_once("/var/www/functions/template.php");
+require_once("/var/www/functions/monster.php");
 $cname = monster_category();
+session_start();
 
 $id = isset($_GET['id']) ? $_GET['id'] : -1;
 
@@ -18,7 +20,15 @@ if($fp_user = fopen($user_file, "r")) {
 } else {
 	die("接続設定の読み込みに失敗しました");
 }
-$data = new GuestData($userName, $password, $database);
+if(isset($_SESSION["user"]) && isset($_SESSION["pass"])) {
+	$data = new AdminData($_SESSION["user"], $_SESSION["pass"], "ezdata");
+	if(!$data->is_admin) {
+		session_destroy();
+		die("データベースの接続に失敗しました");
+	}
+} else {
+	$data = new GuestData($userName, $password, $database);
+}
 if(mysqli_connect_error()) {
 	die("データベースの接続に失敗しました");
 }
@@ -82,9 +92,10 @@ if($id != -1) {
 				$flag = 1;
 				$id = $row["zone"].str_pad($row["id"], 4, "0", STR_PAD_LEFT);
 				$name = $row["name"];
+				$id_f = isset($data->is_admin) ? sprintf("%07d:", $id) : "";
 				if($row["nm"]) $name = '<span class="nm">'.$name.'</span>';
 ?>
-<li><a href="/db/monster/data/?id=<?=$id?>"><?=$name?>@<?=$row["nameS"]?></a></li>
+<li><?=$id_f?><a href="/db/monster/data/?id=<?=$id?>"><?=$name?>@<?=$row["nameS"]?></a></li>
 <?php
 			}
 		}

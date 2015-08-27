@@ -63,8 +63,9 @@ if(item_group($id) != -1) {
 	while($row = $data->fetch()){
 		$i_id = $row["id"];
 		$i_name = $row["name"];
+		$id_f = isset($data->is_admin) ? sprintf("%d:", $i_id) : "";
 ?>
-<li><a href="/db/item/data/?id=<?=$i_id?>"><?=$i_name?></a></li>
+<li><?=$id_f?><a href="/db/item/data/?id=<?=$i_id?>"><?=$i_name?></a></li>
 <?php
 	}
 ?>
@@ -80,7 +81,7 @@ if(item_group($id) != -1) {
 			$i_id = $row["id"];
 			$i_name = $row["name"];
 ?>
-<li><a href="/db/item/data/?id=<?=$i_id?>"><span class="nm"><?=$i_name?></span></a></li>
+<li><?=$i_id?>:<a href="/db/item/data/?id=<?=$i_id?>"><span class="nm"><?=$i_name?></span></a></li>
 <?php
 		}
 		if($data->rows() == 0) {
