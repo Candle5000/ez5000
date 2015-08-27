@@ -61,7 +61,7 @@ ul#dblink li {
 ul#linklist {
 	list-style-type:disc;
 }
-img.dot {
+img.dot,img.map {
 	zoom:2;
 	-ms-interpolation-mode:nearest-neighbor;   /* IE8+ */
 	image-rendering:-webkit-optimize-contrast; /* Safari (WebKit) */
