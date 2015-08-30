@@ -14,7 +14,7 @@ class AdminData extends GuestData {
 	//--------------------------
 	function AdminData($userName, $password, $database) {
 		parent::GuestData($userName, $password, $database);
-		$this->is_admin = ($userName == "admin");
+		$this->is_admin = ($userName == "admin" || $userName == "subb");
 	}
 
 	//--------------------------
