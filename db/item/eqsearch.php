@@ -4,9 +4,11 @@
 //=====================================
 require_once("/var/www/class/mysql.php");
 require_once("/var/www/class/guestdata.php");
+require_once("/var/www/class/admindata.php");
 require_once("/var/www/functions/template.php");
 require_once("/var/www/functions/form.php");
 require_once("/var/www/functions/item.php");
+session_start();
 
 $PAGE_ID = 20030;
 $title = "装備アイテム検索";
@@ -23,7 +25,15 @@ if($fp_user = fopen($user_file, "r")) {
 } else {
 	die("接続設定の読み込みに失敗しました");
 }
-$data = new GuestData($userName, $password, $database);
+if(isset($_SESSION["user"]) && isset($_SESSION["pass"])) {
+	$data = new AdminData($_SESSION["user"], $_SESSION["pass"], "ezdata");
+	if(!$data->is_admin) {
+		session_destroy();
+		die("データベースの接続に失敗しました");
+	}
+} else {
+	$data = new GuestData($userName, $password, $database);
+}
 if(mysqli_connect_error()) {
 	die("データベースの接続に失敗しました");
 }
@@ -594,6 +604,7 @@ if(!$error) {
 		while($row = $data->fetch()) {
 			$id = $row["id"];
 			$name = $row["name"];
+			$id_f = isset($data->is_admin) ? sprintf("%d:", $id) : "";
 			$info = "";
 			if($st1 != 0) {
 				$info .= "<br />└{$status["$st1"]["name"]}:{$row["st1"]}";
@@ -605,7 +616,7 @@ if(!$error) {
 				}
 			}
 ?>
-<li><a href="/db/item/data/?id=<?=$id?>"><?=$name?></a><?=$info?></li>
+<li><?=$id_f?><a href="/db/item/data/?id=<?=$id?>"><?=$name?></a><?=$info?></li>
 <?php
 		}
 	}

@@ -80,6 +80,7 @@ if($rows > 0) {
 		$id = $row["id"];
 		$groupName = $group[item_group_id($id)];
 		$name = $row["hidden"] ? "<span class=\"nm\">".$row["name"]."</span>" : $row["name"];
+		$id_f = isset($data->is_admin) ? sprintf("%d:", $id) : "";
 		if($updflag = ($upd != $row["updated"])) {
 			if($upd != 0) {
 ?>
@@ -93,7 +94,7 @@ if($rows > 0) {
 <?php
 		}
 ?>
-<li><a href="/db/item/data/?id=<?=$id?>"><?=$name?></a>(<?=$groupName?>)</li>
+<li><?=$id_f?><a href="/db/item/data/?id=<?=$id?>"><?=$name?></a>(<?=$groupName?>)</li>
 <?php
 	}
 }
