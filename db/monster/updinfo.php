@@ -4,9 +4,11 @@
 //=====================================
 require_once("/var/www/class/mysql.php");
 require_once("/var/www/class/guestdata.php");
+require_once("/var/www/class/admindata.php");
 require_once("/var/www/functions/template.php");
 require_once("/var/www/functions/form.php");
 require_once("/var/www/functions/monster.php");
+session_start();
 
 $PAGE_ID = 50020;
 $LIMIT = 50;
@@ -20,7 +22,15 @@ if($fp_user = fopen($user_file, "r")) {
 } else {
 	die("接続設定の読み込みに失敗しました");
 }
-$data = new GuestData($userName, $password, $database);
+if(isset($_SESSION["user"]) && isset($_SESSION["pass"])) {
+	$data = new AdminData($_SESSION["user"], $_SESSION["pass"], "ezdata");
+	if(!$data->is_admin) {
+		session_destroy();
+		die("データベースの接続に失敗しました");
+	}
+} else {
+	$data = new GuestData($userName, $password, $database);
+}
 if(mysqli_connect_error()) {
 	die("データベースの接続に失敗しました");
 }
@@ -64,6 +74,7 @@ if($rows > 0) {
 	while($row = $data->fetch()) {
 		$id = $row["zone"].str_pad($row["id"], 4, "0", STR_PAD_LEFT);
 		$name = $row["name"];
+		$id_f = isset($data->is_admin) ? sprintf("%07d:", $id) : "";
 		if($row["nm"]) $name = '<span class="nm">'.$name.'</span>';
 		if($updflag = ($upd != $row["updated"])) {
 			if($upd != 0) {
@@ -78,7 +89,7 @@ if($rows > 0) {
 <?php
 		}
 ?>
-<li><a href="/db/monster/data/?id=<?=$id?>"><?=$name?>@<?=$row["nameS"]?></a></li>
+<li><?=$id_f?><a href="/db/monster/data/?id=<?=$id?>"><?=$name?>@<?=$row["nameS"]?></a></li>
 <?php
 	}
 }
