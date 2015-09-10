@@ -5,7 +5,7 @@
 class MySQL extends mysqli {
 
 	//--------------------------
-	// 変数
+	// 変数の宣言
 	//--------------------------
 
 	//--------------------------
@@ -19,14 +19,8 @@ class MySQL extends mysqli {
 	// SQLクエリの処理
 	//--------------------------
 	public function query($sql) {
-		$result = parent::query($query);
-		if(isset($result->num_rows)) {
-			// SELECTの場合、結果を配列で返す
-			return($result->fetch_array());
-		} else {
-			// SELECT以外の場合、成功したかをbooleanで返す
-			return($result);
-		}
+		$result = parent::query($sql);
+		return($result);
 	}
 
 	//--------------------------
