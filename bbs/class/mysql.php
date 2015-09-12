@@ -16,14 +16,6 @@ class MySQL extends mysqli {
 	}
 
 	//--------------------------
-	// SQLクエリの処理
-	//--------------------------
-	public function query($sql) {
-		$result = parent::query($sql);
-		return($result);
-	}
-
-	//--------------------------
 	// エラーメッセージ
 	//--------------------------
 	public function errors() {

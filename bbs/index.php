@@ -33,7 +33,7 @@ $result = $mysql->query($sql);
 while($array = $result->fetch_array()) {
 	$boad = new Boad($array);
 ?>
-<li><a href="./u/?bid=<?=$boad->sname?>"><?=$boad->name?></a></li>
+<li><a href="./u/?id=<?=$boad->sname?>"><?=$boad->name?></a></li>
 <?php
 }
 ?>

@@ -20,7 +20,7 @@ class Thread {
 	//--------------------------
 	// コンストラクタ
 	//--------------------------
-	function Boad($array) {
+	function Thread($array) {
 		$this->tid = $array["tid"];
 		$this->title = $array["title"];
 		$this->tindex = $array["tindex"];
