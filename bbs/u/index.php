@@ -47,7 +47,7 @@ if($result->num_rows) {
 	while($array = $result->fetch_array()) {
 		$thread = new Thread($array);
 ?>
-<li><a href="./u/read.php?id=<?=$boad->sname?>&tid=<?=$thread->tid?>"><?=$thread->title?></a></li>
+<li><a href="./read.php?id=<?=$boad->sname?>&tid=<?=$thread->tid?>"><?=$thread->title?></a></li>
 <?php
 	}
 } else {
