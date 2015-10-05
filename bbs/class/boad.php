@@ -13,6 +13,7 @@ class Boad {
 	public $count;
 	public $rpasset;
 	public $wpasset;
+	public $default_name;
 
 	//--------------------------
 	// コンストラクタ
@@ -24,6 +25,7 @@ class Boad {
 		$this->count = $array["count"];
 		$this->rpasset = $array["rpasset"];
 		$this->wpasset = $array["wpasset"];
+		$this->default_name = $array["default_name"];
 	}
 }
 ?>
