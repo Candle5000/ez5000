@@ -173,13 +173,15 @@ function mbi($str) {
 //----------------------------------------
 function pagefoot($count) {
 	if($count == -1) {
-		$count_text = "アクセス数の読み込みに失敗しました";
+		$count_text = "アクセス数の読み込みに失敗しました<br />";
+	} else if($count == 0) {
+		$count_text = "";
 	} else {
-		$count_text = "AccsessCount : $count";
+		$count_text = "AccsessCount : $count<br />";
 	}
 ?>
 <div id="footer">
-<?=$count_text?><br />
+<?=$count_text?>
 Eternal Zone (C) Ateam Inc.<br />
 Web Design By Candle
 <div>
