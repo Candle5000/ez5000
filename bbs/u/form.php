@@ -118,6 +118,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 	$comment = isset($_POST["comment"]) ? $mysql->real_escape_string($_POST["comment"]) : "";
 	if($comment == "") $error_list[] = "本文が空です";
 	if(mb_strlen($comment) > 4096) $error_list[] = "本文は4096文字以内にしてください";
+	if(isset($_COOKIE["comment"]) && $_COOKIE["comment"] == $comment) $error_list[] = "同一内容の投稿は禁止されています";
 
 	// sage取得 返信モードのみ
 	$sage = ($mode == 1 && isset($_POST["sage"]) && $_POST["sage"] == "sage");
@@ -145,6 +146,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 				$sql = "INSERT INTO `{$id}_m` (`tid`, `tmid`, `name`, `comment`, `password`, `ts`, `ip`, `ua`, `uid`) VALUES (LAST_INSERT_ID(), '1', '$name', '$comment', PASSWORD('$pass'), NOW(), '$ip', '$ua', '$uid')";
 				$mysql->query($sql);
 				if($mysql->error) die("ERROR22:クエリ処理に失敗しました");
+				setcookie("comment", $comment, time() + 86400);
 				break;
 
 			case 1: // 返信投稿
@@ -158,6 +160,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 				}
 				$mysql->query($sql);
 				if($mysql->error) die("ERROR24:クエリ処理に失敗しました");
+				setcookie("comment", $comment, time() + 86400);
 				break;
 
 			case 2: // メッセージ編集
