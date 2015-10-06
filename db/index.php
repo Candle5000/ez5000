@@ -9,7 +9,6 @@ require_once("../functions/item.php");
 
 $PAGE_ID = 12000;
 $title = "データベース";
-//$user_file = "../../../../etc/mysql-user/user5000.ini";
 $user_file = "/etc/mysql-user/user5000.ini";
 if($fp_user = fopen($user_file, "r")) {
 	$userName = rtrim(fgets($fp_user));
