@@ -7,6 +7,7 @@ require_once("/var/www/bbs/class/boad.php");
 require_once("/var/www/bbs/class/thread.php");
 require_once("/var/www/bbs/class/message.php");
 require_once("/var/www/functions/template.php");
+session_start();
 
 // モードを取得
 if(!isset($_GET["mode"])) die("ERROR01:モードが設定されていません");
@@ -98,7 +99,7 @@ if($mode == 2) {
 if($_SERVER["REQUEST_METHOD"] == "POST") {
 
 	// 名前取得
-	$name = isset($_POST["name"]) ? $mysql->real_escape_string($_POST["name"]) : "";
+	$name = isset($_POST["name"]) ? $_POST["name"] : "";
 	if($name == "") {
 		if($boad->default_name != "") {
 			$name = $boad->default_name;
@@ -110,21 +111,21 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 	}
 
 	// タイトル取得 スレッド作成/編集のみ
-	$title = (($mode == 0 || ($mode == 2 && $tmid == 1)) && $_POST["sbj"]) ? $mysql->real_escape_string($_POST["sbj"]) : "";
+	$title = (($mode == 0 || ($mode == 2 && $tmid == 1)) && $_POST["sbj"]) ? $_POST["sbj"] : "";
 	if(($mode == 0 || ($mode == 2 && $tmid == 1)) && $title == "") $error_list[] = "タイトルが空です";
 	if(mb_strlen($title) > 40) $error_list[] = "タイトルは40文字以内にしてください";
 
 	// 本文取得
-	$comment = isset($_POST["comment"]) ? $mysql->real_escape_string($_POST["comment"]) : "";
+	$comment = isset($_POST["comment"]) ? $_POST["comment"] : "";
 	if($comment == "") $error_list[] = "本文が空です";
 	if(mb_strlen($comment) > 4096) $error_list[] = "本文は4096文字以内にしてください";
-	if(isset($_COOKIE["comment"]) && $_COOKIE["comment"] == $comment) $error_list[] = "同一内容の投稿は禁止されています";
+	if(($mode == 0 || $mode == 1) && isset($_SESSION["comment"]) && $_SESSION["comment"] == $comment) $error_list[] = "同一内容の投稿は禁止されています";
 
 	// sage取得 返信モードのみ
 	$sage = ($mode == 1 && isset($_POST["sage"]) && $_POST["sage"] == "sage");
 
 	// 編集パスワード取得
-	$pass = isset($_POST["pass"]) ? $mysql->real_escape_string($_POST["pass"]) : "";
+	$pass = isset($_POST["pass"]) ? $_POST["pass"] : "";
 	if($pass == "") $error_list[] = "パスワードが空です";
 	if(!preg_match("/^[!-~]{4,64}$/", $pass)) $error_list[] = "パスワードは半角英数字と記号のみで4～64文字にしてください";
 
@@ -137,20 +138,25 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 	if(!isset($uid)) $uid = "";
 
 	if(!isset($error_list)) {
+		$sql_title = $mysql->real_escape_string($title);
+		$sql_name = $mysql->real_escape_string($name);
+		$sql_comment = $mysql->real_escape_string($comment);
+		$sql_pass = $mysql->real_escape_string($pass);
+
 		switch($mode) {
 
 			case 0: // スレッド作成
-				$sql = "INSERT INTO `{$id}_t` (`title`, `tindex`, `mcount`) SELECT '$title' AS `title`, MAX(`tindex`)+1 AS `tindex`, '1' FROM `{$id}_t`";
+				$sql = "INSERT INTO `{$id}_t` (`title`, `tindex`, `mcount`) SELECT '{$sql_title}' AS `title`, MAX(`tindex`)+1 AS `tindex`, '1' FROM `{$id}_t`";
 				$mysql->query($sql);
 				if($mysql->error) die("ERROR21:クエリ処理に失敗しました");
-				$sql = "INSERT INTO `{$id}_m` (`tid`, `tmid`, `name`, `comment`, `password`, `ts`, `ip`, `ua`, `uid`) VALUES (LAST_INSERT_ID(), '1', '$name', '$comment', PASSWORD('$pass'), NOW(), '$ip', '$ua', '$uid')";
+				$sql = "INSERT INTO `{$id}_m` (`tid`, `tmid`, `name`, `comment`, `password`, `ts`, `ip`, `ua`, `uid`) VALUES (LAST_INSERT_ID(), '1', '$sql_name', '$sql_comment', PASSWORD('$sql_pass'), NOW(), '$ip', '$ua', '$uid')";
 				$mysql->query($sql);
 				if($mysql->error) die("ERROR22:クエリ処理に失敗しました");
-				setcookie("comment", $comment, time() + 86400);
+				$_SESSION["comment"] = $comment;
 				break;
 
 			case 1: // 返信投稿
-				$sql = "INSERT INTO `{$id}_m` (`tid`, `tmid`, `name`, `comment`, `password`, `ts`, `ip`, `ua`, `uid`) SELECT '$tid' AS `tid`, `mcount`+1 AS `tmid`, '$name' AS `name`, '$comment' AS `comment`, PASSWORD('$pass') AS `password`, NOW() AS `ts`, '$ip' AS `ip`, '$ua' AS `ua`, '$uid' AS `uid` FROM `{$id}_t` WHERE `tid`='$tid'";
+				$sql = "INSERT INTO `{$id}_m` (`tid`, `tmid`, `name`, `comment`, `password`, `ts`, `ip`, `ua`, `uid`) SELECT '$tid' AS `tid`, `mcount`+1 AS `tmid`, '$sql_name' AS `name`, '$sql_comment' AS `comment`, PASSWORD('$sql_pass') AS `password`, NOW() AS `ts`, '$ip' AS `ip`, '$ua' AS `ua`, '$uid' AS `uid` FROM `{$id}_t` WHERE `tid`='$tid'";
 				$mysql->query($sql);
 				if($mysql->error) die("ERROR23:クエリ処理に失敗しました");
 				if($sage) {
@@ -160,21 +166,21 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 				}
 				$mysql->query($sql);
 				if($mysql->error) die("ERROR24:クエリ処理に失敗しました");
-				setcookie("comment", $comment, time() + 86400);
+				$_SESSION["comment"] = $comment;
 				break;
 
 			case 2: // メッセージ編集
-				$sql = "SELECT `password`=PASSWORD('$pass') AS `match` FROM `{$id}_m` WHERE `tid`='$tid' AND `tmid`='$tmid' AND `mid`='{$message->mid}'";
+				$sql = "SELECT `password`=PASSWORD('$sql_pass') AS `match` FROM `{$id}_m` WHERE `tid`='$tid' AND `tmid`='$tmid' AND `mid`='{$message->mid}'";
 				$result = $mysql->query($sql);
 				if($mysql->error) die("ERROR25:クエリ処理に失敗しました");
 				if(!$result->num_rows) die("ERROR26:メッセージが見つかりません");
 				$array = $result->fetch_array();
 				if($array["match"]) {
-					$sql = "UPDATE `{$id}_m` SET `name`='$name', `comment`='$comment', `ip`='$ip', `ua`='$ua', `uid`='$uid' WHERE `tid`='$tid' AND `tmid`='$tmid' AND `mid`='{$message->mid}' AND `password`=PASSWORD('$pass')";
+					$sql = "UPDATE `{$id}_m` SET `name`='$sql_name', `comment`='$sql_comment', `ip`='$ip', `ua`='$ua', `uid`='$uid' WHERE `tid`='$tid' AND `tmid`='$tmid' AND `mid`='{$message->mid}' AND `password`=PASSWORD('$pass')";
 					$mysql->query($sql);
 					if($mysql->error) die("ERROR27:クエリ処理に失敗しました");
 					if($tmid == 1) {
-						$sql = "UPDATE `{$id}_t` SET `title`='$title' WHERE `tid`='$tid'";
+						$sql = "UPDATE `{$id}_t` SET `title`='$sql_title' WHERE `tid`='$tid'";
 						$mysql->query($sql);
 						if($mysql->error) die("ERROR28:クエリ処理に失敗しました");
 					}
