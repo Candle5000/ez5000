@@ -8,7 +8,7 @@ require_once("/var/www/class/admindata.php");
 require_once("/var/www/functions/template.php");
 session_start();
 
-$id = isset($_GET["id"]) ? $_GET["id"] : 0;
+$id = (isset($_GET["id"]) && is_numeric($_GET['id'])) ? $_GET["id"] : 0;
 $mode = (isset($_GET["mode"]) && ($_GET["mode"] == 1 || $_GET["mode"] == 2)) ? $_GET["mode"] : 0;
 
 $user_file = "/etc/mysql-user/user5000.ini";

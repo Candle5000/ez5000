@@ -206,6 +206,7 @@ p {
 	margin:0px;
 	text-align:left;
 	word-break:break-all;
+	word-wrap:break-word;
 }
 table {
 	border-collapse:collapse;
