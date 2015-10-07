@@ -103,6 +103,8 @@ if($id != -1) {
 <?php
 			}
 		}
+		
+		unset($categories);
 
 		//ヒット件数0
 		if($flag == 0) {
@@ -132,12 +134,18 @@ if($id != -1) {
 	$data->select_group_by("category", "monster", "", "category", "HAVING COUNT(id) >= 5");
 	while($rows = $data->fetch()) {
 		$id = $rows["category"];
+		$o_flag = ($id == 900);
 ?>
 <li><a href="/db/monster/?id=<?=$id?>"><?=$cname[$id]?></a></li>
 <?php
 	}
+
+	if(!$o_flag) {
 ?>
 <li><a href="/db/monster/?id=900"><?=$cname[900]?></a></li>
+<?php
+	}
+?>
 </ul>
 <hr class="normal">
 <ul id="footlink">
