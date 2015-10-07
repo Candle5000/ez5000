@@ -10,7 +10,11 @@ require_once("/var/www/functions/monster.php");
 $cname = monster_category();
 session_start();
 
-$id = isset($_GET['id']) ? $_GET['id'] : -1;
+if(isset($_GET['id']) && is_numeric($_GET['id'])) {
+	$id = $_GET['id'];
+} else {
+	$id = -1;
+}
 
 $user_file = "/etc/mysql-user/user5000.ini";
 if($fp_user = fopen($user_file, "r")) {

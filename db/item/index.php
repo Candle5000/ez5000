@@ -10,9 +10,10 @@ require_once("/var/www/functions/item.php");
 $xml_file = "/var/www/functions/xml/item_group.xml";
 session_start();
 
-$id = 0;
-if(isset($_GET['id'])) {
+if(isset($_GET['id']) && is_numeric($_GET['id'])) {
 	$id = $_GET['id'];
+} else {
+	$id = 0;
 }
 
 if(item_group($id) != -1) {

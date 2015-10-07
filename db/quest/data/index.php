@@ -8,8 +8,10 @@ require_once("/var/www/functions/template.php");
 require_once("/var/www/functions/quest.php");
 $xml = "/var/www/functions/xml/quest_group.xml";
 
-if($id = isset($_GET['id'])) {
+if(isset($_GET['id']) && is_numeric($_GET['id'])) {
 	$id = $_GET['id'];
+} else {
+	$id = 0;
 }
 
 $user_file = "/etc/mysql-user/user5000.ini";
