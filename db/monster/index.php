@@ -62,6 +62,16 @@ if($id != -1) {
 <h1>モンスターデータ</h1>
 <hr class="normal">
 <?php
+	//種族ID取得
+	if($id == 900) {
+		$data->select_group_by("category", "monster", "", "category", "HAVING COUNT(id) < 5");
+		while($rows = $data->fetch()) {
+			$categories[] = $rows["category"];
+		}
+	} else {
+		$categories[] = $id;
+	}
+
 	for($i = 0; $i < 2; $i++) {
 		if($i == 0) {
 ?>
@@ -76,16 +86,6 @@ if($id != -1) {
 <ul id="linklist">
 <?php
 		$flag = 0;
-
-		//種族ID取得
-		if($id == 900) {
-			$data->select_group_by("category", "monster", "", "category", "HAVING COUNT(id) < 5");
-			while($rows = $data->fetch()) {
-				$categories[] = $rows["category"];
-			}
-		} else {
-			$categories[] = $id;
-		}
 
 		//検索出力
 		foreach($categories as $category) {
@@ -104,8 +104,6 @@ if($id != -1) {
 			}
 		}
 		
-		unset($categories);
-
 		//ヒット件数0
 		if($flag == 0) {
 ?>
