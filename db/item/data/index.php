@@ -7,8 +7,10 @@ require_once("/var/www/class/guestdata.php");
 require_once("/var/www/functions/template.php");
 require_once("/var/www/functions/item.php");
 
-if($id = isset($_GET['id'])) {
+if($id = isset($_GET['id']) && is_numeric($_GET['id'])) {
 	$id = $_GET['id'];
+} else {
+	$id = 0;
 }
 
 $user_file = "/etc/mysql-user/user5000.ini";

@@ -11,7 +11,7 @@ $category = monster_category();
 $walkspeed = monster_walkspeed();
 $search = monster_search();
 
-if(isset($_GET['id'])) {
+if(isset($_GET['id']) && is_numeric($_GET['id'])) {
 	$zone = floor($_GET['id'] / 10000);
 	$id = $_GET['id'] % 10000;
 } else {

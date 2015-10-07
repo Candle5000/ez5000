@@ -10,6 +10,7 @@ $MAX_Lv = 55;
 
 if($id = isset($_GET['id'])) {
 	$id = $_GET['id'];
+	if(!preg_match("/^[0-9]+$/", $id)) $id = 0;
 }
 
 $user_file = "/etc/mysql-user/user5000.ini";
