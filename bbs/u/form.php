@@ -98,6 +98,15 @@ if($mode == 2) {
 
 if($_SERVER["REQUEST_METHOD"] == "POST") {
 
+	// 文字コード確認 フィーチャーフォンのみ
+	if(device_info() == "mb") {
+		if(isset($_POST["enc"])) {
+			$enc = mb_detect_encoding($_POST["enc"]);
+		} else {
+			$error_list[] = "文字コードの検出に失敗しました";
+		}
+	}
+
 	// 名前取得
 	$name = isset($_POST["name"]) ? $_POST["name"] : "";
 	if($name == "") {
@@ -138,6 +147,11 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 	if(!isset($uid)) $uid = "";
 
 	if(!isset($error_list)) {
+		if(device_info() == "mb") {
+			$title = mb_convert_encoding($title, "UTF-8", $enc);
+			$name = mb_convert_encoding($name, "UTF-8", $enc);
+			$comment = mb_convert_encoding($comment, "UTF-8", $enc);
+		}
 		$sql_title = $mysql->real_escape_string($title);
 		$sql_name = $mysql->real_escape_string($name);
 		$sql_comment = $mysql->real_escape_string($comment);
@@ -295,6 +309,13 @@ if(!($_SERVER["REQUEST_METHOD"] == "POST") || isset($error_list)) {
 編集パス<br />
 <input type="password" name="pass" maxlength="32" value=""><br />
 <hr class="normal">
+<?php
+	if(device_info() == "mb") {
+?>
+<input type="hidden" name="enc" value="あ">
+<?php
+	}
+?>
 <input type="hidden" name="id" value="<?=$boad->id?>">
 <?php
 	if($mode == 1 || $mode == 2) {
