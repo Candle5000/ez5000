@@ -101,7 +101,17 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 	// 文字コード確認 フィーチャーフォンのみ
 	if(device_info() == "mb") {
 		if(isset($_POST["enc"])) {
-			$enc = mb_detect_encoding($_POST["enc"]);
+			if($_POST["enc"] == "あ") {
+				$enc_mode = 0;
+			} else if(mb_convert_encoding($_POST["enc"], "UTF-8", "SJIS-WIN") == "あ") {
+				$enc_mode = 1;
+			} else if(urldecode($_POST["enc"]) == "あ") {
+				$enc_mode = 2;
+			} else if(mb_convert_encoding(urldecode($_POST["enc"]), "UTF-8", "SJIS-WIN") == "あ") {
+				$enc_mode = 3;
+			} else {
+				$enc_mode = 0;
+			}
 		} else {
 			$error_list[] = "文字コードの検出に失敗しました";
 		}
@@ -115,19 +125,46 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 		} else {
 			$error_list[] = "お名前が空です";
 		}
-	} else if(mb_strlen($name) > 30) {
-		$error_list[] = "お名前は30文字以内にしてください";
+	} else {
+		if(device_info() == "mb") {
+			if($enc_mode == 1) {
+				$name = mb_convert_encoding($name, "UTF-8", "SJIS-WIN");
+			} else if($enc_mode == 2) {
+				$name = urldecode($name);
+			} else if($enc_mode == 3) {
+				$name = mb_convert_encoding(urldecode($name), "UTF-8", "SJIS-WIN");
+			}
+		}
+		if(mb_strlen($name) > 30) $error_list[] = "お名前は30文字以内にしてください";
 	}
 
 	// タイトル取得 スレッド作成/編集のみ
 	$title = (($mode == 0 || ($mode == 2 && $tmid == 1)) && $_POST["sbj"]) ? $_POST["sbj"] : "";
 	if(($mode == 0 || ($mode == 2 && $tmid == 1)) && $title == "") $error_list[] = "タイトルが空です";
+	if(device_info() == "mb") {
+		if($enc_mode == 1) {
+			$title = mb_convert_encoding($title, "UTF-8", "SJIS-WIN");
+		} else if($enc_mode == 2) {
+			$title = urldecode($title);
+		} else if($enc_mode == 3) {
+			$title = mb_convert_encoding(urldecode($title), "UTF-8", "SJIS-WIN");
+		}
+	}
 	if(mb_strlen($title) > 40) $error_list[] = "タイトルは40文字以内にしてください";
 
 	// 本文取得
 	$comment = isset($_POST["comment"]) ? $_POST["comment"] : "";
 	if($comment == "") $error_list[] = "本文が空です";
 	if(mb_strlen($comment) > 4096) $error_list[] = "本文は4096文字以内にしてください";
+	if(device_info() == "mb") {
+		if($enc_mode == 1) {
+			$comment = mb_convert_encoding($comment, "UTF-8", "SJIS-WIN");
+		} else if($enc_mode == 2) {
+			$comment = urldecode($comment);
+		} else if($enc_mode == 3) {
+			$comment = mb_convert_encoding(urldecode($comment), "UTF-8", "SJIS-WIN");
+		}
+	}
 	if(($mode == 0 || $mode == 1) && isset($_SESSION["comment"]) && $_SESSION["comment"] == $comment) $error_list[] = "同一内容の投稿は禁止されています";
 
 	// sage取得 返信モードのみ
@@ -147,11 +184,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 	if(!isset($uid)) $uid = "";
 
 	if(!isset($error_list)) {
-		if(device_info() == "mb") {
-			$title = mb_convert_encoding($title, "UTF-8", $enc);
-			$name = mb_convert_encoding($name, "UTF-8", $enc);
-			$comment = mb_convert_encoding($comment, "UTF-8", $enc);
-		}
+		if($mode == 0 || $mode == 1) $_SESSION["comment"] = $comment;
 		$sql_title = $mysql->real_escape_string($title);
 		$sql_name = $mysql->real_escape_string($name);
 		$sql_comment = $mysql->real_escape_string($comment);
@@ -166,7 +199,6 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 				$sql = "INSERT INTO `{$id}_m` (`tid`, `tmid`, `name`, `comment`, `password`, `ts`, `ip`, `ua`, `uid`) VALUES (LAST_INSERT_ID(), '1', '$sql_name', '$sql_comment', PASSWORD('$sql_pass'), NOW(), '$ip', '$ua', '$uid')";
 				$mysql->query($sql);
 				if($mysql->error) die("ERROR22:クエリ処理に失敗しました");
-				$_SESSION["comment"] = $comment;
 				break;
 
 			case 1: // 返信投稿
@@ -180,7 +212,6 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 				}
 				$mysql->query($sql);
 				if($mysql->error) die("ERROR24:クエリ処理に失敗しました");
-				$_SESSION["comment"] = $comment;
 				break;
 
 			case 2: // メッセージ編集
@@ -249,7 +280,7 @@ switch(device_info()) {
 		break;
 	case "mb":
 		$comment_w = 40;
-		$commnet_h = 4;
+		$comment_h = 4;
 		break;
 	case "pc":
 		$comment_w = 80;
@@ -315,9 +346,6 @@ if(!($_SERVER["REQUEST_METHOD"] == "POST") || isset($error_list)) {
 <input type="hidden" name="enc" value="あ">
 <?php
 	}
-?>
-<input type="hidden" name="id" value="<?=$boad->id?>">
-<?php
 	if($mode == 1 || $mode == 2) {
 ?>
 <input type="hidden" name="tid" value="<?=$thread->tid?>">
