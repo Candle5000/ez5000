@@ -199,6 +199,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 				$sql = "INSERT INTO `{$id}_m` (`tid`, `tmid`, `name`, `comment`, `password`, `ts`, `ip`, `ua`, `uid`) VALUES (LAST_INSERT_ID(), '1', '$sql_name', '$sql_comment', PASSWORD('$sql_pass'), NOW(), '$ip', '$ua', '$uid')";
 				$mysql->query($sql);
 				if($mysql->error) die("ERROR22:クエリ処理に失敗しました");
+				if($name != $boad->default_name) setcookie("bbs_name", $name, time() + 604800);
 				break;
 
 			case 1: // 返信投稿
@@ -212,6 +213,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 				}
 				$mysql->query($sql);
 				if($mysql->error) die("ERROR24:クエリ処理に失敗しました");
+				if($name != $boad->default_name) setcookie("bbs_name", $name, time() + 604800);
 				break;
 
 			case 2: // メッセージ編集
@@ -229,6 +231,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 						$mysql->query($sql);
 						if($mysql->error) die("ERROR28:クエリ処理に失敗しました");
 					}
+					if($name != $boad->default_name) setcookie("bbs_name", $name, time() + 604800);
 				} else {
 					$error_list[] = "パスワードが間違っています";
 				}
@@ -240,7 +243,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 // フォーム内容
 if(!($_SERVER["REQUEST_METHOD"] == "POST")) {
 	if($mode != 2) {
-		$name = "";
+		$name = isset($_COOKIE["bbs_name"]) ? $_COOKIE["bbs_name"] : "";
 		$subject = "";
 		$comment = (isset($re) && $re != 0) ? ">>$re" : "";
 	} else {
