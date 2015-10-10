@@ -57,8 +57,15 @@ if(isset($_GET["page"])) {
 if(isset($_GET["words"])) {
 	$words = $_GET["words"];
 	if(device_info() == 'mb' && isset($_GET["enc"])) {
-		$enc = mb_detect_encoding($_GET["enc"]);
-		$words = mb_convert_encoding($words, "UTF-8", $enc);
+		if(isset($_GET["enc"])) {
+			if(mb_convert_encoding($_GET["enc"], "UTF-8", "SJIS-WIN") == "あ") {
+				$words = mb_convert_encoding($words, "UTF-8", "SJIS-WIN");
+			} else if(urldecode($_GET["enc"]) == "あ") {
+				$words = urldecode($words);
+			} else if(mb_convert_encoding(urldecode($_GET["enc"]), "UTF-8", "SJIS-WIN") == "あ") {
+				$words = mb_convert_encoding(urldecode($words), "UTF-8", "SJIS-WIN");
+			}
+		}
 	}
 	$rows = $data->search_words($words, "items", $mode, ($page * 50));
 } else {
