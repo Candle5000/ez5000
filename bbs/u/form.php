@@ -395,11 +395,12 @@ if(!($_SERVER["REQUEST_METHOD"] == "POST") || isset($error_list)) {
 <?php
 if($mode == 1 || $mode == 2) {
 ?>
-<li><a href="/bbs/u/read.php?id=<?=$boad->sname?>&tid=<?=$thread->tid?>">スレッドに戻る</a></li>
+<li><a href="/bbs/u/read.php?id=<?=$boad->sname?>&tid=<?=$thread->tid?>"<?=mbi_ack(7)?>><?=mbi("7.")?>スレッドに戻る</a></li>
 <?php
 }
 ?>
-<li><a href="/bbs/u/?id=<?=$boad->sname?>"<?=mbi_ack(9)?>><?=mbi("8.").$boad->name?></a></li>
+<li><a href="/bbs/u/?id=<?=$boad->sname?>"<?=mbi_ack(8)?>><?=mbi("8.").$boad->name?></a></li>
+<li><a href="/bbs/"<?=mbi_ack(9)?>><?=mbi("9.")?>掲示板一覧</a></li>
 <li><a href="/"<?=mbi_ack(0)?>><?=mbi("0.")?>トップページ</a></li>
 </ul>
 <?php
