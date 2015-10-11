@@ -76,7 +76,7 @@ if($result->num_rows) {
 	while($array = $result->fetch_array()) {
 		$thread = new Thread($array);
 ?>
-<li><a href="./read.php?id=<?=$boad->sname?>&tid=<?=$thread->tid?>"><?=htmlspecialchars($thread->title)?></a></li>
+<li><a href="./read.php?id=<?=$boad->sname?>&tid=<?=$thread->tid?>"><?=htmlspecialchars($thread->title)."(".$thread->mcount.")"?></a></li>
 <?php
 	}
 } else {
