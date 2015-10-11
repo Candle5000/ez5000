@@ -118,12 +118,12 @@ if(!isset($tmid)) {
 <div class="cnt"><?=$pagelink?></div>
 <?php
 if($page == 0 && !isset($tmid)) {
-	$fmessage->printMessage();
+	$fmessage->printMessage($boad, $thread);
 }
 
 while($array = $result->fetch_array()) {
 	$message = new Message($array);
-	$message->printMessage();
+	$message->printMessage($boad, $thread);
 }
 ?>
 <hr class="normal">
