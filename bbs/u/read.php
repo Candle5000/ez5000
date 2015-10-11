@@ -89,7 +89,7 @@ if(!isset($tmid)) {
 	}
 } else {
 	//------------------------------
-	// メッセージ一覧表示
+	// 単一メッセージ表示
 	//------------------------------
 
 	// メッセージ情報を取得
@@ -112,7 +112,17 @@ if(!isset($tmid)) {
 <h2>[<?=$thread->tid?>] <?=htmlspecialchars($thread->title)?></h2>
 <hr class="normal">
 <p>
+<?php
+if($thread->mcount > 999) {
+?>
+[<?=mbi("2.")?>返信]
+<?php
+} else {
+?>
 [<a href="./form.php?mode=reform&id=<?=$boad->sname?>&tid=<?=$tid?>"<?=mbi_ack(2)?>><?=mbi("2.")?>返信</a>]
+<?php
+}
+?>
 </p>
 <hr class="normal">
 <div class="cnt"><?=$pagelink?></div>

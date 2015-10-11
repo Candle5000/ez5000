@@ -34,13 +34,14 @@ class Message {
 	// メッセージ出力
 	//--------------------------
 	public function printMessage($mysql, $boad, $thread) {
+		$reply = ($thread->mcount > 999) ? "返信" : "<a href=\"./form.php?mode=reform&id=".$boad->sname."&tid=".$thread->tid."&re=".$this->tmid."\">返信</a>";
 ?>
 <hr class="normal">
 <p>
 [<?=$this->tmid?>] By <?=htmlspecialchars($this->name)?><br />
 <?=$this->textConvert($mysql, $boad, $thread, $this->comment)?><br />
 <?=$this->ts?><br />
-[<a href="./form.php?mode=reform&id=<?=$boad->sname?>&tid=<?=$thread->tid?>&re=<?=$this->tmid?>">返信</a>] [<a href="./form.php?mode=modify&id=<?=$boad->sname?>&tid=<?=$thread->tid?>&tmid=<?=$this->tmid?>">編集</a>]
+[<?=$reply?>] [<a href="./form.php?mode=modify&id=<?=$boad->sname?>&tid=<?=$thread->tid?>&tmid=<?=$this->tmid?>">編集</a>]
 </p>
 <?php
 	}
