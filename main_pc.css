@@ -52,6 +52,10 @@ table#bmskill {
 table#topcount {
 	width:720;
 }
+textarea#comment {
+	width:90%;
+	height:20em;
+}
 ul#dblink li {
 	background: -webkit-gradient(linear, left top, right bottom, from(#FFFACD),color-stop(0.7, #FFFACD),to(#F0CD96));
 	font-size:large;

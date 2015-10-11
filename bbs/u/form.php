@@ -189,16 +189,18 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 		$sql_name = $mysql->real_escape_string($name);
 		$sql_comment = $mysql->real_escape_string($comment);
 		$sql_pass = $mysql->real_escape_string($pass);
+		$date = date("Y-m-d");
 
 		switch($mode) {
 
 			case 0: // スレッド作成
-				$sql = "INSERT INTO `{$id}_t` (`title`, `tindex`, `mcount`) SELECT '{$sql_title}' AS `title`, MAX(`tindex`)+1 AS `tindex`, '1' FROM `{$id}_t`";
+				$sql = "INSERT INTO `{$id}_t` (`title`, `tindex`, `mcount`, `updated`) SELECT '{$sql_title}' AS `title`, MAX(`tindex`)+1 AS `tindex`, '1' AS `mcount`, '$date' AS `updated` FROM `{$id}_t`";
 				$mysql->query($sql);
 				if($mysql->error) die("ERROR21:クエリ処理に失敗しました");
 				$sql = "INSERT INTO `{$id}_m` (`tid`, `tmid`, `name`, `comment`, `password`, `ts`, `ip`, `ua`, `uid`) VALUES (LAST_INSERT_ID(), '1', '$sql_name', '$sql_comment', PASSWORD('$sql_pass'), NOW(), '$ip', '$ua', '$uid')";
 				$mysql->query($sql);
 				if($mysql->error) die("ERROR22:クエリ処理に失敗しました");
+				if($name != $boad->default_name) setcookie("bbs_name", $name, time() + 604800);
 				break;
 
 			case 1: // 返信投稿
@@ -208,10 +210,11 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 				if($sage) {
 					$sql = "UPDATE `{$id}_t` SET `mcount`=`mcount`+1 WHERE `tid`='$tid'";
 				} else {
-					$sql = "UPDATE `{$id}_t`, (SELECT MAX(`tindex`)+1 AS `tindex_max` FROM `{$id}_t`) AS `thread` SET `tindex`=`thread`.`tindex_max`, `mcount`=`mcount`+1 WHERE `tid`='$tid'";
+					$sql = "UPDATE `{$id}_t`, (SELECT MAX(`tindex`)+1 AS `tindex_max` FROM `{$id}_t`) AS `thread` SET `tindex`=`thread`.`tindex_max`, `mcount`=`mcount`+1, `updated`='$date' WHERE `tid`='$tid'";
 				}
 				$mysql->query($sql);
 				if($mysql->error) die("ERROR24:クエリ処理に失敗しました");
+				if($name != $boad->default_name) setcookie("bbs_name", $name, time() + 604800);
 				break;
 
 			case 2: // メッセージ編集
@@ -229,6 +232,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 						$mysql->query($sql);
 						if($mysql->error) die("ERROR28:クエリ処理に失敗しました");
 					}
+					if($name != $boad->default_name) setcookie("bbs_name", $name, time() + 604800);
 				} else {
 					$error_list[] = "パスワードが間違っています";
 				}
@@ -240,7 +244,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 // フォーム内容
 if(!($_SERVER["REQUEST_METHOD"] == "POST")) {
 	if($mode != 2) {
-		$name = "";
+		$name = isset($_COOKIE["bbs_name"]) ? $_COOKIE["bbs_name"] : "";
 		$subject = "";
 		$comment = (isset($re) && $re != 0) ? ">>$re" : "";
 	} else {
@@ -270,26 +274,6 @@ if(!($_SERVER["REQUEST_METHOD"] == "POST") || isset($error_list)) {
 	}
 } else {
 	$title = "送信完了";
-}
-
-// コメントフォームのサイズ
-switch(device_info()) {
-	case "sp":
-		$comment_w = 40;
-		$comment_h = 6;
-		break;
-	case "mb":
-		$comment_w = 40;
-		$comment_h = 4;
-		break;
-	case "pc":
-		$comment_w = 80;
-		$comment_h = 12;
-		break;
-	default:
-		$comment_w = 40;
-		$comment_h = 4;
-		break;
 }
 ?>
 <html>
@@ -326,7 +310,7 @@ if(!($_SERVER["REQUEST_METHOD"] == "POST") || isset($error_list)) {
 	}
 ?>
 本文<br />
-<textarea name="comment" cols="<?=$comment_w?>" rows="<?=$comment_h?>" wrap="virtual"><?=$comment?></textarea><br />
+<textarea id="comment" name="comment" wrap="virtual"><?=$comment?></textarea><br />
 <?php
 	if($mode == 1) {
 ?>
@@ -392,11 +376,12 @@ if(!($_SERVER["REQUEST_METHOD"] == "POST") || isset($error_list)) {
 <?php
 if($mode == 1 || $mode == 2) {
 ?>
-<li><a href="/bbs/u/read.php?id=<?=$boad->sname?>&tid=<?=$thread->tid?>">スレッドに戻る</a></li>
+<li><a href="/bbs/u/read.php?id=<?=$boad->sname?>&tid=<?=$thread->tid?>"<?=mbi_ack(7)?>><?=mbi("7.")?>スレッドに戻る</a></li>
 <?php
 }
 ?>
-<li><a href="/bbs/u/?id=<?=$boad->sname?>"<?=mbi_ack(9)?>><?=mbi("8.").$boad->name?></a></li>
+<li><a href="/bbs/u/?id=<?=$boad->sname?>"<?=mbi_ack(8)?>><?=mbi("8.").$boad->name?></a></li>
+<li><a href="/bbs/"<?=mbi_ack(9)?>><?=mbi("9.")?>掲示板一覧</a></li>
 <li><a href="/"<?=mbi_ack(0)?>><?=mbi("0.")?>トップページ</a></li>
 </ul>
 <?php

@@ -29,5 +29,20 @@ class Message {
 		$this->ua = $array["ua"];
 		$this->uid = $array["uid"];
 	}
+
+	//--------------------------
+	// メッセージ出力
+	//--------------------------
+	public function printMessage() {
+?>
+<hr class="normal">
+<p>
+[<?=$this->tmid?>] By <?=htmlspecialchars($this->name)?><br />
+<?=nl2br(htmlspecialchars($this->comment))?><br />
+<?=$this->ts?><br />
+[<a href="./form.php?mode=reform&id=<?=$boad->sname?>&tid=<?=$tid?>&re=<?=$this->tmid?>">返信</a>] [<a href="./form.php?mode=modify&id=<?=$boad->sname?>&tid=<?=$tid?>&tmid=<?=$this->tmid?>">編集</a>]
+</p>
+<?php
+	}
 }
 ?>
