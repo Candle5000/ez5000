@@ -60,6 +60,19 @@ table#status {
 table#status td {
 	font-size:small;
 }
+textarea#comment {
+	width:90%;
+}
+@media screen and (max-height: 800px) {
+	textarea {
+		height:10em;
+	}
+}
+@media screen and (min-height: 800px) {
+	textarea {
+		height:20em;
+	}
+}
 ul#dblink li {
 	background: -webkit-gradient(linear, left top, right bottom, from(#FFFACD),color-stop(0.7, #FFFACD),to(#F0CD96));
 	font-size:large;

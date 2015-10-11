@@ -275,26 +275,6 @@ if(!($_SERVER["REQUEST_METHOD"] == "POST") || isset($error_list)) {
 } else {
 	$title = "送信完了";
 }
-
-// コメントフォームのサイズ
-switch(device_info()) {
-	case "sp":
-		$comment_w = 40;
-		$comment_h = 6;
-		break;
-	case "mb":
-		$comment_w = 40;
-		$comment_h = 4;
-		break;
-	case "pc":
-		$comment_w = 80;
-		$comment_h = 12;
-		break;
-	default:
-		$comment_w = 40;
-		$comment_h = 4;
-		break;
-}
 ?>
 <html>
 <head>
@@ -330,7 +310,7 @@ if(!($_SERVER["REQUEST_METHOD"] == "POST") || isset($error_list)) {
 	}
 ?>
 本文<br />
-<textarea name="comment" cols="<?=$comment_w?>" rows="<?=$comment_h?>" wrap="virtual"><?=$comment?></textarea><br />
+<textarea id="comment" name="comment" wrap="virtual"><?=$comment?></textarea><br />
 <?php
 	if($mode == 1) {
 ?>
