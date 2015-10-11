@@ -17,7 +17,13 @@ if(!preg_match("/^[a-zA-Z0-9]{1,16}$/", $id)) die("ERROR02:無効なIDです");
 // スレッドID取得
 if(!isset($_GET["tid"])) die("ERROR03:IDがありません");
 $tid = $_GET["tid"];
-if(!preg_match("/^[0-9]{1,9}$/", $tid)) die("ERROR04:無効なIDです");
+if(!is_numeric($tid)) die("ERROR04:無効なIDです");
+
+// レス番号を取得
+if(isset($_GET["tmid"])) {
+	$tmid = $_GET["tmid"];
+	if(!is_numeric($tmid)) die("ERROR05:無効なIDです");
+}
 
 // ページを取得
 $page = (isset($_GET["page"]) && preg_match("/^[0-9]+$/", $_GET["page"])) ? $_GET["page"] : 0;
@@ -36,16 +42,9 @@ if($mysql->connect_error) die("データベースの接続に失敗しました"
 // 掲示板情報を取得
 $sql = "SELECT * FROM `boad` WHERE `sname`='$id'";
 $result = $mysql->query($sql);
-if(!$result->num_rows) die("ERROR05:存在しないIDです");
+if(!$result->num_rows) die("ERROR06:存在しないIDです");
 $boad = new Boad($result->fetch_array());
 $title = htmlspecialchars($boad->name);
-
-// レス数を取得
-$sql = "SELECT COUNT(`mid`) AS `count` FROM `{$id}_m` WHERE `tid`='$tid'";
-$result = $mysql->query($sql);
-if($mysql->error) die("ERROR06:存在しないIDです");
-$array = $result->fetch_array();
-$rows = $array["count"];
 
 // スレッド情報を取得
 $sql = "SELECT * FROM `{$id}_t` WHERE `tid`='$tid'";
@@ -54,34 +53,52 @@ if($mysql->error) die("ERROR07:存在しないIDです");
 if(!$result->num_rows) die("ERROR08:存在しないIDです");
 $thread = new Thread($result->fetch_array());
 
-// メッセージ情報(1)を取得 ページ0のときのみ
-if($page == 0) {
-	$sql = "SELECT * FROM `{$id}_m` WHERE `tid`='$tid' AND `tmid`='1'";
+if(!isset($tmid)) {
+	//------------------------------
+	// メッセージ一覧表示
+	//------------------------------
+
+	// メッセージ情報(1)を取得 ページ0のときのみ
+	if($page == 0) {
+		$sql = "SELECT * FROM `{$id}_m` WHERE `tid`='$tid' AND `tmid`='1'";
+		$result = $mysql->query($sql);
+		if($mysql->error) die("ERROR11:存在しないIDです");
+		if(!$result->num_rows) die("ERROR12:存在しないIDです");
+		$fmessage = new Message($result->fetch_array());
+	}
+
+	// メッセージ情報を取得
+	if($page == 0) {
+		$sql = "SELECT * FROM `{$id}_m` WHERE `tid`='$tid' AND `tmid`>'1' ORDER BY `tmid` DESC LIMIT 0,$LIMIT";
+	} else {
+		$sql = "SELECT * FROM `{$id}_m` WHERE `tid`='$tid' ORDER BY `tmid` DESC LIMIT ".($page * $LIMIT).",$LIMIT";
+	}
 	$result = $mysql->query($sql);
-	if($mysql->error) die("ERROR09:存在しないIDです");
-	if(!$result->num_rows) die("ERROR10:存在しないIDです");
-	$fmessage = new Message($result->fetch_array());
-}
+	if($mysql->error) die("ERROR13:存在しないIDです");
 
-// メッセージ情報を取得
-if($page == 0) {
-	$sql = "SELECT * FROM `{$id}_m` WHERE `tid`='$tid' AND `tmid`>'1' ORDER BY `tmid` DESC LIMIT 0,$LIMIT";
+	// ページ切り替えリンク生成
+	if(($page > 0) && ($thread->mcount > 0)) {
+		$pagelink = "<a href=\"./read.php?id=$id&tid=$tid&page=".($page - 1)."\"".mbi_ack("*").">".mbi("*.")."前のページ</a> | ";
+	} else {
+		$pagelink = mbi("*.")."前のページ | ";
+	}
+	if((($page + 1) * $LIMIT) < $thread->mcount) {
+		$pagelink .= "<a href=\"./read.php?id=$id&tid=$tid&page=".($page + 1)."\"".mbi_ack("#").">".mbi("#.")."次のページ</a>";
+	} else {
+		$pagelink .= mbi("#.")."次のページ";
+	}
 } else {
-	$sql = "SELECT * FROM `{$id}_m` WHERE `tid`='$tid' ORDER BY `tmid` DESC LIMIT ".($page * $LIMIT).",$LIMIT";
-}
-$result = $mysql->query($sql);
-if($mysql->error) die("ERROR11:存在しないIDです");
+	//------------------------------
+	// メッセージ一覧表示
+	//------------------------------
 
-// ページ切り替えリンク生成
-if(($page > 0) && ($rows > 0)) {
-	$pagelink = "<a href=\"./read.php?id=$id&tid=$tid&page=".($page - 1)."\"".mbi_ack("*").">".mbi("*.")."前のページ</a> | ";
-} else {
-	$pagelink = mbi("*.")."前のページ | ";
-}
-if((($page + 1) * $LIMIT) < $rows) {
-	$pagelink .= "<a href=\"./read.php?id=$id&tid=$tid&page=".($page + 1)."\"".mbi_ack("#").">".mbi("#.")."次のページ</a>";
-} else {
-	$pagelink .= mbi("#.")."次のページ";
+	// メッセージ情報を取得
+	$sql = "SELECT * FROM `{$id}_m` WHERE `tid`='$tid' AND `tmid`='$tmid'";
+	$result = $mysql->query($sql);
+	if($mysql->error) die("ERROR21:存在しないIDです");
+	if(!$result->num_rows) die("ERROR22:メッセージが存在しません");
+
+	$pagelink = mbi("*.")."前のページ | ".mbi("#.")."次のページ";
 }
 ?>
 <html>
@@ -100,35 +117,26 @@ if((($page + 1) * $LIMIT) < $rows) {
 <hr class="normal">
 <div class="cnt"><?=$pagelink?></div>
 <?php
-if($page == 0) {
-?>
-<hr class="normal">
-<p>
-[1] By <?=htmlspecialchars($fmessage->name)?><br />
-<?=nl2br(htmlspecialchars($fmessage->comment))?><br />
-<?=$fmessage->ts?><br />
-[<a href="./form.php?mode=reform&id=<?=$boad->sname?>&tid=<?=$tid?>&re=1">返信</a>] [<a href="./form.php?mode=modify&id=<?=$boad->sname?>&tid=<?=$tid?>&tmid=1">編集</a>]
-</p>
-<?php
+if($page == 0 && !isset($tmid)) {
+	$fmessage->printMessage();
 }
 
 while($array = $result->fetch_array()) {
 	$message = new Message($array);
-?>
-<hr class="normal">
-<p>
-[<?=$message->tmid?>] By <?=htmlspecialchars($message->name)?><br />
-<?=nl2br(htmlspecialchars($message->comment))?><br />
-<?=$message->ts?><br />
-[<a href="./form.php?mode=reform&id=<?=$boad->sname?>&tid=<?=$tid?>&re=<?=$message->tmid?>">返信</a>] [<a href="./form.php?mode=modify&id=<?=$boad->sname?>&tid=<?=$tid?>&tmid=<?=$message->tmid?>">編集</a>]
-</p>
-<?php
+	$message->printMessage();
 }
 ?>
 <hr class="normal">
 <div class="cnt"><?=$pagelink?></div>
 <hr class="normal">
 <ul id="footlink">
+<?php
+if(isset($tmid)) {
+?>
+<li><a href="/bbs/u/read.php?id=<?=$boad->sname?>&tid=<?=$thread->tid?>"<?=mbi_ack(7)?>><?=mbi("7.")?>スレッドに戻る</a></li>
+<?php
+}
+?>
 <li><a href="/bbs/u/?id=<?=$boad->sname?>"<?=mbi_ack(8)?>><?=mbi("8.")?><?=$boad->name?></a></li>
 <li><a href="/bbs/"<?=mbi_ack(9)?>><?=mbi("9.")?>掲示板一覧</a></li>
 <li><a href="/"<?=mbi_ack(0)?>><?=mbi("0.")?>トップページ</a></li>

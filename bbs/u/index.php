@@ -73,10 +73,12 @@ if((($page + 1) * $LIMIT) < $rows) {
 <ul id="linklist">
 <?php
 if($result->num_rows) {
+	$date = date("Y-m-d H:i:s", strtotime("-2 day"));
 	while($array = $result->fetch_array()) {
 		$thread = new Thread($array);
+		$new = (strtotime($date) < strtotime($thread->updated)) ? "<span class=\"nc6\">New</span>" : "";
 ?>
-<li><a href="./read.php?id=<?=$boad->sname?>&tid=<?=$thread->tid?>"><?=htmlspecialchars($thread->title)?></a></li>
+<li><a href="./read.php?id=<?=$boad->sname?>&tid=<?=$thread->tid?>"><?=htmlspecialchars($thread->title)."(".$thread->mcount.")"?></a><?=$new?></li>
 <?php
 	}
 } else {

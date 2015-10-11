@@ -47,6 +47,10 @@ table th {
 table#topcount {
 	width:90%;
 }
+textarea#comment {
+	width:90%;
+	height:4em;
+}
 ul#dblink {
 	font-size:small;
 }

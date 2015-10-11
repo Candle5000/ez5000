@@ -117,6 +117,9 @@ function is_au() {
 function pagehead($title) {
 ?>
 <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Cache-Control" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <meta http-equiv="Content-Style-Type" content="text/css" />
 <meta http-equiv="content-language" content="ja" />
 <?php

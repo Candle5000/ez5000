@@ -14,6 +14,7 @@ class Thread {
 	public $writepass;
 	public $acount;
 	public $mcount;
+	public $updated;
 	public $locked;
 	public $top;
 
@@ -26,6 +27,7 @@ class Thread {
 		$this->tindex = $array["tindex"];
 		$this->acount = $array["acount"];
 		$this->mcount = $array["mcount"];
+		$this->updated = $array["updated"];
 		$this->locked = $array["locked"];
 		$this->top = $array["top"];
 	}
