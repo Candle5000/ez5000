@@ -189,11 +189,12 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 		$sql_name = $mysql->real_escape_string($name);
 		$sql_comment = $mysql->real_escape_string($comment);
 		$sql_pass = $mysql->real_escape_string($pass);
+		$date = date("Y-m-d");
 
 		switch($mode) {
 
 			case 0: // スレッド作成
-				$sql = "INSERT INTO `{$id}_t` (`title`, `tindex`, `mcount`) SELECT '{$sql_title}' AS `title`, MAX(`tindex`)+1 AS `tindex`, '1' FROM `{$id}_t`";
+				$sql = "INSERT INTO `{$id}_t` (`title`, `tindex`, `mcount`, `updated`) SELECT '{$sql_title}' AS `title`, MAX(`tindex`)+1 AS `tindex`, '1' AS `mcount`, '$date' AS `updated` FROM `{$id}_t`";
 				$mysql->query($sql);
 				if($mysql->error) die("ERROR21:クエリ処理に失敗しました");
 				$sql = "INSERT INTO `{$id}_m` (`tid`, `tmid`, `name`, `comment`, `password`, `ts`, `ip`, `ua`, `uid`) VALUES (LAST_INSERT_ID(), '1', '$sql_name', '$sql_comment', PASSWORD('$sql_pass'), NOW(), '$ip', '$ua', '$uid')";
@@ -209,7 +210,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 				if($sage) {
 					$sql = "UPDATE `{$id}_t` SET `mcount`=`mcount`+1 WHERE `tid`='$tid'";
 				} else {
-					$sql = "UPDATE `{$id}_t`, (SELECT MAX(`tindex`)+1 AS `tindex_max` FROM `{$id}_t`) AS `thread` SET `tindex`=`thread`.`tindex_max`, `mcount`=`mcount`+1 WHERE `tid`='$tid'";
+					$sql = "UPDATE `{$id}_t`, (SELECT MAX(`tindex`)+1 AS `tindex_max` FROM `{$id}_t`) AS `thread` SET `tindex`=`thread`.`tindex_max`, `mcount`=`mcount`+1, `updated`='$date' WHERE `tid`='$tid'";
 				}
 				$mysql->query($sql);
 				if($mysql->error) die("ERROR24:クエリ処理に失敗しました");
