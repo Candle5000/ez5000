@@ -26,7 +26,7 @@ if(isset($_GET["tmid"])) {
 }
 
 // ページを取得
-$page = (isset($_GET["page"]) && preg_match("/^[0-9]+$/", $_GET["page"])) ? $_GET["page"] : 0;
+$page = (isset($_GET["page"]) && is_numeric($_GET["page"])) ? $_GET["page"] : 0;
 
 $user_file = "/etc/mysql-user/userbbs.ini";
 if($fp_user = fopen($user_file, "r")) {
@@ -47,6 +47,10 @@ $boad = new Boad($result->fetch_array());
 $title = htmlspecialchars($boad->name);
 
 // スレッド情報を取得
+if(!isset($_GET["tmid"]) && !isset($_GET["page"])) {
+	$sql = "UPDATE `{$id}_t` SET `acount`=`acount`+1 WHERE `tid`='$tid'";
+	$mysql->query($sql);
+}
 $sql = "SELECT * FROM `{$id}_t` WHERE `tid`='$tid'";
 $result = $mysql->query($sql);
 if($mysql->error) die("ERROR07:存在しないIDです");
@@ -152,7 +156,7 @@ if(isset($tmid)) {
 <li><a href="/"<?=mbi_ack(0)?>><?=mbi("0.")?>トップページ</a></li>
 </ul>
 <?php
-pagefoot(0);
+pagefoot($thread->acount);
 ?>
 </div>
 </body>

@@ -26,6 +26,8 @@ $mysql = new MySQL($userName, $password, $database);
 if($mysql->connect_error) die("データベースの接続に失敗しました");
 
 // 掲示板情報を取得
+$sql = "UPDATE `boad` SET `count`=`count`+1 WHERE `sname`='$id'";
+$mysql->query($sql);
 $sql = "SELECT * FROM `boad` WHERE `sname`='$id'";
 $result = $mysql->query($sql);
 if(!$result->num_rows) die("ERROR03:存在しないIDです");
@@ -96,7 +98,7 @@ if($result->num_rows) {
 <li><a href="/"<?=mbi_ack(0)?>><?=mbi("0.")?>トップページ</a></li>
 </ul>
 <?php
-pagefoot(0);
+pagefoot($boad->count);
 ?>
 </div>
 </body>
