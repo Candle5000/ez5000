@@ -85,14 +85,15 @@ if($mode == 1 || $mode == 2) {
 	if($mysql->error) die("ERROR12:存在しないIDです");
 	if(!$result->num_rows) die("ERROR13:存在しないIDです");
 	$thread = new Thread($result->fetch_array());
+	if($thread->mcount > 999) die("ERROR14:スレッドの投稿数が上限に達しています");
 }
 
 // メッセージ情報を取得 編集モードのみ
 if($mode == 2) {
 	$sql = "SELECT * FROM `{$id}_m` WHERE `tid`='$tid' AND `tmid`='$tmid'";
 	$result = $mysql->query($sql);
-	if($mysql->error) die("ERROR14:存在しないIDです");
-	if(!$result->num_rows) die("ERROR15:メッセージが見つかりません");
+	if($mysql->error) die("ERROR15:存在しないIDです");
+	if(!$result->num_rows) die("ERROR16:メッセージが見つかりません");
 	$message = new Message($result->fetch_array());
 }
 
@@ -175,6 +176,10 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 	if($pass == "") $error_list[] = "パスワードが空です";
 	if(!preg_match("/^[!-~]{4,64}$/", $pass)) $error_list[] = "パスワードは半角英数字と記号のみで4～64文字にしてください";
 
+	// 連投チェック
+	if($mode == 0 && isset($_SESSION["thposttime"]) && ($_SESSION["thposttime"] > time())) $error_list[] = "300秒間は連続でスレッドを作成できません";
+	if($mode == 1 && isset($_SESSION["reposttime"]) && ($_SESSION["reposttime"] > time())) $error_list[] = "60秒間は連続で返信を投稿できません";
+
 	// ユーザー情報取得
 	$ip = $_SERVER["REMOTE_ADDR"];
 	$ua = $_SERVER["HTTP_USER_AGENT"];
@@ -189,18 +194,18 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 		$sql_name = $mysql->real_escape_string($name);
 		$sql_comment = $mysql->real_escape_string($comment);
 		$sql_pass = $mysql->real_escape_string($pass);
-		$date = date("Y-m-d");
 
 		switch($mode) {
 
 			case 0: // スレッド作成
-				$sql = "INSERT INTO `{$id}_t` (`title`, `tindex`, `mcount`, `updated`) SELECT '{$sql_title}' AS `title`, MAX(`tindex`)+1 AS `tindex`, '1' AS `mcount`, '$date' AS `updated` FROM `{$id}_t`";
+				$sql = "INSERT INTO `{$id}_t` (`title`, `tindex`, `mcount`, `updated`) SELECT '{$sql_title}' AS `title`, MAX(`tindex`)+1 AS `tindex`, '1' AS `mcount`, NOW() AS `updated` FROM `{$id}_t`";
 				$mysql->query($sql);
 				if($mysql->error) die("ERROR21:クエリ処理に失敗しました");
 				$sql = "INSERT INTO `{$id}_m` (`tid`, `tmid`, `name`, `comment`, `password`, `ts`, `ip`, `ua`, `uid`) VALUES (LAST_INSERT_ID(), '1', '$sql_name', '$sql_comment', PASSWORD('$sql_pass'), NOW(), '$ip', '$ua', '$uid')";
 				$mysql->query($sql);
 				if($mysql->error) die("ERROR22:クエリ処理に失敗しました");
 				if($name != $boad->default_name) setcookie("bbs_name", $name, time() + 604800);
+				$_SESSION["thposttime"] = time() + 300;
 				break;
 
 			case 1: // 返信投稿
@@ -208,13 +213,14 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 				$mysql->query($sql);
 				if($mysql->error) die("ERROR23:クエリ処理に失敗しました");
 				if($sage) {
-					$sql = "UPDATE `{$id}_t` SET `mcount`=`mcount`+1 WHERE `tid`='$tid'";
+					$sql = "UPDATE `{$id}_t` SET `mcount`=`mcount`+1, `updated`=NOW() WHERE `tid`='$tid'";
 				} else {
-					$sql = "UPDATE `{$id}_t`, (SELECT MAX(`tindex`)+1 AS `tindex_max` FROM `{$id}_t`) AS `thread` SET `tindex`=`thread`.`tindex_max`, `mcount`=`mcount`+1, `updated`='$date' WHERE `tid`='$tid'";
+					$sql = "UPDATE `{$id}_t`, (SELECT MAX(`tindex`)+1 AS `tindex_max` FROM `{$id}_t`) AS `thread` SET `tindex`=`thread`.`tindex_max`, `mcount`=`mcount`+1, `updated`=NOW() WHERE `tid`='$tid'";
 				}
 				$mysql->query($sql);
 				if($mysql->error) die("ERROR24:クエリ処理に失敗しました");
 				if($name != $boad->default_name) setcookie("bbs_name", $name, time() + 604800);
+				$_SESSION["reposttime"] = time() + 60;
 				break;
 
 			case 2: // メッセージ編集
