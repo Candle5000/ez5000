@@ -56,8 +56,15 @@ class Message {
 		$text = preg_replace("/&gt;&gt;&gt;(([0-9]+)(\.[0-9]+)?)/", ">>>$1", $text);
 		$text = preg_replace("/&gt;&gt;([0-9]+)/", ">>$1", $text);
 
-		// メッセージアンカー
+		// URL変換
+		$pattern = '/https?:\/\/([0-9a-z\.\-]+)[\w\/:%#\$&\?\(\)~\.=\+\-]+/';
+		$replace = '<a href="$0" target="_blank">$1</a>';
+		$text = preg_replace($pattern, $replace, $text);
+
+		// アンカーのパターン
 		$pattern = "/>>>([0-9]+)\.([0-9]+)/";
+
+		// メッセージアンカー
 		while(preg_match($pattern, $text, $match)) {
 			$sql = "SELECT 1 FROM `{$id}_m` WHERE `tid`='{$match["1"]}' AND `tmid`='{$match["2"]}'";
 			$result = $mysql->query($sql);
