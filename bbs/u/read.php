@@ -26,7 +26,7 @@ if(isset($_GET["tmid"])) {
 }
 
 // ページを取得
-$page = (isset($_GET["page"]) && preg_match("/^[0-9]+$/", $_GET["page"])) ? $_GET["page"] : 0;
+$page = (isset($_GET["page"]) && is_numeric($_GET["page"])) ? $_GET["page"] : 0;
 
 $user_file = "/etc/mysql-user/userbbs.ini";
 if($fp_user = fopen($user_file, "r")) {
@@ -47,6 +47,10 @@ $boad = new Boad($result->fetch_array());
 $title = htmlspecialchars($boad->name);
 
 // スレッド情報を取得
+if(!isset($_GET["tmid"]) && !isset($_GET["view"]) && !isset($_GET["page"])) {
+	$sql = "UPDATE `{$id}_t` SET `acount`=`acount`+1 WHERE `tid`='$tid'";
+	$mysql->query($sql);
+}
 $sql = "SELECT * FROM `{$id}_t` WHERE `tid`='$tid'";
 $result = $mysql->query($sql);
 if($mysql->error) die("ERROR07:存在しないIDです");
@@ -59,7 +63,7 @@ if(!isset($tmid)) {
 	//------------------------------
 
 	// メッセージ情報(1)を取得 ページ0のときのみ
-	if($page == 0) {
+	if($page == 0 && !isset($_GET["view"])) {
 		$sql = "SELECT * FROM `{$id}_m` WHERE `tid`='$tid' AND `tmid`='1'";
 		$result = $mysql->query($sql);
 		if($mysql->error) die("ERROR11:存在しないIDです");
@@ -68,28 +72,30 @@ if(!isset($tmid)) {
 	}
 
 	// メッセージ情報を取得
-	if($page == 0) {
+	if($page == 0 && !isset($_GET["view"])) {
 		$sql = "SELECT * FROM `{$id}_m` WHERE `tid`='$tid' AND `tmid`>'1' ORDER BY `tmid` DESC LIMIT 0,$LIMIT";
 	} else {
-		$sql = "SELECT * FROM `{$id}_m` WHERE `tid`='$tid' ORDER BY `tmid` DESC LIMIT ".($page * $LIMIT).",$LIMIT";
+		$order = (isset($_GET["view"]) && $_GET["view"] == "asc") ? "ASC" : "DESC";
+		$sql = "SELECT * FROM `{$id}_m` WHERE `tid`='$tid' ORDER BY `tmid` $order LIMIT ".($page * $LIMIT).",$LIMIT";
 	}
 	$result = $mysql->query($sql);
 	if($mysql->error) die("ERROR13:存在しないIDです");
 
 	// ページ切り替えリンク生成
+	$view = isset($_GET["view"]) ? ($_GET["view"] == "asc") ? "&view=asc" : "&view=desc" : "";
 	if(($page > 0) && ($thread->mcount > 0)) {
-		$pagelink = "<a href=\"./read.php?id=$id&tid=$tid&page=".($page - 1)."\"".mbi_ack("*").">".mbi("*.")."前のページ</a> | ";
+		$pagelink = "<a href=\"./read.php?id=$id&tid=$tid$view&page=".($page - 1)."\"".mbi_ack("*").">".mbi("*.")."前のページ</a> | ";
 	} else {
 		$pagelink = mbi("*.")."前のページ | ";
 	}
 	if((($page + 1) * $LIMIT) < $thread->mcount) {
-		$pagelink .= "<a href=\"./read.php?id=$id&tid=$tid&page=".($page + 1)."\"".mbi_ack("#").">".mbi("#.")."次のページ</a>";
+		$pagelink .= "<a href=\"./read.php?id=$id&tid=$tid$view&page=".($page + 1)."\"".mbi_ack("#").">".mbi("#.")."次のページ</a>";
 	} else {
 		$pagelink .= mbi("#.")."次のページ";
 	}
 } else {
 	//------------------------------
-	// メッセージ一覧表示
+	// 単一メッセージ表示
 	//------------------------------
 
 	// メッセージ情報を取得
@@ -112,18 +118,24 @@ if(!isset($tmid)) {
 <h2>[<?=$thread->tid?>] <?=htmlspecialchars($thread->title)?></h2>
 <hr class="normal">
 <p>
-[<a href="./form.php?mode=reform&id=<?=$boad->sname?>&tid=<?=$tid?>"<?=mbi_ack(2)?>><?=mbi("2.")?>返信</a>]
+<?php
+$reply = mbi("2.")."返信";
+$reply = ($thread->mcount > 999) ? "[$reply]" : "[<a href=\"./form.php?mode=reform&id=".$boad->sname."&tid=$tid\"".mbi_ack(2).">$reply</a>]";
+$old = "[<a href=\"./read.php?id=".$boad->sname."&tid=$tid&view=asc&page=0\"".mbi_ack(4).">".mbi("4.")."最古</a>]";
+$new = "[<a href=\"./read.php?id=".$boad->sname."&tid=$tid&view=desc&page=0\"".mbi_ack(6).">".mbi("6.")."最新</a>]";
+?>
+<?=$reply?> <?=$old?> <?=$new?>
 </p>
 <hr class="normal">
 <div class="cnt"><?=$pagelink?></div>
 <?php
-if($page == 0 && !isset($tmid)) {
-	$fmessage->printMessage($boad, $thread);
+if($page == 0 && !isset($_GET["view"]) && !isset($tmid)) {
+	$fmessage->printMessage($mysql, $boad, $thread);
 }
 
 while($array = $result->fetch_array()) {
 	$message = new Message($array);
-	$message->printMessage($boad, $thread);
+	$message->printMessage($mysql, $boad, $thread);
 }
 ?>
 <hr class="normal">
@@ -142,7 +154,7 @@ if(isset($tmid)) {
 <li><a href="/"<?=mbi_ack(0)?>><?=mbi("0.")?>トップページ</a></li>
 </ul>
 <?php
-pagefoot(0);
+pagefoot($thread->acount);
 ?>
 </div>
 </body>

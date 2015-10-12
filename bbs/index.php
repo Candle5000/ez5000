@@ -7,7 +7,6 @@ require_once("/var/www/bbs/class/boad.php");
 require_once("/var/www/functions/template.php");
 
 $title = "掲示板";
-$sql = "SELECT * FROM boad";
 $user_file = "/etc/mysql-user/userbbs.ini";
 if($fp_user = fopen($user_file, "r")) {
 	$userName = rtrim(fgets($fp_user));
@@ -18,6 +17,11 @@ if($fp_user = fopen($user_file, "r")) {
 }
 $mysql = new MySQL($userName, $password, $database);
 if($mysql->connect_error) die("データベースの接続に失敗しました");
+$sql = "UPDATE `accesscount` SET `count`=`count`+1 WHERE `id`='10001'";
+$mysql->query($sql);
+$sql = "SELECT `count` FROM `accesscount` WHERE `id`='10001'";
+$count = $mysql->query($sql)->fetch_object()->count;
+$sql = "SELECT * FROM `boad`";
 $result = $mysql->query($sql);
 ?>
 <html>
@@ -30,10 +34,16 @@ $result = $mysql->query($sql);
 <hr class="normal">
 <ul id="linklist">
 <?php
-while($array = $result->fetch_array()) {
-	$boad = new Boad($array);
+if($result->num_rows) {
+	while($array = $result->fetch_array()) {
+		$boad = new Boad($array);
 ?>
 <li><a href="./u/?id=<?=$boad->sname?>"><?=$boad->name?></a></li>
+<?php
+	}
+} else {
+?>
+<li>掲示板がありません</li>
 <?php
 }
 ?>
@@ -43,7 +53,7 @@ while($array = $result->fetch_array()) {
 <li><a href="/"<?=mbi_ack(0)?>><?=mbi("0.")?>トップページ</a></li>
 </ul>
 <?php
-pagefoot(0);
+pagefoot($count);
 ?>
 </div>
 </body>
