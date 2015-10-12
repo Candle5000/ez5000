@@ -176,6 +176,10 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 	if($pass == "") $error_list[] = "パスワードが空です";
 	if(!preg_match("/^[!-~]{4,64}$/", $pass)) $error_list[] = "パスワードは半角英数字と記号のみで4～64文字にしてください";
 
+	// 連投チェック
+	if($mode == 0 && isset($_SESSION["thposttime"]) && ($_SESSION["thposttime"] > time())) $error_list[] = "300秒間は連続でスレッドを作成できません";
+	if($mode == 1 && isset($_SESSION["reposttime"]) && ($_SESSION["reposttime"] > time())) $error_list[] = "60秒間は連続で返信を投稿できません";
+
 	// ユーザー情報取得
 	$ip = $_SERVER["REMOTE_ADDR"];
 	$ua = $_SERVER["HTTP_USER_AGENT"];
@@ -190,7 +194,6 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 		$sql_name = $mysql->real_escape_string($name);
 		$sql_comment = $mysql->real_escape_string($comment);
 		$sql_pass = $mysql->real_escape_string($pass);
-		$date = date("Y-m-d");
 
 		switch($mode) {
 
@@ -202,6 +205,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 				$mysql->query($sql);
 				if($mysql->error) die("ERROR22:クエリ処理に失敗しました");
 				if($name != $boad->default_name) setcookie("bbs_name", $name, time() + 604800);
+				$_SESSION["thposttime"] = time() + 300;
 				break;
 
 			case 1: // 返信投稿
@@ -216,6 +220,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 				$mysql->query($sql);
 				if($mysql->error) die("ERROR24:クエリ処理に失敗しました");
 				if($name != $boad->default_name) setcookie("bbs_name", $name, time() + 604800);
+				$_SESSION["reposttime"] = time() + 60;
 				break;
 
 			case 2: // メッセージ編集
