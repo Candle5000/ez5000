@@ -15,11 +15,14 @@ class Message {
 	public $ip;
 	public $ua;
 	public $uid;
+	public $mysql;
+	public $boad;
+	public $thread;
 
 	//--------------------------
 	// コンストラクタ
 	//--------------------------
-	function Message($array) {
+	function Message($array, $mysql_temp, $boad_temp, $thread_temp) {
 		$this->mid = $array["mid"];
 		$this->tmid = $array["tmid"];
 		$this->name = $array["name"];
@@ -28,20 +31,23 @@ class Message {
 		$this->ip = $array["ip"];
 		$this->ua = $array["ua"];
 		$this->uid = $array["uid"];
+		$this->mysql = $mysql_temp;
+		$this->boad = $boad_temp;
+		$this->thread = $thread_temp;
 	}
 
 	//--------------------------
 	// メッセージ出力
 	//--------------------------
-	public function printMessage($mysql, $boad, $thread) {
-		$reply = ($thread->mcount > 999) ? "返信" : "<a href=\"./form.php?mode=reform&id=".$boad->sname."&tid=".$thread->tid."&re=".$this->tmid."\">返信</a>";
+	public function printMessage() {
+		$reply = ($this->thread->mcount > 999) ? "返信" : "<a href=\"./form.php?mode=reform&id=".$this->boad->sname."&tid=".$this->thread->tid."&re=".$this->tmid."\">返信</a>";
 ?>
 <hr class="normal">
 <p>
 [<?=$this->tmid?>] By <?=htmlspecialchars($this->name)?><br />
-<?=$this->textConvert($mysql, $boad, $thread, $this->comment)?><br />
+<?=$this->textConvert($this->comment)?><br />
 <?=$this->ts?><br />
-[<?=$reply?>] [<a href="./form.php?mode=modify&id=<?=$boad->sname?>&tid=<?=$thread->tid?>&tmid=<?=$this->tmid?>">編集</a>]
+[<?=$reply?>] [<a href="./form.php?mode=modify&id=<?=$this->boad->sname?>&tid=<?=$this->thread->tid?>&tmid=<?=$this->tmid?>">編集</a>]
 </p>
 <?php
 	}
@@ -49,66 +55,45 @@ class Message {
 	//--------------------------
 	// 本文変換
 	//--------------------------
-	public function textConvert($mysql, $boad, $thread, $text) {
-		$id = $boad->sname;
-		$tid = $thread->tid;
-		$text = nl2br(htmlspecialchars($text));
-		$text = preg_replace("/&gt;&gt;&gt;(([0-9]+)(\.[0-9]+)?)/", ">>>$1", $text);
-		$text = preg_replace("/&gt;&gt;([0-9]+)/", ">>$1", $text);
+	private function textConvert($text) {
+		mb_regex_encoding("UTF-8");
+		$pattern = '/(https?:\/\/([0-9a-z\.\-]+)[\w\/:%#\$&\?~\.=\+\-]+)|(>>>([0-9]+)\.([0-9]+))|(>>>([0-9]+))|(>>([0-9]+))|([<>&])/';
+		$text = preg_replace_callback($pattern, array($this, 'textReplace'), $text);
+		return(nl2br($text));
+	}
 
-		// URL変換
-		$pattern = '/https?:\/\/([0-9a-z\.\-]+)[\w\/:%#\$&\?\(\)~\.=\+\-]+/';
-		$replace = '<a href="$0" target="_blank">$1</a>';
-		$text = preg_replace($pattern, $replace, $text);
-
-		// アンカーのパターン
-		$pattern = "/>>>([0-9]+)\.([0-9]+)/";
-
-		// メッセージアンカー
-		while(preg_match($pattern, $text, $match)) {
-			$sql = "SELECT 1 FROM `{$id}_m` WHERE `tid`='{$match["1"]}' AND `tmid`='{$match["2"]}'";
-			$result = $mysql->query($sql);
-			$link_text = "&gt;&gt;&gt;{$match[1]}.{$match[2]}";
-			if($result->num_rows) {
-				$replace = "<a href=\"/bbs/u/read.php?id=$id&tid={$match[1]}&tmid={$match[2]}\">$link_text</a>";
+	//--------------------------
+	// 検索置換
+	//--------------------------
+	private function textReplace($matches) {
+		if($matches[1] != "") {
+			return("<a href=\"{$matches[1]}\" target=\"blank\">".htmlspecialchars($matches[2])."</a>");
+		} else if($matches[3] != "") {
+			$sql = "SELECT 1 FROM `{$this->boad->sname}_m` WHERE `tid`='{$matches[4]}' AND `tmid`='{$matches[5]}'";
+			if($this->mysql->query($sql)->num_rows) {
+				return("<a href=\"./read.php?id=".$this->boad->sname."&tid={$matches[4]}&tmid={$matches[5]}\">".htmlspecialchars($matches[3])."</a>");
 			} else {
-				$replace = $link_text;
+				return(htmlspecialchars($matches[3]));
 			}
-			$search = ">>>{$match[1]}.{$match[2]}";
-			$text = str_replace($search, $replace, $text);
-		}
-
-		// スレッドアンカー
-		$pattern = "/>>>([0-9]+)/";
-		while(preg_match($pattern, $text, $match)) {
-			$sql = "SELECT 1 FROM `{$id}_t` WHERE `tid`='{$match["1"]}'";
-			$result = $mysql->query($sql);
-			$link_text = "&gt;&gt;&gt;".$match[1];
-			if($result->num_rows) {
-				$replace = "<a href=\"/bbs/u/read.php?id=$id&tid={$match[1]}\">$link_text</a>";
+		} else if($matches[6] != "") {
+			$sql = "SELECT 1 FROM `{$this->boad->sname}_t` WHERE `tid`='{$matches[7]}'";
+			if($this->mysql->query($sql)->num_rows) {
+				return("<a href=\"./read.php?id=".$this->boad->sname."&tid={$matches[7]}\">".htmlspecialchars($matches[6])."</a>");
 			} else {
-				$replace = $link_text;
+				return(htmlspecialchars($matches[6]));
 			}
-			$search = ">>>{$match[1]}";
-			$text = str_replace($search, $replace, $text);
-		}
-
-		// スレ内アンカー
-		$pattern = "/>>([0-9]+)/";
-		while(preg_match($pattern, $text, $match)) {
-			$sql = "SELECT 1 FROM `{$id}_m` WHERE `tid`='$tid' AND `tmid`='{$match["1"]}'";
-			$result = $mysql->query($sql);
-			$link_text = "&gt;&gt;".$match[1];
-			if($result->num_rows) {
-				$replace = "<a href=\"/bbs/u/read.php?id=$id&tid=$tid&tmid={$match[1]}\">$link_text</a>";
+		} else if($matches[8] != "") {
+			$sql = "SELECT 1 FROM `{$this->boad->sname}_m` WHERE `tid`='{$this->thread->tid}' AND `tmid`='{$matches[9]}'";
+			if($this->mysql->query($sql)->num_rows) {
+				return("<a href=\"./read.php?id={$this->boad->sname}&tid={$this->thread->tid}&tmid={$matches[9]}\">".htmlspecialchars($matches[8])."</a>");
 			} else {
-				$replace = $link_text;
+				return(htmlspecialchars($matches[8]));
 			}
-			$search = ">>{$match[1]}";
-			$text = str_replace($search, $replace, $text);
+		} else if($matches[10] != "") {
+			return(htmlspecialchars($matches[10]));
+		} else {
+			return("");
 		}
-
-		return($text);
 	}
 }
 ?>

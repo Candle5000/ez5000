@@ -68,7 +68,7 @@ if(!isset($tmid)) {
 		$result = $mysql->query($sql);
 		if($mysql->error) die("ERROR11:存在しないIDです");
 		if(!$result->num_rows) die("ERROR12:存在しないIDです");
-		$fmessage = new Message($result->fetch_array());
+		$fmessage = new Message($result->fetch_array(), $mysql, $boad, $thread);
 	}
 
 	// メッセージ情報を取得
@@ -134,7 +134,7 @@ if($page == 0 && !isset($_GET["view"]) && !isset($tmid)) {
 }
 
 while($array = $result->fetch_array()) {
-	$message = new Message($array);
+	$message = new Message($array, $mysql, $boad, $thread);
 	$message->printMessage($mysql, $boad, $thread);
 }
 ?>

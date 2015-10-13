@@ -94,7 +94,7 @@ if($mode == 2) {
 	$result = $mysql->query($sql);
 	if($mysql->error) die("ERROR15:存在しないIDです");
 	if(!$result->num_rows) die("ERROR16:メッセージが見つかりません");
-	$message = new Message($result->fetch_array());
+	$message = new Message($result->fetch_array(), $mysql, $boad, $thread);
 }
 
 if($_SERVER["REQUEST_METHOD"] == "POST") {
