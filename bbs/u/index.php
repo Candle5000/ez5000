@@ -48,14 +48,15 @@ if($mysql->error) die("ERROR05:存在しないIDです");
 
 // ページ切り替えリンク生成
 if(($page > 0) && ($rows > 0)) {
-	$pagelink = "<a href=\"./?id=$id&page=".($page - 1)."\"".mbi_ack("*").">".mbi("*.")."前のページ</a> | ";
+	$pagelink = "[<a href=\"./?id=$id&page=".($page - 1)."\"".mbi_ack("*").">".mbi("*.")."前へ</a>] ";
 } else {
-	$pagelink = mbi("*.")."前のページ | ";
+	$pagelink = mbi("*.")."[前へ] ";
 }
+$pagelink .= "[P ".($page + 1)."/".ceil($rows / $LIMIT)." ]";
 if((($page + 1) * $LIMIT) < $rows) {
-	$pagelink .= "<a href=\"./?id=$id&page=".($page + 1)."\"".mbi_ack("#").">".mbi("#.")."次のページ</a>";
+	$pagelink .= " [<a href=\"./?id=$id&page=".($page + 1)."\"".mbi_ack("#").">".mbi("#.")."次へ</a>]";
 } else {
-	$pagelink .= mbi("#.")."次のページ";
+	$pagelink .= mbi("#.")." [次へ]";
 }
 ?>
 <html>
@@ -70,7 +71,7 @@ if((($page + 1) * $LIMIT) < $rows) {
 [<a href="./form.php?mode=thform&id=<?=$boad->sname?>"<?=mbi_ack(8)?>><?=mbi("8.")?>新規スレ</a>]
 </p>
 <hr class="normal">
-<div class="cnt"><?=$pagelink?></div>
+<div id="pagelink"><?=$pagelink?></div>
 <hr class="normal">
 <?php
 if(device_info() == 'mb') {
@@ -108,7 +109,7 @@ if(device_info() == 'mb') {
 }
 ?>
 <hr class="normal">
-<div class="cnt"><?=$pagelink?></div>
+<div id="pagelink"><?=$pagelink?></div>
 <hr class="normal">
 <ul id="footlink">
 <li><a href="/bbs/"<?=mbi_ack(9)?>><?=mbi("9.")?>掲示板一覧</a></li>

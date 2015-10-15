@@ -121,8 +121,8 @@ if(!isset($tmid)) {
 <?php
 $reply = mbi("2.")."返信";
 $reply = ($thread->mcount > 999 || $thread->locked) ? "[$reply]" : "[<a href=\"./form.php?mode=reform&id=".$boad->sname."&tid=$tid\"".mbi_ack(2).">$reply</a>]";
-$old = "[<a href=\"./read.php?id=".$boad->sname."&tid=$tid&view=asc&page=0\"".mbi_ack(4).">".mbi("4.")."最古</a>]";
-$new = "[<a href=\"./read.php?id=".$boad->sname."&tid=$tid&view=desc&page=0\"".mbi_ack(6).">".mbi("6.")."最新</a>]";
+$old = "[<a href=\"./read.php?id={$boad->sname}&tid=$tid&view=asc&page=0\"".mbi_ack(4).">".mbi("4.")."最古</a>]";
+$new = "[<a href=\"./read.php?id={$boad->sname}&tid=$tid&view=desc&page=0\"".mbi_ack(6).">".mbi("6.")."最新</a>]";
 ?>
 <?=$reply?> <?=$old?> <?=$new?>
 </p>
@@ -140,6 +140,17 @@ while($array = $result->fetch_array()) {
 ?>
 <hr class="normal">
 <div class="cnt"><?=$pagelink?></div>
+<hr class="normal">
+<?php
+$url = "./read.php?id=$id&tid=$tid$view";
+?>
+<form action="<?=$_SERVER["PHP_SELF"]?>" method="get" enctype="multipart/form-data">
+<input name="id" type="hidden" value="<?=$id?>">
+<input name="tid" type="hidden" value="<?=$tid?>">
+<?=(isset($_GET["view"]) ? "<input name=\"view\" type=\"hidden\" value=\"{$_GET["view"]}\">\n" : "")?>
+<input name="page" type="text" maxlength="3" value="<?=$page?>" size="4">/<?=(ceil($thread->mcount / $LIMIT) - 1)?>
+<input type="submit" value="ページへ移動">
+</form>
 <hr class="normal">
 <ul id="footlink">
 <?php
