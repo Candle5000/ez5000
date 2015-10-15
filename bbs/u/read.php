@@ -120,7 +120,7 @@ if(!isset($tmid)) {
 <p>
 <?php
 $reply = mbi("2.")."返信";
-$reply = ($thread->mcount > 999) ? "[$reply]" : "[<a href=\"./form.php?mode=reform&id=".$boad->sname."&tid=$tid\"".mbi_ack(2).">$reply</a>]";
+$reply = ($thread->mcount > 999 || $thread->locked) ? "[$reply]" : "[<a href=\"./form.php?mode=reform&id=".$boad->sname."&tid=$tid\"".mbi_ack(2).">$reply</a>]";
 $old = "[<a href=\"./read.php?id=".$boad->sname."&tid=$tid&view=asc&page=0\"".mbi_ack(4).">".mbi("4.")."最古</a>]";
 $new = "[<a href=\"./read.php?id=".$boad->sname."&tid=$tid&view=desc&page=0\"".mbi_ack(6).">".mbi("6.")."最新</a>]";
 ?>

@@ -254,10 +254,8 @@ ul#dblink li {
 	border:solid 1px #F0CD96;
 }
 ul#footlink {
-	text-align:right;
 	list-style-type:none;
-	margin:0px;
-	padding:0px;
+	text-align:right;
 }
 img.dot {
 	margin:10px 0px;

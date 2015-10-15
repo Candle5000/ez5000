@@ -30,6 +30,10 @@ h2 {
 	font-size:large;
 	padding:0px 8px;
 }
+li {
+	margin-top:3px;
+	margin-bottom:3px;
+}
 p {
 	font-size:medium;
 	padding:5px;
@@ -79,9 +83,16 @@ ul#dblink li {
 	margin:5px;
 	padding:3px 12px;
 }
-ul#linklist,ul#footlink {
-	line-height:2.0em;
+ul#linklist {
 	list-style-type:square;
+}
+ul#footlink li {
+	margin-right:5px;
+}
+ul#threadlist {
+	list-style:none;
+	margin:10px;
+	padding:0px;
 }
 @media screen and (max-width: 440px) {
 	img.map {

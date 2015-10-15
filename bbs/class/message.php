@@ -40,7 +40,7 @@ class Message {
 	// メッセージ出力
 	//--------------------------
 	public function printMessage() {
-		$reply = ($this->thread->mcount > 999) ? "返信" : "<a href=\"./form.php?mode=reform&id=".$this->boad->sname."&tid=".$this->thread->tid."&re=".$this->tmid."\">返信</a>";
+		$reply = ($this->thread->mcount > 999 || $this->thread->locked) ? "返信" : "<a href=\"./form.php?mode=reform&id=".$this->boad->sname."&tid=".$this->thread->tid."&re=".$this->tmid."\">返信</a>";
 ?>
 <hr class="normal">
 <p>

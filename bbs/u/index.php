@@ -35,14 +35,14 @@ $boad = new Boad($result->fetch_array());
 $title = $boad->name;
 
 // スレッド数を取得
-$sql = "SELECT COUNT(`tid`) AS `count` FROM `{$id}_t`";
+$sql = "SELECT COUNT(1) AS `count` FROM `{$id}_t`";
 $result = $mysql->query($sql);
 if($mysql->error) die("ERROR04:存在しないIDです");
 $array = $result->fetch_array();
 $rows = $array["count"];
 
 // スレッド一覧を取得
-$sql = "SELECT * FROM `{$id}_t` ORDER BY `tindex` DESC LIMIT ".($page * $LIMIT).",$LIMIT";
+$sql = "SELECT * FROM `{$id}_t` ORDER BY `top` DESC, `tindex` DESC LIMIT ".($page * $LIMIT).",$LIMIT";
 $result = $mysql->query($sql);
 if($mysql->error) die("ERROR05:存在しないIDです");
 
@@ -72,15 +72,28 @@ if((($page + 1) * $LIMIT) < $rows) {
 <hr class="normal">
 <div class="cnt"><?=$pagelink?></div>
 <hr class="normal">
-<ul id="linklist">
 <?php
+if(device_info() == 'mb') {
+	echo "<div id=\"threadlist\">\n";
+} else {
+	echo "<ul id=\"threadlist\">\n";
+}
 if($result->num_rows) {
 	$date = date("Y-m-d H:i:s", strtotime("-2 day"));
 	while($array = $result->fetch_array()) {
 		$thread = new Thread($array);
 		$new = (strtotime($date) < strtotime($thread->updated)) ? "<span class=\"nc6\">New</span>" : "";
+		if($thread->locked) {
+			$marker = "※";
+		} else if($thread->top) {
+			$marker = "▼";
+		} else {
+			$marker = "▽";
+		}
+		$li_h = (device_info() == 'mb') ? "" : "<li>";
+		$li_t = (device_info() == 'mb') ? "<br />\n" : "</li>\n";
 ?>
-<li><a href="./read.php?id=<?=$boad->sname?>&tid=<?=$thread->tid?>"><?=htmlspecialchars($thread->title)."(".$thread->mcount.")"?></a><?=$new?></li>
+<?=$li_h?><span class="nc5"><?=$marker?></span><a href="./read.php?id=<?=$boad->sname?>&tid=<?=$thread->tid?>"><?=htmlspecialchars($thread->title)."(".$thread->mcount.")"?></a><?=$new.$li_t?>
 <?php
 	}
 } else {
@@ -88,8 +101,12 @@ if($result->num_rows) {
 <li>スレッドがありません</li>
 <?php
 }
+if(device_info() == 'mb') {
+	echo '</div>';
+} else {
+	echo '</ul>';
+}
 ?>
-</ul>
 <hr class="normal">
 <div class="cnt"><?=$pagelink?></div>
 <hr class="normal">
