@@ -64,6 +64,33 @@ ul#dblink li {
 }
 ul#linklist {
 	list-style-type:disc;
+	margin-top:12px;
+	margin-bottom:12px;
+}
+ul#linklist li {
+	margin-top:5px;
+	margin-bottom:5px;
+}
+ul#threadlist {
+	list-style:none;
+	margin:16px;
+	padding:0px;
+}
+ul#threadlist li {
+	margin:5px 0px;
+	padding:0px;
+}
+ul#footlink {
+	margin:12px;
+	padding:0px;
+}
+ul#footlink {
+	margin:5px;
+	padding:0px;
+}
+ul#footlink li {
+	margin:5px 0px;
+	padding:0px;
 }
 img.dot,img.map {
 	zoom:2;

@@ -181,6 +181,10 @@ div#infobox #boxtitle {
 	font-weight:bold;
 	list-style-type:circle;
 }
+div#pagelink {
+	text-align:center;
+	margin:2px 0px;
+}
 h1 {
 	background-color:#FFF;
 	font-weight:bold;
@@ -254,10 +258,8 @@ ul#dblink li {
 	border:solid 1px #F0CD96;
 }
 ul#footlink {
-	text-align:right;
 	list-style-type:none;
-	margin:0px;
-	padding:0px;
+	text-align:right;
 }
 img.dot {
 	margin:10px 0px;
