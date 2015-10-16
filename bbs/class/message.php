@@ -40,7 +40,7 @@ class Message {
 	// メッセージ出力
 	//--------------------------
 	public function printMessage() {
-		$reply = ($this->thread->mcount > 999 || $this->thread->locked) ? "返信" : "<a href=\"./form.php?mode=reform&id=".$this->boad->sname."&tid=".$this->thread->tid."&re=".$this->tmid."\">返信</a>";
+		$reply = ($this->thread->mcount > 999 || $this->thread->locked) ? "返信" : "<a href=\"./form.php?mode=reform&id={$this->boad->sname}&tid={$this->thread->tid}&re={$this->tmid}\">返信</a>";
 ?>
 <hr class="normal">
 <p>
@@ -50,6 +50,16 @@ class Message {
 [<?=$reply?>] [<a href="./form.php?mode=modify&id=<?=$this->boad->sname?>&tid=<?=$this->thread->tid?>&tmid=<?=$this->tmid?>">編集</a>]
 </p>
 <?php
+	}
+
+	//--------------------------
+	// トリップ変換
+	//--------------------------
+	public static function tripConvert($name) {
+		$array = explode('#', $name, 2);
+		$array[0] = str_replace('/', '', $array[0]);
+		if(isset($array[1])) $array[1] = strtoupper(substr(hash('md5', $array[1]), 0, 8));
+		return($array);
 	}
 
 	//--------------------------
