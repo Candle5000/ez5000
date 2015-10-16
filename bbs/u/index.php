@@ -8,6 +8,9 @@ require_once("/var/www/bbs/class/thread.php");
 require_once("/var/www/functions/template.php");
 $LIMIT = 20;
 
+// クッキー設定
+setcookie("cookiecheck", true, time() + 864000);
+
 if(!isset($_GET["id"])) die("ERROR01:IDがありません");
 $id = $_GET["id"];
 if(!preg_match("/^[a-zA-Z0-9]{1,16}$/", $id)) die("ERROR02:無効なIDです");
@@ -73,12 +76,8 @@ if((($page + 1) * $LIMIT) < $rows) {
 <hr class="normal">
 <div id="pagelink"><?=$pagelink?></div>
 <hr class="normal">
+<ul id="threadlist">
 <?php
-if(device_info() == 'mb') {
-	echo "<div id=\"threadlist\">\n";
-} else {
-	echo "<ul id=\"threadlist\">\n";
-}
 if($result->num_rows) {
 	$date = date("Y-m-d H:i:s", strtotime("-2 day"));
 	while($array = $result->fetch_array()) {
@@ -91,10 +90,8 @@ if($result->num_rows) {
 		} else {
 			$marker = "▽";
 		}
-		$li_h = (device_info() == 'mb') ? "" : "<li>";
-		$li_t = (device_info() == 'mb') ? "<br />\n" : "</li>\n";
 ?>
-<?=$li_h?><span class="nc5"><?=$marker?></span><a href="./read.php?id=<?=$boad->sname?>&tid=<?=$thread->tid?>"><?=htmlspecialchars($thread->title)."(".$thread->mcount.")"?></a><?=$new.$li_t?>
+<li><span class="nc5"><?=$marker?></span><a href="./read.php?id=<?=$boad->sname?>&tid=<?=$thread->tid?>"><?=htmlspecialchars($thread->title)."(".$thread->mcount.")"?></a><?=$new?></li>
 <?php
 	}
 } else {
@@ -102,12 +99,8 @@ if($result->num_rows) {
 <li>スレッドがありません</li>
 <?php
 }
-if(device_info() == 'mb') {
-	echo '</div>';
-} else {
-	echo '</ul>';
-}
 ?>
+</ul>
 <hr class="normal">
 <div id="pagelink"><?=$pagelink?></div>
 <hr class="normal">

@@ -9,6 +9,9 @@ require_once("/var/www/bbs/class/message.php");
 require_once("/var/www/functions/template.php");
 $LIMIT = 10;
 
+// クッキー設定
+setcookie("cookiecheck", true, time() + 864000);
+
 // 掲示板ID取得
 if(!isset($_GET["id"])) die("ERROR01:IDがありません");
 $id = $_GET["id"];

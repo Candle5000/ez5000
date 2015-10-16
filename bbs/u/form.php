@@ -176,6 +176,12 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 	if($pass == "") $error_list[] = "パスワードが空です";
 	if(!preg_match("/^[!-~]{4,64}$/", $pass)) $error_list[] = "パスワードは半角英数字と記号のみで4～64文字にしてください";
 
+	// クッキー有効確認
+	if(!isset($_COOKIE["cookiecheck"])) {
+		$error_list[] = "クッキーを有効にしてください";
+		setcookie("cookiecheck", true, time() + 864000);
+	}
+
 	// 連投チェック
 	if($mode == 0 && isset($_SESSION["thposttime"]) && ($_SESSION["thposttime"] > time())) $error_list[] = "300秒間は連続でスレッドを作成できません";
 	if($mode == 1 && isset($_SESSION["reposttime"]) && ($_SESSION["reposttime"] > time())) $error_list[] = "60秒間は連続で返信を投稿できません";
