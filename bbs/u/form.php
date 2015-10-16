@@ -94,7 +94,7 @@ if($mode == 2) {
 	$result = $mysql->query($sql);
 	if($mysql->error) die("ERROR15:存在しないIDです");
 	if(!$result->num_rows) die("ERROR16:メッセージが見つかりません");
-	$message = new Message($result->fetch_array());
+	$message = new Message($result->fetch_array(), $mysql, $boad, $thread);
 }
 
 if($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -120,23 +120,26 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 
 	// 名前取得
 	$name = isset($_POST["name"]) ? $_POST["name"] : "";
-	if($name == "") {
+	if(device_info() == "mb") {
+		if($enc_mode == 1) {
+			$name = mb_convert_encoding($name, "UTF-8", "SJIS-WIN");
+		} else if($enc_mode == 2) {
+			$name = urldecode($name);
+		} else if($enc_mode == 3) {
+			$name = mb_convert_encoding(urldecode($name), "UTF-8", "SJIS-WIN");
+		}
+	}
+	$name_a = Message::tripConvert($name);
+	if($name_a[0] == "") {
 		if($boad->default_name != "") {
 			$name = $boad->default_name;
 		} else {
 			$error_list[] = "お名前が空です";
 		}
+	} else if(mb_strlen($name_a[0]) > 30) {
+		$error_list[] = "お名前は30文字以内にしてください";
 	} else {
-		if(device_info() == "mb") {
-			if($enc_mode == 1) {
-				$name = mb_convert_encoding($name, "UTF-8", "SJIS-WIN");
-			} else if($enc_mode == 2) {
-				$name = urldecode($name);
-			} else if($enc_mode == 3) {
-				$name = mb_convert_encoding(urldecode($name), "UTF-8", "SJIS-WIN");
-			}
-		}
-		if(mb_strlen($name) > 30) $error_list[] = "お名前は30文字以内にしてください";
+		$name = isset($name_a[1]) ? $name_a[0].'/'.$name_a[1] : $name_a[0];
 	}
 
 	// タイトル取得 スレッド作成/編集のみ
@@ -176,6 +179,12 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 	if($pass == "") $error_list[] = "パスワードが空です";
 	if(!preg_match("/^[!-~]{4,64}$/", $pass)) $error_list[] = "パスワードは半角英数字と記号のみで4～64文字にしてください";
 
+	// クッキー有効確認
+	if(!isset($_COOKIE["cookiecheck"])) {
+		$error_list[] = "クッキーを有効にしてください";
+		setcookie("cookiecheck", true, time() + 864000);
+	}
+
 	// 連投チェック
 	if($mode == 0 && isset($_SESSION["thposttime"]) && ($_SESSION["thposttime"] > time())) $error_list[] = "300秒間は連続でスレッドを作成できません";
 	if($mode == 1 && isset($_SESSION["reposttime"]) && ($_SESSION["reposttime"] > time())) $error_list[] = "60秒間は連続で返信を投稿できません";
@@ -204,7 +213,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 				$sql = "INSERT INTO `{$id}_m` (`tid`, `tmid`, `name`, `comment`, `password`, `ts`, `ip`, `ua`, `uid`) VALUES (LAST_INSERT_ID(), '1', '$sql_name', '$sql_comment', PASSWORD('$sql_pass'), NOW(), '$ip', '$ua', '$uid')";
 				$mysql->query($sql);
 				if($mysql->error) die("ERROR22:クエリ処理に失敗しました");
-				if($name != $boad->default_name) setcookie("bbs_name", $name, time() + 604800);
+				if($name != $boad->default_name) setcookie("bbs_name", $name_a[0], time() + 604800);
 				$_SESSION["thposttime"] = time() + 300;
 				break;
 
@@ -219,7 +228,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 				}
 				$mysql->query($sql);
 				if($mysql->error) die("ERROR24:クエリ処理に失敗しました");
-				if($name != $boad->default_name) setcookie("bbs_name", $name, time() + 604800);
+				if($name != $boad->default_name) setcookie("bbs_name", $name_a[0], time() + 604800);
 				$_SESSION["reposttime"] = time() + 60;
 				break;
 
@@ -238,7 +247,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 						$mysql->query($sql);
 						if($mysql->error) die("ERROR28:クエリ処理に失敗しました");
 					}
-					if($name != $boad->default_name) setcookie("bbs_name", $name, time() + 604800);
+					if($name != $boad->default_name) setcookie("bbs_name", $name_a[0], time() + 604800);
 				} else {
 					$error_list[] = "パスワードが間違っています";
 				}
@@ -254,7 +263,8 @@ if(!($_SERVER["REQUEST_METHOD"] == "POST")) {
 		$subject = "";
 		$comment = (isset($re) && $re != 0) ? ">>$re" : "";
 	} else {
-		$name = $message->name;
+		$name_a = explode('/', $message->name, 2);
+		$name = $name_a[0];
 		$subject = $thread->title;
 		$comment = $message->comment;
 	}

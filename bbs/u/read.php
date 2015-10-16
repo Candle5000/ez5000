@@ -9,6 +9,9 @@ require_once("/var/www/bbs/class/message.php");
 require_once("/var/www/functions/template.php");
 $LIMIT = 10;
 
+// クッキー設定
+setcookie("cookiecheck", true, time() + 864000);
+
 // 掲示板ID取得
 if(!isset($_GET["id"])) die("ERROR01:IDがありません");
 $id = $_GET["id"];
@@ -68,7 +71,7 @@ if(!isset($tmid)) {
 		$result = $mysql->query($sql);
 		if($mysql->error) die("ERROR11:存在しないIDです");
 		if(!$result->num_rows) die("ERROR12:存在しないIDです");
-		$fmessage = new Message($result->fetch_array());
+		$fmessage = new Message($result->fetch_array(), $mysql, $boad, $thread);
 	}
 
 	// メッセージ情報を取得
@@ -120,9 +123,9 @@ if(!isset($tmid)) {
 <p>
 <?php
 $reply = mbi("2.")."返信";
-$reply = ($thread->mcount > 999) ? "[$reply]" : "[<a href=\"./form.php?mode=reform&id=".$boad->sname."&tid=$tid\"".mbi_ack(2).">$reply</a>]";
-$old = "[<a href=\"./read.php?id=".$boad->sname."&tid=$tid&view=asc&page=0\"".mbi_ack(4).">".mbi("4.")."最古</a>]";
-$new = "[<a href=\"./read.php?id=".$boad->sname."&tid=$tid&view=desc&page=0\"".mbi_ack(6).">".mbi("6.")."最新</a>]";
+$reply = ($thread->mcount > 999 || $thread->locked) ? "[$reply]" : "[<a href=\"./form.php?mode=reform&id=".$boad->sname."&tid=$tid\"".mbi_ack(2).">$reply</a>]";
+$old = "[<a href=\"./read.php?id={$boad->sname}&tid=$tid&view=asc&page=0\"".mbi_ack(4).">".mbi("4.")."最古</a>]";
+$new = "[<a href=\"./read.php?id={$boad->sname}&tid=$tid&view=desc&page=0\"".mbi_ack(6).">".mbi("6.")."最新</a>]";
 ?>
 <?=$reply?> <?=$old?> <?=$new?>
 </p>
@@ -134,12 +137,23 @@ if($page == 0 && !isset($_GET["view"]) && !isset($tmid)) {
 }
 
 while($array = $result->fetch_array()) {
-	$message = new Message($array);
+	$message = new Message($array, $mysql, $boad, $thread);
 	$message->printMessage($mysql, $boad, $thread);
 }
 ?>
 <hr class="normal">
 <div class="cnt"><?=$pagelink?></div>
+<hr class="normal">
+<?php
+$url = "./read.php?id=$id&tid=$tid$view";
+?>
+<form action="<?=$_SERVER["PHP_SELF"]?>" method="get" enctype="multipart/form-data">
+<input name="id" type="hidden" value="<?=$id?>">
+<input name="tid" type="hidden" value="<?=$tid?>">
+<?=(isset($_GET["view"]) ? "<input name=\"view\" type=\"hidden\" value=\"{$_GET["view"]}\">\n" : "")?>
+<input name="page" type="text" maxlength="3" value="<?=$page?>" size="4">/<?=(ceil($thread->mcount / $LIMIT) - 1)?>
+<input type="submit" value="ページへ移動">
+</form>
 <hr class="normal">
 <ul id="footlink">
 <?php
