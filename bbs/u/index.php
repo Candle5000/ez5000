@@ -53,13 +53,13 @@ if($mysql->error) die("ERROR05:存在しないIDです");
 if(($page > 0) && ($rows > 0)) {
 	$pagelink = "[<a href=\"./?id=$id&page=".($page - 1)."\"".mbi_ack("*").">".mbi("*.")."前へ</a>] ";
 } else {
-	$pagelink = mbi("*.")."[前へ] ";
+	$pagelink = "[".mbi("*.")."前へ] ";
 }
 $pagelink .= "[P ".($page + 1)."/".ceil($rows / $LIMIT)." ]";
 if((($page + 1) * $LIMIT) < $rows) {
 	$pagelink .= " [<a href=\"./?id=$id&page=".($page + 1)."\"".mbi_ack("#").">".mbi("#.")."次へ</a>]";
 } else {
-	$pagelink .= mbi("#.")." [次へ]";
+	$pagelink .= " [".mbi("#.")."次へ]";
 }
 ?>
 <html>
