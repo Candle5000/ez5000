@@ -58,7 +58,7 @@ class Message {
 	public static function tripConvert($name) {
 		$array = explode('#', $name, 2);
 		$array[0] = str_replace('/', '', $array[0]);
-		if(isset($array[1])) $array[1] = strtoupper(substr(hash('md5', $array[1]), 0, 8));
+		if(isset($array[1])) $array[1] = strtoupper(substr(hash('md5', mb_convert_encoding($array[1], 'EUC-JP', 'UTF-8')), 0, 8));
 		return($array);
 	}
 
@@ -67,7 +67,7 @@ class Message {
 	//--------------------------
 	private function textConvert($text) {
 		mb_regex_encoding("UTF-8");
-		$pattern = '/(https?:\/\/([0-9a-z\.\-]+)[\w\/:%#\$&\?~\.=\+\-]+)|(>>>([0-9]+)\.([0-9]+))|(>>>([0-9]+))|(>>([0-9]+))|([<>&])/';
+		$pattern = '/(https?:\/\/([0-9a-z\.\-]+)[\w\/:%#\$&\?~\.=\+\-]*)|(>>>([0-9]+)\.([0-9]+))|(>>>([0-9]+))|(>>([0-9]+))|([<>&])/';
 		$text = preg_replace_callback($pattern, array($this, 'textReplace'), $text);
 		return(nl2br($text));
 	}
