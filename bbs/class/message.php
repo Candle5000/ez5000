@@ -67,7 +67,7 @@ class Message {
 	//--------------------------
 	private function textConvert($text) {
 		mb_regex_encoding("UTF-8");
-		$pattern = '/(https?:\/\/([0-9a-z\.\-]+)[\w\/:%#\$&\?~\.=\+\-]+)|(>>>([0-9]+)\.([0-9]+))|(>>>([0-9]+))|(>>([0-9]+))|([<>&])/';
+		$pattern = '/(https?:\/\/([0-9a-z\.\-]+)[\w\/:%#\$&\?~\.=\+\-]*)|(>>>([0-9]+)\.([0-9]+))|(>>>([0-9]+))|(>>([0-9]+))|([<>&])/';
 		$text = preg_replace_callback($pattern, array($this, 'textReplace'), $text);
 		return(nl2br($text));
 	}
