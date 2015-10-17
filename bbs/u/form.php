@@ -139,7 +139,8 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 	} else if(mb_strlen($name_a[0]) > 30) {
 		$error_list[] = "お名前は30文字以内にしてください";
 	} else {
-		$name = isset($name_a[1]) ? $name_a[0].'/'.$name_a[1] : $name_a[0];
+		$name_t = isset($name_a[1]) ? $name_a[0].'/'.$name_a[1] : $name_a[0];
+		$name = $name_a[0];
 	}
 
 	// タイトル取得 スレッド作成/編集のみ
@@ -200,7 +201,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 	if(!isset($error_list)) {
 		if($mode == 0 || $mode == 1) $_SESSION["comment"] = $comment;
 		$sql_title = $mysql->real_escape_string($title);
-		$sql_name = $mysql->real_escape_string($name);
+		$sql_name = $mysql->real_escape_string($name_t);
 		$sql_comment = $mysql->real_escape_string($comment);
 		$sql_pass = $mysql->real_escape_string($pass);
 
@@ -213,7 +214,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 				$sql = "INSERT INTO `{$id}_m` (`tid`, `tmid`, `name`, `comment`, `password`, `ts`, `ip`, `ua`, `uid`) VALUES (LAST_INSERT_ID(), '1', '$sql_name', '$sql_comment', PASSWORD('$sql_pass'), NOW(), '$ip', '$ua', '$uid')";
 				$mysql->query($sql);
 				if($mysql->error) die("ERROR22:クエリ処理に失敗しました");
-				if($name != $boad->default_name) setcookie("bbs_name", $name_a[0], time() + 604800);
+				if($name_t != $boad->default_name) setcookie("bbs_name", $name_a[0], time() + 604800);
 				$_SESSION["thposttime"] = time() + 300;
 				break;
 
@@ -228,7 +229,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 				}
 				$mysql->query($sql);
 				if($mysql->error) die("ERROR24:クエリ処理に失敗しました");
-				if($name != $boad->default_name) setcookie("bbs_name", $name_a[0], time() + 604800);
+				if($name_t != $boad->default_name) setcookie("bbs_name", $name_a[0], time() + 604800);
 				$_SESSION["reposttime"] = time() + 60;
 				break;
 
@@ -247,7 +248,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 						$mysql->query($sql);
 						if($mysql->error) die("ERROR28:クエリ処理に失敗しました");
 					}
-					if($name != $boad->default_name) setcookie("bbs_name", $name_a[0], time() + 604800);
+					if($name_t != $boad->default_name) setcookie("bbs_name", $name_a[0], time() + 604800);
 				} else {
 					$error_list[] = "パスワードが間違っています";
 				}
