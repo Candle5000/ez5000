@@ -145,7 +145,8 @@ while($array = $result->fetch_array()) {
 <div class="cnt"><?=$pagelink?></div>
 <hr class="normal">
 <?php
-$url = "./read.php?id=$id&tid=$tid$view";
+if(!isset($tmid)) {
+	$url = "./read.php?id=$id&tid=$tid$view";
 ?>
 <form action="<?=$_SERVER["PHP_SELF"]?>" method="get" enctype="multipart/form-data">
 <input name="id" type="hidden" value="<?=$id?>">
@@ -155,6 +156,9 @@ $url = "./read.php?id=$id&tid=$tid$view";
 <input type="submit" value="ページへ移動">
 </form>
 <hr class="normal">
+<?php
+}
+?>
 <ul id="footlink">
 <?php
 if(isset($tmid)) {
