@@ -1,5 +1,7 @@
 phpinfo.php
 *~
 *.swp
+*.ico
+*.png
 img/
 lefko/
