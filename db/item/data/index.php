@@ -89,8 +89,10 @@ if($data->is_added("items", $id)) {
 	$data->select_column_a("note", "quest", "note LIKE '%##use##i$id##%' AND id BETWEEN 30000 AND 40000");
 	if($data->rows()) {
 		while($product = $data->fetch()) {
-			$p_link = preg_match("/##get(##i[0-9]+##)pri[0-9]+##([^g]*?|[^g]*?g[^e]*?|[^g]*?ge[^t]*?)##use##i$id##([^g]*?|[^g]*?g[^e]*?|[^g]*?ge[^t]*?).*?##end##/s", $product["note"], $match) ? $match[1] : -1;
-			$i_use[] = ($p_link != -1) ? $p_link."の製作" : "";
+			preg_match_all("/##get(##i[0-9]+##)pri[0-9]+##([^g]*?|[^g]*?g[^e]*?|[^g]*?ge[^t]*?)##use##i$id##([^g]*?|[^g]*?g[^e]*?|[^g]*?ge[^t]*?).*?##end##/s", $product["note"], $matches, PREG_SET_ORDER);
+			foreach($matches as $match) {
+				$i_use[] = $match[1]."の製作";
+			}
 		}
 	}
 
