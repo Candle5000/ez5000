@@ -60,7 +60,7 @@ $url = $_SERVER["PHP_SELF"]."?mode={$_GET["mode"]}&id=$id";
 if($mode == 1 || $mode == 2) $url .= "&tid=$tid";
 if($mode == 2) $url .= "&tmid=$tmid";
 
-$user_file = "/etc/mysql-user/userbbs.ini";
+$user_file = "/etc/mysql-user/user5000.ini";
 if($fp_user = fopen($user_file, "r")) {
 	$userName = rtrim(fgets($fp_user));
 	$password = rtrim(fgets($fp_user));
@@ -80,7 +80,7 @@ $title = $boad->name;
 
 // スレッド情報を取得 返信/編集モードのみ
 if($mode == 1 || $mode == 2) {
-	$sql = "SELECT * FROM `{$id}_t` WHERE `tid`='$tid'";
+	$sql = "SELECT `thread`.`tid`,`title`,`tindex`,`acount`,COUNT(1) AS `mcount`,`updated`,`locked`,`top` FROM `thread` NATURAL JOIN `message` WHERE `bid`='{$boad->bid}' AND `tid`='$tid' GROUP BY `tid`";
 	$result = $mysql->query($sql);
 	if($mysql->error) die("ERROR12:存在しないIDです");
 	if(!$result->num_rows) die("ERROR13:存在しないIDです");
@@ -90,7 +90,7 @@ if($mode == 1 || $mode == 2) {
 
 // メッセージ情報を取得 編集モードのみ
 if($mode == 2) {
-	$sql = "SELECT * FROM `{$id}_m` WHERE `tid`='$tid' AND `tmid`='$tmid'";
+	$sql = "SELECT * FROM `message` WHERE `bid`='{$boad->bid}' AND `tid`='$tid' AND `tmid`='$tmid'";
 	$result = $mysql->query($sql);
 	if($mysql->error) die("ERROR15:存在しないIDです");
 	if(!$result->num_rows) die("ERROR16:メッセージが見つかりません");
@@ -132,12 +132,14 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 	$name_a = Message::tripConvert($name);
 	if($name_a[0] == "") {
 		if($boad->default_name != "") {
-			$name = $boad->default_name;
+			$name_a[0] = $boad->default_name;
 		} else {
 			$error_list[] = "お名前が空です";
 		}
+		$name = "";
 	} else if(mb_strlen($name_a[0]) > 30) {
 		$error_list[] = "お名前は30文字以内にしてください";
+		$name = $name_a[0];
 	} else {
 		$name_t = isset($name_a[1]) ? $name_a[0].'/'.$name_a[1] : $name_a[0];
 		$name = $name_a[0];
@@ -199,7 +201,6 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 	if(!isset($uid)) $uid = "";
 
 	if(!isset($error_list)) {
-		if($mode == 0 || $mode == 1) $_SESSION["comment"] = $comment;
 		$sql_title = $mysql->real_escape_string($title);
 		$sql_name = $mysql->real_escape_string($name_t);
 		$sql_comment = $mysql->real_escape_string($comment);
@@ -208,10 +209,10 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 		switch($mode) {
 
 			case 0: // スレッド作成
-				$sql = "INSERT INTO `{$id}_t` (`title`, `tindex`, `mcount`, `updated`) SELECT '{$sql_title}' AS `title`, MAX(`tindex`)+1 AS `tindex`, '1' AS `mcount`, NOW() AS `updated` FROM `{$id}_t`";
+				$sql = "INSERT INTO `thread` (`bid`, `title`, `tindex`, `mcount`, `updated`) SELECT '{$boad->bid}' AS `bid`, '{$sql_title}' AS `title`, MAX(`tindex`)+1 AS `tindex`, '1' AS `mcount`, NOW() AS `updated` FROM `thread` WHERE `bid`='{$boad->bid}'";
 				$mysql->query($sql);
 				if($mysql->error) die("ERROR21:クエリ処理に失敗しました");
-				$sql = "INSERT INTO `{$id}_m` (`tid`, `tmid`, `name`, `comment`, `password`, `ts`, `ip`, `ua`, `uid`) VALUES (LAST_INSERT_ID(), '1', '$sql_name', '$sql_comment', PASSWORD('$sql_pass'), NOW(), '$ip', '$ua', '$uid')";
+				$sql = "INSERT INTO `message` (`bid`, `tid`, `tmid`, `name`, `comment`, `password`, `ts`, `ip`, `ua`, `uid`) VALUES ('{$boad->bid}', LAST_INSERT_ID(), '1', '$sql_name', '$sql_comment', PASSWORD('$sql_pass'), NOW(), '$ip', '$ua', '$uid')";
 				$mysql->query($sql);
 				if($mysql->error) die("ERROR22:クエリ処理に失敗しました");
 				if($name_t != $boad->default_name) setcookie("bbs_name", $name_a[0], time() + 604800);
@@ -219,13 +220,13 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 				break;
 
 			case 1: // 返信投稿
-				$sql = "INSERT INTO `{$id}_m` (`tid`, `tmid`, `name`, `comment`, `password`, `ts`, `ip`, `ua`, `uid`) SELECT '$tid' AS `tid`, `mcount`+1 AS `tmid`, '$sql_name' AS `name`, '$sql_comment' AS `comment`, PASSWORD('$sql_pass') AS `password`, NOW() AS `ts`, '$ip' AS `ip`, '$ua' AS `ua`, '$uid' AS `uid` FROM `{$id}_t` WHERE `tid`='$tid'";
+				$sql = "INSERT INTO `message` (`bid`, `tid`, `tmid`, `name`, `comment`, `password`, `ts`, `ip`, `ua`, `uid`) SELECT '{$boad->bid}' AS `bid`, '$tid' AS `tid`, MAX(`tmid`)+1 AS `tmid`, '$sql_name' AS `name`, '$sql_comment' AS `comment`, PASSWORD('$sql_pass') AS `password`, NOW() AS `ts`, '$ip' AS `ip`, '$ua' AS `ua`, '$uid' AS `uid` FROM `message` WHERE `bid`='{$boad->bid}' AND `tid`='$tid'";
 				$mysql->query($sql);
 				if($mysql->error) die("ERROR23:クエリ処理に失敗しました");
 				if($sage) {
-					$sql = "UPDATE `{$id}_t` SET `mcount`=`mcount`+1, `updated`=NOW() WHERE `tid`='$tid'";
+					$sql = "UPDATE `thread` SET `mcount`=`mcount`+1, `updated`=NOW() WHERE `bid`='{$boad->bid}' AND `tid`='$tid'";
 				} else {
-					$sql = "UPDATE `{$id}_t`, (SELECT MAX(`tindex`)+1 AS `tindex_max` FROM `{$id}_t`) AS `thread` SET `tindex`=`thread`.`tindex_max`, `mcount`=`mcount`+1, `updated`=NOW() WHERE `tid`='$tid'";
+					$sql = "UPDATE `thread`, (SELECT MAX(`tindex`)+1 AS `tindex_max` FROM `thread` WHERE `bid`='{$boad->bid}') AS `thread` SET `tindex`=`thread`.`tindex_max`, `mcount`=`mcount`+1, `updated`=NOW() WHERE `bid`='{$boad->bid}' AND `tid`='$tid'";
 				}
 				$mysql->query($sql);
 				if($mysql->error) die("ERROR24:クエリ処理に失敗しました");
@@ -234,17 +235,17 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 				break;
 
 			case 2: // メッセージ編集
-				$sql = "SELECT `password`=PASSWORD('$sql_pass') AS `match` FROM `{$id}_m` WHERE `tid`='$tid' AND `tmid`='$tmid' AND `mid`='{$message->mid}'";
+				$sql = "SELECT `password`=PASSWORD('$sql_pass') AS `match` FROM `message` WHERE `bid`='{$boad->bid}' AND `tid`='$tid' AND `tmid`='$tmid' AND `mid`='{$message->mid}'";
 				$result = $mysql->query($sql);
 				if($mysql->error) die("ERROR25:クエリ処理に失敗しました");
 				if(!$result->num_rows) die("ERROR26:メッセージが見つかりません");
 				$array = $result->fetch_array();
 				if($array["match"]) {
-					$sql = "UPDATE `{$id}_m` SET `name`='$sql_name', `comment`='$sql_comment', `ip`='$ip', `ua`='$ua', `uid`='$uid' WHERE `tid`='$tid' AND `tmid`='$tmid' AND `mid`='{$message->mid}' AND `password`=PASSWORD('$pass')";
+					$sql = "UPDATE `message` SET `name`='$sql_name', `comment`='$sql_comment', `ip`='$ip', `ua`='$ua', `uid`='$uid' WHERE `bid`='{$boad->bid}' AND `tid`='$tid' AND `tmid`='$tmid' AND `mid`='{$message->mid}' AND `password`=PASSWORD('$pass')";
 					$mysql->query($sql);
 					if($mysql->error) die("ERROR27:クエリ処理に失敗しました");
 					if($tmid == 1) {
-						$sql = "UPDATE `{$id}_t` SET `title`='$sql_title' WHERE `tid`='$tid'";
+						$sql = "UPDATE `thread` SET `title`='$sql_title' WHERE `bid`='{$boad->bid}' AND `tid`='$tid'";
 						$mysql->query($sql);
 						if($mysql->error) die("ERROR28:クエリ処理に失敗しました");
 					}
@@ -254,6 +255,9 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 				}
 				break;
 		}
+
+		// 同一内容投稿防止
+		if($mode == 0 || $mode == 1) $_SESSION["comment"] = $comment;
 	}
 }
 
@@ -393,11 +397,11 @@ if(!($_SERVER["REQUEST_METHOD"] == "POST") || isset($error_list)) {
 <?php
 if($mode == 1 || $mode == 2) {
 ?>
-<li><a href="/bbs/u/read.php?id=<?=$boad->sname?>&tid=<?=$thread->tid?>"<?=mbi_ack(7)?>><?=mbi("7.")?>スレッドに戻る</a></li>
+<li><a href="/bbs/read.php?id=<?=$boad->sname?>&tid=<?=$thread->tid?>"<?=mbi_ack(7)?>><?=mbi("7.")?>スレッドに戻る</a></li>
 <?php
 }
 ?>
-<li><a href="/bbs/u/?id=<?=$boad->sname?>"<?=mbi_ack(8)?>><?=mbi("8.").$boad->name?></a></li>
+<li><a href="/bbs/?id=<?=$boad->sname?>"<?=mbi_ack(8)?>><?=mbi("8.").$boad->name?></a></li>
 <li><a href="/bbs/"<?=mbi_ack(9)?>><?=mbi("9.")?>掲示板一覧</a></li>
 <li><a href="/"<?=mbi_ack(0)?>><?=mbi("0.")?>トップページ</a></li>
 </ul>

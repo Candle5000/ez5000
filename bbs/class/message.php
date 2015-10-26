@@ -80,21 +80,21 @@ class Message {
 		if($matches[1] != "") {
 			return("<a href=\"{$matches[1]}\" target=\"blank\">".htmlspecialchars($matches[2])."</a>");
 		} else if($matches[3] != "") {
-			$sql = "SELECT 1 FROM `{$this->boad->sname}_m` WHERE `tid`='{$matches[4]}' AND `tmid`='{$matches[5]}'";
+			$sql = "SELECT 1 FROM `message` WHERE `bid`='{$this->boad->bid}' AND `tid`='{$matches[4]}' AND `tmid`='{$matches[5]}'";
 			if($this->mysql->query($sql)->num_rows) {
 				return("<a href=\"./read.php?id=".$this->boad->sname."&tid={$matches[4]}&tmid={$matches[5]}\">".htmlspecialchars($matches[3])."</a>");
 			} else {
 				return(htmlspecialchars($matches[3]));
 			}
 		} else if($matches[6] != "") {
-			$sql = "SELECT 1 FROM `{$this->boad->sname}_t` WHERE `tid`='{$matches[7]}'";
+			$sql = "SELECT 1 FROM `thread` WHERE `bid`='{$this->boad->bid}' AND `tid`='{$matches[7]}'";
 			if($this->mysql->query($sql)->num_rows) {
 				return("<a href=\"./read.php?id=".$this->boad->sname."&tid={$matches[7]}\">".htmlspecialchars($matches[6])."</a>");
 			} else {
 				return(htmlspecialchars($matches[6]));
 			}
 		} else if($matches[8] != "") {
-			$sql = "SELECT 1 FROM `{$this->boad->sname}_m` WHERE `tid`='{$this->thread->tid}' AND `tmid`='{$matches[9]}'";
+			$sql = "SELECT 1 FROM `message` WHERE `bid`='{$this->boad->bid}' AND `tid`='{$this->thread->tid}' AND `tmid`='{$matches[9]}'";
 			if($this->mysql->query($sql)->num_rows) {
 				return("<a href=\"./read.php?id={$this->boad->sname}&tid={$this->thread->tid}&tmid={$matches[9]}\">".htmlspecialchars($matches[8])."</a>");
 			} else {
