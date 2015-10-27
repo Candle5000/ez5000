@@ -79,7 +79,7 @@ if(!isset($tmid)) {
 		$sql = "SELECT * FROM `message` WHERE `bid`='{$boad->bid}' AND `tid`='$tid' AND `tmid`>'1' ORDER BY `tmid` DESC LIMIT 0,$LIMIT";
 	} else {
 		$order = (isset($_GET["view"]) && $_GET["view"] == "asc") ? "ASC" : "DESC";
-		$sql = "SELECT * FROM `message` WHERE `bid`='{$boad->bid}' `tid`='$tid' ORDER BY `tmid` $order LIMIT ".($page * $LIMIT).",$LIMIT";
+		$sql = "SELECT * FROM `message` WHERE `bid`='{$boad->bid}' AND `tid`='$tid' ORDER BY `tmid` $order LIMIT ".($page * $LIMIT).",$LIMIT";
 	}
 	$result = $mysql->query($sql);
 	if($mysql->error) die("ERROR13:存在しないIDです");

@@ -209,10 +209,16 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 		switch($mode) {
 
 			case 0: // スレッド作成
-				$sql = "INSERT INTO `thread` (`bid`, `title`, `tindex`, `mcount`, `updated`) SELECT '{$boad->bid}' AS `bid`, '{$sql_title}' AS `title`, MAX(`tindex`)+1 AS `tindex`, '1' AS `mcount`, NOW() AS `updated` FROM `thread` WHERE `bid`='{$boad->bid}'";
+				$sql = "SELECT MAX(`tid`)+1 AS `next_tid`, MAX(`tindex`)+1 AS `next_tindex` FROM `thread` WHERE `bid`='{$boad->bid}'";
+				$result_obj = $mysql->query($sql)->fetch_object();
+				if($mysql->error) die("ERROR20:クエリ処理に失敗しました");
+				$next_tid = $result_obj->next_tid;
+				$next_tindex = $result_obj->next_tindex;
+				$sql = "INSERT INTO `thread` (`tid`, `bid`, `title`, `tindex`, `mcount`, `updated`) VALUES($next_tid, '{$boad->bid}', '{$sql_title}', '$next_tindex', '1', NOW())";
 				$mysql->query($sql);
 				if($mysql->error) die("ERROR21:クエリ処理に失敗しました");
-				$sql = "INSERT INTO `message` (`bid`, `tid`, `tmid`, `name`, `comment`, `password`, `ts`, `ip`, `ua`, `uid`) VALUES ('{$boad->bid}', LAST_INSERT_ID(), '1', '$sql_name', '$sql_comment', PASSWORD('$sql_pass'), NOW(), '$ip', '$ua', '$uid')";
+				$sql_sub = "SELECT MAX(`mid`)+1 AS `mid`, '{$boad->bid}' AS `bid`, $next_tid AS `tid`, '1' AS `tmid`, '$sql_name' AS `name`, '$sql_comment' AS `comment`, PASSWORD('$sql_pass') AS `password`, NOW() AS `ts`, '$ip' AS `ip`, '$ua' AS `ua`, '$uid' AS `uid` FROM `message` WHERE `bid`='{$boad->bid}'";
+				$sql = "INSERT INTO `message` (`mid`, `bid`, `tid`, `tmid`, `name`, `comment`, `password`, `ts`, `ip`, `ua`, `uid`) $sql_sub";
 				$mysql->query($sql);
 				if($mysql->error) die("ERROR22:クエリ処理に失敗しました");
 				if($name_t != $boad->default_name) setcookie("bbs_name", $name_a[0], time() + 604800);
@@ -220,13 +226,16 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 				break;
 
 			case 1: // 返信投稿
-				$sql = "INSERT INTO `message` (`bid`, `tid`, `tmid`, `name`, `comment`, `password`, `ts`, `ip`, `ua`, `uid`) SELECT '{$boad->bid}' AS `bid`, '$tid' AS `tid`, MAX(`tmid`)+1 AS `tmid`, '$sql_name' AS `name`, '$sql_comment' AS `comment`, PASSWORD('$sql_pass') AS `password`, NOW() AS `ts`, '$ip' AS `ip`, '$ua' AS `ua`, '$uid' AS `uid` FROM `message` WHERE `bid`='{$boad->bid}' AND `tid`='$tid'";
+				$sql_max_mid = "SELECT MAX(`mid`)+1 FROM `message` WHERE `bid`='{$boad->bid}'";
+				$sql_sub = "SELECT ($sql_max_mid) AS `mid`, '{$boad->bid}' AS `bid`, '$tid' AS `tid`, MAX(`tmid`)+1 AS `tmid`, '$sql_name' AS `name`, '$sql_comment' AS `comment`, PASSWORD('$sql_pass') AS `password`, NOW() AS `ts`, '$ip' AS `ip`, '$ua' AS `ua`, '$uid' AS `uid` FROM `message` WHERE `bid`='{$boad->bid}' AND `tid`='$tid'";
+				$sql = "INSERT INTO `message` (`mid`, `bid`, `tid`, `tmid`, `name`, `comment`, `password`, `ts`, `ip`, `ua`, `uid`) $sql_sub";
 				$mysql->query($sql);
 				if($mysql->error) die("ERROR23:クエリ処理に失敗しました");
 				if($sage) {
 					$sql = "UPDATE `thread` SET `mcount`=`mcount`+1, `updated`=NOW() WHERE `bid`='{$boad->bid}' AND `tid`='$tid'";
 				} else {
-					$sql = "UPDATE `thread`, (SELECT MAX(`tindex`)+1 AS `tindex_max` FROM `thread` WHERE `bid`='{$boad->bid}') AS `thread` SET `tindex`=`thread`.`tindex_max`, `mcount`=`mcount`+1, `updated`=NOW() WHERE `bid`='{$boad->bid}' AND `tid`='$tid'";
+					$sql_sub = "SELECT MAX(`tindex`)+1 AS `tindex_max` FROM `thread` WHERE `bid`='{$boad->bid}'";
+					$sql = "UPDATE `thread`, ($sql_sub) AS `thread` SET `tindex`=`thread`.`tindex_max`, `mcount`=`mcount`+1, `updated`=NOW() WHERE `bid`='{$boad->bid}' AND `tid`='$tid'";
 				}
 				$mysql->query($sql);
 				if($mysql->error) die("ERROR24:クエリ処理に失敗しました");

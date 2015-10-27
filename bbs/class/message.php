@@ -59,7 +59,7 @@ class Message {
 		$name = str_replace('＃', '#', $name);
 		$array = explode('#', $name, 2);
 		$array[0] = str_replace('/', '', $array[0]);
-		if(isset($array[1])) $array[1] = strtoupper(substr(hash('md5', mb_convert_encoding($array[1], 'EUC-JP', 'UTF-8')), 0, 8));
+		if(isset($array[1]) && $array[1] != "") $array[1] = strtoupper(substr(hash('md5', mb_convert_encoding($array[1], 'EUC-JP', 'UTF-8')), 0, 8));
 		return($array);
 	}
 
