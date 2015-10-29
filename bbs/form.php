@@ -131,20 +131,17 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 		}
 	}
 	$name_a = Message::tripConvert($name);
+	$name = $name_a[0];
 	if($name_a[0] == "") {
 		if($boad->default_name != "") {
 			$name_a[0] = $boad->default_name;
 		} else {
 			$error_list[] = "お名前が空です";
 		}
-		$name = "";
 	} else if(mb_strlen($name_a[0]) > 30) {
 		$error_list[] = "お名前は30文字以内にしてください";
-		$name = $name_a[0];
-	} else {
-		$name_t = isset($name_a[1]) ? $name_a[0].'/'.$name_a[1] : $name_a[0];
-		$name = $name_a[0];
 	}
+	$name_t = isset($name_a[1]) ? $name_a[0].'/'.$name_a[1] : $name_a[0];
 
 	// タイトル取得 スレッド作成/編集のみ
 	$title = (($mode == 0 || ($mode == 2 && $tmid == 1)) && $_POST["sbj"]) ? $_POST["sbj"] : "";
@@ -242,7 +239,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 				$sql = "INSERT INTO `message` (`mid`, `bid`, `tid`, `tmid`, `name`, `comment`, `image`, `password`, `ts`, `ip`, `ua`, `uid`) $sql_sub";
 				$mysql->query($sql);
 				if($mysql->error) die("ERROR22:クエリ処理に失敗しました");
-				if($name_t != $boad->default_name) setcookie("bbs_name", $name_a[0], time() + 604800);
+				if($name_a[0] != $boad->default_name) setcookie("bbs_name", $name_a[0], time() + 604800);
 				$_SESSION["thposttime"] = time() + 300;
 				$tid = $next_tid;
 				$tmid = 1;
@@ -264,7 +261,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 				}
 				$mysql->query($sql);
 				if($mysql->error) die("ERROR24:クエリ処理に失敗しました");
-				if($name_t != $boad->default_name) setcookie("bbs_name", $name_a[0], time() + 604800);
+				if($name_a[0] != $boad->default_name) setcookie("bbs_name", $name_a[0], time() + 604800);
 				$_SESSION["reposttime"] = time() + 60;
 				break;
 
@@ -283,7 +280,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 						$mysql->query($sql);
 						if($mysql->error) die("ERROR28:クエリ処理に失敗しました");
 					}
-					if($name_t != $boad->default_name) setcookie("bbs_name", $name_a[0], time() + 604800);
+					if($name_a[0] != $boad->default_name) setcookie("bbs_name", $name_a[0], time() + 604800);
 				} else {
 					$error_list[] = "パスワードが間違っています";
 				}
