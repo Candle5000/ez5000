@@ -8,6 +8,7 @@ require_once("/var/www/bbs/class/thread.php");
 require_once("/var/www/bbs/class/message.php");
 require_once("/var/www/functions/template.php");
 session_start();
+$MAX_FSIZE = 512000;
 
 // モードを取得
 if(!isset($_GET["mode"])) die("ERROR01:モードが設定されていません");
@@ -177,6 +178,26 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 	// sage取得 返信モードのみ
 	$sage = ($mode == 1 && isset($_POST["sage"]) && $_POST["sage"] == "sage");
 
+	// ファイルアップロード
+	$file_id = "";
+	if(is_uploaded_file($_FILES["media"]["tmp_name"])) {
+		$extension = pathinfo($_FILES["media"]["name"], PATHINFO_EXTENSION);
+		if(preg_match("/(png|jpe?g|gif)/i", $extension)) {
+			try {
+				$imageinfo = @getimagesize($_FILES["media"]["tmp_name"]);
+				if(filesize($_FILES["media"]["tmp_name"]) < $MAX_FSIZE) {
+					$file_id = uniqid().".$extension";
+				} else {
+					$error_list[] = "ファイルサイズが大きすぎます".filesize($_FILES["media"]["tmp_name"]);
+				}
+			} catch(RuntimeException $e) {
+				$error_list[] = "ファイルの読み込みに失敗しました";
+			}
+		} else {
+			$error_list[] = "ファイル拡張子が非対応です";
+		}
+	}
+
 	// 編集パスワード取得
 	$pass = isset($_POST["pass"]) ? $_POST["pass"] : "";
 	if($pass == "") $error_list[] = "パスワードが空です";
@@ -223,6 +244,8 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 				if($mysql->error) die("ERROR22:クエリ処理に失敗しました");
 				if($name_t != $boad->default_name) setcookie("bbs_name", $name_a[0], time() + 604800);
 				$_SESSION["thposttime"] = time() + 300;
+				$tid = $next_tid;
+				$tmid = 1;
 				break;
 
 			case 1: // 返信投稿
@@ -231,6 +254,8 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 				$sql = "INSERT INTO `message` (`mid`, `bid`, `tid`, `tmid`, `name`, `comment`, `password`, `ts`, `ip`, `ua`, `uid`) $sql_sub";
 				$mysql->query($sql);
 				if($mysql->error) die("ERROR23:クエリ処理に失敗しました");
+				$sql = "SELECT MAX(`tmid`) AS `max_tmid` FROM `message` WHERE `bid`='{$boad->bid}' AND `tid`='$tid'";
+				$tmid = $mysql->query($sql)->fetch_object()->max_tmid;
 				if($sage) {
 					$sql = "UPDATE `thread` SET `mcount`=`mcount`+1, `updated`=NOW() WHERE `bid`='{$boad->bid}' AND `tid`='$tid'";
 				} else {
@@ -265,8 +290,19 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 				break;
 		}
 
-		// 同一内容投稿防止
-		if($mode == 0 || $mode == 1) $_SESSION["comment"] = $comment;
+		if(!isset($error_list)) {
+
+			// 同一内容投稿防止
+			if($mode == 0 || $mode == 1) $_SESSION["comment"] = $comment;
+
+			// ファイルアップロード
+			if(is_uploaded_file($_FILES["media"]["tmp_name"])) {
+				$file_path = "/var/www/img/bbs/{$boad->sname}-$tid-$tmid-$file_id";
+				if(move_uploaded_file($_FILES["media"]["tmp_name"], $file_path)) {
+					chmod($file_path, 0644);
+				}
+			}
+		}
 	}
 }
 
@@ -353,6 +389,9 @@ if(!($_SERVER["REQUEST_METHOD"] == "POST") || isset($error_list)) {
 ?>
 編集パス<br />
 <input type="password" name="pass" maxlength="32" value=""><br />
+画像ファイル<?=mbi("(対応機種のみ)")?><br />
+<input type="hidden" name="MAX_FILE_SIZE" value="<?=$MAX_FSIZE?>" />
+<input name="media" type="file"><br />
 <hr class="normal">
 <?php
 	if(device_info() == "mb") {
