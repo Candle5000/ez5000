@@ -11,6 +11,7 @@ class Message {
 	public $tmid;
 	public $name;
 	public $comment;
+	public $image;
 	public $ts;
 	public $ip;
 	public $ua;
@@ -27,6 +28,7 @@ class Message {
 		$this->tmid = $array["tmid"];
 		$this->name = $array["name"];
 		$this->comment = $array["comment"];
+		$this->image = $array["image"];
 		$this->ts = $array["ts"];
 		$this->ip = $array["ip"];
 		$this->ua = $array["ua"];
@@ -41,10 +43,27 @@ class Message {
 	//--------------------------
 	public function printMessage() {
 		$reply = ($this->thread->mcount > 999 || $this->thread->locked) ? "返信" : "<a href=\"./form.php?mode=reform&id={$this->boad->sname}&tid={$this->thread->tid}&re={$this->tmid}\">返信</a>";
+		if($this->image != "") {
+			switch(device_info()) {
+				case 'mb':
+					$width = 120;
+					break;
+				case 'sp':
+					$width = 180;
+					break;
+				case 'pc':
+					$width = 320;
+					break;
+			}
+			$file_id = "{$this->boad->sname}-{$this->thread->tid}-{$this->tmid}-{$this->image}";
+			$img = "\n<a href=\"/img/bbs/$file_id\"><img src=\"outimg.php?img=$file_id&size=$width\" /></a><br />\n";
+		} else {
+			$img = "";
+		}
 ?>
 <hr class="normal">
 <p>
-[<?=$this->tmid?>] By <?=htmlspecialchars($this->name)?><br />
+[<?=$this->tmid?>] By <?=htmlspecialchars($this->name)?><br /><?=$img?>
 <?=$this->textConvert($this->comment)?><br />
 <?=$this->ts?><br />
 [<?=$reply?>] [<a href="./form.php?mode=modify&id=<?=$this->boad->sname?>&tid=<?=$this->thread->tid?>&tmid=<?=$this->tmid?>">編集</a>]

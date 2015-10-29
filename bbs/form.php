@@ -238,8 +238,8 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 				$sql = "INSERT INTO `thread` (`tid`, `bid`, `title`, `tindex`, `mcount`, `updated`) VALUES($next_tid, '{$boad->bid}', '{$sql_title}', '$next_tindex', '1', NOW())";
 				$mysql->query($sql);
 				if($mysql->error) die("ERROR21:クエリ処理に失敗しました");
-				$sql_sub = "SELECT MAX(`mid`)+1 AS `mid`, '{$boad->bid}' AS `bid`, $next_tid AS `tid`, '1' AS `tmid`, '$sql_name' AS `name`, '$sql_comment' AS `comment`, PASSWORD('$sql_pass') AS `password`, NOW() AS `ts`, '$ip' AS `ip`, '$ua' AS `ua`, '$uid' AS `uid` FROM `message` WHERE `bid`='{$boad->bid}'";
-				$sql = "INSERT INTO `message` (`mid`, `bid`, `tid`, `tmid`, `name`, `comment`, `password`, `ts`, `ip`, `ua`, `uid`) $sql_sub";
+				$sql_sub = "SELECT MAX(`mid`)+1 AS `mid`, '{$boad->bid}' AS `bid`, $next_tid AS `tid`, '1' AS `tmid`, '$sql_name' AS `name`, '$sql_comment' AS `comment`, '$file_id' AS `image`, PASSWORD('$sql_pass') AS `password`, NOW() AS `ts`, '$ip' AS `ip`, '$ua' AS `ua`, '$uid' AS `uid` FROM `message` WHERE `bid`='{$boad->bid}'";
+				$sql = "INSERT INTO `message` (`mid`, `bid`, `tid`, `tmid`, `name`, `comment`, `image`, `password`, `ts`, `ip`, `ua`, `uid`) $sql_sub";
 				$mysql->query($sql);
 				if($mysql->error) die("ERROR22:クエリ処理に失敗しました");
 				if($name_t != $boad->default_name) setcookie("bbs_name", $name_a[0], time() + 604800);
@@ -250,8 +250,8 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 
 			case 1: // 返信投稿
 				$sql_max_mid = "SELECT MAX(`mid`)+1 FROM `message` WHERE `bid`='{$boad->bid}'";
-				$sql_sub = "SELECT ($sql_max_mid) AS `mid`, '{$boad->bid}' AS `bid`, '$tid' AS `tid`, MAX(`tmid`)+1 AS `tmid`, '$sql_name' AS `name`, '$sql_comment' AS `comment`, PASSWORD('$sql_pass') AS `password`, NOW() AS `ts`, '$ip' AS `ip`, '$ua' AS `ua`, '$uid' AS `uid` FROM `message` WHERE `bid`='{$boad->bid}' AND `tid`='$tid'";
-				$sql = "INSERT INTO `message` (`mid`, `bid`, `tid`, `tmid`, `name`, `comment`, `password`, `ts`, `ip`, `ua`, `uid`) $sql_sub";
+				$sql_sub = "SELECT ($sql_max_mid) AS `mid`, '{$boad->bid}' AS `bid`, '$tid' AS `tid`, MAX(`tmid`)+1 AS `tmid`, '$sql_name' AS `name`, '$sql_comment' AS `comment`, '$file_id' AS `image`, PASSWORD('$sql_pass') AS `password`, NOW() AS `ts`, '$ip' AS `ip`, '$ua' AS `ua`, '$uid' AS `uid` FROM `message` WHERE `bid`='{$boad->bid}' AND `tid`='$tid'";
+				$sql = "INSERT INTO `message` (`mid`, `bid`, `tid`, `tmid`, `name`, `comment`, `image`, `password`, `ts`, `ip`, `ua`, `uid`) $sql_sub";
 				$mysql->query($sql);
 				if($mysql->error) die("ERROR23:クエリ処理に失敗しました");
 				$sql = "SELECT MAX(`tmid`) AS `max_tmid` FROM `message` WHERE `bid`='{$boad->bid}' AND `tid`='$tid'";
@@ -275,7 +275,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 				if(!$result->num_rows) die("ERROR26:メッセージが見つかりません");
 				$array = $result->fetch_array();
 				if($array["match"]) {
-					$sql = "UPDATE `message` SET `name`='$sql_name', `comment`='$sql_comment', `ip`='$ip', `ua`='$ua', `uid`='$uid' WHERE `bid`='{$boad->bid}' AND `tid`='$tid' AND `tmid`='$tmid' AND `mid`='{$message->mid}' AND `password`=PASSWORD('$pass')";
+					$sql = "UPDATE `message` SET `name`='$sql_name', `comment`='$sql_comment', `image`='$file_id', `ip`='$ip', `ua`='$ua', `uid`='$uid' WHERE `bid`='{$boad->bid}' AND `tid`='$tid' AND `tmid`='$tmid' AND `mid`='{$message->mid}' AND `password`=PASSWORD('$pass')";
 					$mysql->query($sql);
 					if($mysql->error) die("ERROR27:クエリ処理に失敗しました");
 					if($tmid == 1) {
