@@ -195,6 +195,9 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 		}
 	}
 
+	// 添付ファイル削除 編集モードのみ
+	$delmedia = (($file_id == "") && isset($_POST["delmedia"]) && $_POST["delmedia"]) ? true : false;
+
 	// 編集パスワード取得
 	$pass = isset($_POST["pass"]) ? $_POST["pass"] : "";
 	if($pass == "") $error_list[] = "パスワードが空です";
@@ -272,7 +275,8 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 				if(!$result->num_rows) die("ERROR26:メッセージが見つかりません");
 				$array = $result->fetch_array();
 				if($array["match"]) {
-					$sql = "UPDATE `message` SET `name`='$sql_name', `comment`='$sql_comment', `image`='$file_id', `ip`='$ip', `ua`='$ua', `uid`='$uid' WHERE `bid`='{$boad->bid}' AND `tid`='$tid' AND `tmid`='$tmid' AND `mid`='{$message->mid}' AND `password`=PASSWORD('$pass')";
+					$sql_img = (!$delmedia && ($file_id == "")) ? "" : "`image`='$file_id', ";
+					$sql = "UPDATE `message` SET `name`='$sql_name', `comment`='$sql_comment', $sql_img`ip`='$ip', `ua`='$ua', `uid`='$uid' WHERE `bid`='{$boad->bid}' AND `tid`='$tid' AND `tmid`='$tmid' AND `mid`='{$message->mid}' AND `password`=PASSWORD('$pass')";
 					$mysql->query($sql);
 					if($mysql->error) die("ERROR27:クエリ処理に失敗しました");
 					if($tmid == 1) {
@@ -388,7 +392,14 @@ if(!($_SERVER["REQUEST_METHOD"] == "POST") || isset($error_list)) {
 <input type="password" name="pass" maxlength="32" value=""><br />
 画像ファイル<?=mbi("(対応機種のみ)")?><br />
 <input type="hidden" name="MAX_FILE_SIZE" value="<?=$MAX_FSIZE?>" />
-<input name="media" type="file"><br />
+<input name="media" type="file" value="1"><br />
+<?php
+	if($mode == 2 && $message->image != "") {
+?>
+<input type="checkbox" name="delmedia">添付ファイル削除<br />
+<?php
+	}
+?>
 <hr class="normal">
 <?php
 	if(device_info() == "mb") {

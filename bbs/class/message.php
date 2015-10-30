@@ -19,6 +19,7 @@ class Message {
 	public $mysql;
 	public $boad;
 	public $thread;
+	public static $imgsize = array('mb' => 120, 'sp' => 180, 'pc' => 320);
 
 	//--------------------------
 	// コンストラクタ
@@ -42,21 +43,16 @@ class Message {
 	// メッセージ出力
 	//--------------------------
 	public function printMessage() {
+		$size = Message::$imgsize;
 		$reply = ($this->thread->mcount > 999 || $this->thread->locked) ? "返信" : "<a href=\"./form.php?mode=reform&id={$this->boad->sname}&tid={$this->thread->tid}&re={$this->tmid}\">返信</a>";
 		if($this->image != "") {
-			switch(device_info()) {
-				case 'mb':
-					$width = 120;
-					break;
-				case 'sp':
-					$width = 180;
-					break;
-				case 'pc':
-					$width = 320;
-					break;
-			}
 			$file_id = "{$this->boad->sname}-{$this->thread->tid}-{$this->tmid}-{$this->image}";
-			$img = "\n<a href=\"/img/bbs/$file_id\"><img src=\"outimg.php?img=$file_id&size=$width\" /></a><br />\n";
+			$imageinfo = getimagesize("/var/www/img/bbs/$file_id");
+			if($imageinfo[0] > $size[device_info()] || $imageinfo[1] > $size[device_info()]) {
+				$img = "\n<a href=\"/img/bbs/$file_id\"><img src=\"outimg.php?img=$file_id&size={$size[device_info()]}\" /></a><br />\n";
+			} else {
+				$img = "\n<a href=\"/img/bbs/$file_id\"><img src=\"/img/bbs/$file_id\" /></a><br />\n";
+			}
 		} else {
 			$img = "";
 		}
