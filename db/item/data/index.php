@@ -4,8 +4,10 @@
 //=====================================
 require_once("/var/www/class/mysql.php");
 require_once("/var/www/class/guestdata.php");
+require_once("/var/www/class/admindata.php");
 require_once("/var/www/functions/template.php");
 require_once("/var/www/functions/item.php");
+session_start();
 
 if($id = isset($_GET['id']) && is_numeric($_GET['id'])) {
 	$id = $_GET['id'];
@@ -21,7 +23,15 @@ if($fp_user = fopen($user_file, "r")) {
 } else {
 	die("接続設定の読み込みに失敗しました");
 }
-$data = new GuestData($userName, $password, $database);
+if(isset($_SESSION["user"]) && isset($_SESSION["pass"])) {
+	$data = new AdminData($_SESSION["user"], $_SESSION["pass"], "ezdata");
+	if(!$data->is_admin) {
+		session_destroy();
+		die("データベースの接続に失敗しました");
+	}
+} else {
+	$data = new GuestData($userName, $password, $database);
+}
 if(mysqli_connect_error()) {
 	die("データベースの接続に失敗しました");
 }
@@ -41,6 +51,10 @@ if($data->is_added("items", $id)) {
 	$i_price = item_price($item["price"]);
 	$i_stack = $item["stack"];
 	$i_note = nl2br($item["note"]);
+	$i_hidden = $item["hidden"];
+
+	//未実装アイテム
+	if(!isset($data->is_admin) && $i_hidden) toppage();
 
 	//D/D計算
 	if($flag = preg_match("/DMG([0-9]+(～[0-9]+)?).*?DLY([0-9]+)/ms", $i_text, $val)) {
