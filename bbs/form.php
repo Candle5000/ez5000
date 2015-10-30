@@ -285,6 +285,10 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 						if($mysql->error) die("ERROR28:クエリ処理に失敗しました");
 					}
 					if($name_a[0] != $boad->default_name) setcookie("bbs_name", $name_a[0], time() + 604800);
+					if(($message->image != "") && ($delmedia || $file_id != "")) {
+						$filename = "{$boad->sname}-$tid-$tmid-{$message->image}";
+						rename("/var/www/img/bbs/$filename", "/var/www/img/bbs/trash/$filename");
+					}
 				} else {
 					$error_list[] = "パスワードが間違っています";
 				}

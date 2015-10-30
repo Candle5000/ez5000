@@ -49,9 +49,9 @@ class Message {
 			$file_id = "{$this->boad->sname}-{$this->thread->tid}-{$this->tmid}-{$this->image}";
 			$imageinfo = getimagesize("/var/www/img/bbs/$file_id");
 			if($imageinfo[0] > $size[device_info()] || $imageinfo[1] > $size[device_info()]) {
-				$img = "\n<a href=\"/img/bbs/$file_id\"><img src=\"outimg.php?img=$file_id&size={$size[device_info()]}\" /></a><br />\n";
+				$img = "\n<a href=\"/img/bbs/$file_id\"><img src=\"outimg.php?img=$file_id&size={$size[device_info()]}\" class=\"smn\" /></a><br />\n";
 			} else {
-				$img = "\n<a href=\"/img/bbs/$file_id\"><img src=\"/img/bbs/$file_id\" /></a><br />\n";
+				$img = "\n<a href=\"/img/bbs/$file_id\"><img src=\"/img/bbs/$file_id\" class=\"smn\" /></a><br />\n";
 			}
 		} else {
 			$img = "";
