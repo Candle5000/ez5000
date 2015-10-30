@@ -31,7 +31,7 @@ if(isset($_GET["tmid"])) {
 // ページを取得
 $page = (isset($_GET["page"]) && is_numeric($_GET["page"])) ? $_GET["page"] : 0;
 
-$user_file = "/etc/mysql-user/userbbs.ini";
+$user_file = "/etc/mysql-user/user5000.ini";
 if($fp_user = fopen($user_file, "r")) {
 	$userName = rtrim(fgets($fp_user));
 	$password = rtrim(fgets($fp_user));
@@ -51,10 +51,10 @@ $title = htmlspecialchars($boad->name);
 
 // スレッド情報を取得
 if(!isset($_GET["tmid"]) && !isset($_GET["view"]) && !isset($_GET["page"])) {
-	$sql = "UPDATE `{$id}_t` SET `acount`=`acount`+1 WHERE `tid`='$tid'";
+	$sql = "UPDATE `thread` SET `acount`=`acount`+1 WHERE `bid`='{$boad->bid}' AND `tid`='$tid'";
 	$mysql->query($sql);
 }
-$sql = "SELECT * FROM `{$id}_t` WHERE `tid`='$tid'";
+$sql = "SELECT * FROM `thread` WHERE `bid`='{$boad->bid}' AND `tid`='$tid'";
 $result = $mysql->query($sql);
 if($mysql->error) die("ERROR07:存在しないIDです");
 if(!$result->num_rows) die("ERROR08:存在しないIDです");
@@ -67,7 +67,7 @@ if(!isset($tmid)) {
 
 	// メッセージ情報(1)を取得 ページ0のときのみ
 	if($page == 0 && !isset($_GET["view"])) {
-		$sql = "SELECT * FROM `{$id}_m` WHERE `tid`='$tid' AND `tmid`='1'";
+		$sql = "SELECT * FROM `message` WHERE `bid`='{$boad->bid}' AND `tid`='$tid' AND `tmid`='1'";
 		$result = $mysql->query($sql);
 		if($mysql->error) die("ERROR11:存在しないIDです");
 		if(!$result->num_rows) die("ERROR12:存在しないIDです");
@@ -76,10 +76,10 @@ if(!isset($tmid)) {
 
 	// メッセージ情報を取得
 	if($page == 0 && !isset($_GET["view"])) {
-		$sql = "SELECT * FROM `{$id}_m` WHERE `tid`='$tid' AND `tmid`>'1' ORDER BY `tmid` DESC LIMIT 0,$LIMIT";
+		$sql = "SELECT * FROM `message` WHERE `bid`='{$boad->bid}' AND `tid`='$tid' AND `tmid`>'1' ORDER BY `tmid` DESC LIMIT 0,$LIMIT";
 	} else {
 		$order = (isset($_GET["view"]) && $_GET["view"] == "asc") ? "ASC" : "DESC";
-		$sql = "SELECT * FROM `{$id}_m` WHERE `tid`='$tid' ORDER BY `tmid` $order LIMIT ".($page * $LIMIT).",$LIMIT";
+		$sql = "SELECT * FROM `message` WHERE `bid`='{$boad->bid}' AND `tid`='$tid' ORDER BY `tmid` $order LIMIT ".($page * $LIMIT).",$LIMIT";
 	}
 	$result = $mysql->query($sql);
 	if($mysql->error) die("ERROR13:存在しないIDです");
@@ -102,7 +102,7 @@ if(!isset($tmid)) {
 	//------------------------------
 
 	// メッセージ情報を取得
-	$sql = "SELECT * FROM `{$id}_m` WHERE `tid`='$tid' AND `tmid`='$tmid'";
+	$sql = "SELECT * FROM `message` WHERE `bid`='{$boad->bid}' AND `tid`='$tid' AND `tmid`='$tmid'";
 	$result = $mysql->query($sql);
 	if($mysql->error) die("ERROR21:存在しないIDです");
 	if(!$result->num_rows) die("ERROR22:メッセージが存在しません");
@@ -163,12 +163,11 @@ if(!isset($tmid)) {
 <?php
 if(isset($tmid)) {
 ?>
-<li><a href="/bbs/u/read.php?id=<?=$boad->sname?>&tid=<?=$thread->tid?>"<?=mbi_ack(7)?>><?=mbi("7.")?>スレッドに戻る</a></li>
+<li><a href="/bbs/read.php?id=<?=$boad->sname?>&tid=<?=$thread->tid?>"<?=mbi_ack(8)?>><?=mbi("8.")?>スレッドに戻る</a></li>
 <?php
 }
 ?>
-<li><a href="/bbs/u/?id=<?=$boad->sname?>"<?=mbi_ack(8)?>><?=mbi("8.")?><?=$boad->name?></a></li>
-<li><a href="/bbs/"<?=mbi_ack(9)?>><?=mbi("9.")?>掲示板一覧</a></li>
+<li><a href="/bbs/?id=<?=$boad->sname?>"<?=mbi_ack(9)?>><?=mbi("9.")?><?=$boad->name?></a></li>
 <li><a href="/"<?=mbi_ack(0)?>><?=mbi("0.")?>トップページ</a></li>
 </ul>
 <?php

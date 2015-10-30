@@ -264,3 +264,8 @@ ul#footlink {
 img.dot {
 	margin:10px 0px;
 }
+img.smn {
+	display:block;
+	margin-left:auto;
+	margin-right:auto;
+}
