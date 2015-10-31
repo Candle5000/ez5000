@@ -87,14 +87,15 @@ if($mode == 1 || $mode == 2) {
 	if(!$result->num_rows) die("ERROR13:存在しないIDです");
 	$thread = new Thread($result->fetch_array());
 	if($thread->mcount > 999) die("ERROR14:スレッドの投稿数が上限に達しています");
+	if($thread->locked) die("ERROR15:スレッドがロックされています");
 }
 
 // メッセージ情報を取得 編集モードのみ
 if($mode == 2) {
 	$sql = "SELECT * FROM `message` WHERE `bid`='{$boad->bid}' AND `tid`='$tid' AND `tmid`='$tmid'";
 	$result = $mysql->query($sql);
-	if($mysql->error) die("ERROR15:存在しないIDです");
-	if(!$result->num_rows) die("ERROR16:メッセージが見つかりません");
+	if($mysql->error) die("ERROR16:存在しないIDです");
+	if(!$result->num_rows) die("ERROR17:メッセージが見つかりません");
 	$message = new Message($result->fetch_array(), $mysql, $boad, $thread);
 }
 
