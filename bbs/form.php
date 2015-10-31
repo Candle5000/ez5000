@@ -258,7 +258,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 				$sql = "SELECT MAX(`tmid`) AS `max_tmid` FROM `message` WHERE `bid`='{$boad->bid}' AND `tid`='$tid'";
 				$tmid = $mysql->query($sql)->fetch_object()->max_tmid;
 				if($sage) {
-					$sql = "UPDATE `thread` `updated`=NOW() WHERE `bid`='{$boad->bid}' AND `tid`='$tid'";
+					$sql = "UPDATE `thread` SET `updated`=NOW() WHERE `bid`='{$boad->bid}' AND `tid`='$tid'";
 				} else {
 					$sql_sub = "SELECT MAX(`tindex`)+1 AS `tindex_max` FROM `thread` WHERE `bid`='{$boad->bid}'";
 					$sql = "UPDATE `thread`, ($sql_sub) AS `thread` SET `tindex`=`thread`.`tindex_max`, `updated`=NOW() WHERE `bid`='{$boad->bid}' AND `tid`='$tid'";
