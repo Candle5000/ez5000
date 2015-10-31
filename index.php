@@ -4,6 +4,7 @@
 //=====================================
 require_once("/var/www/class/mysql.php");
 require_once("/var/www/class/guestdata.php");
+require_once("/var/www/bbs/class/boad.php");
 require_once("/var/www/functions/template.php");
 require_once("/var/www/functions/item.php");
 
@@ -23,6 +24,8 @@ $data = new GuestData($userName, $password, $database);
 if(mysqli_connect_error()) {
 	die("データベースの接続に失敗しました");
 }
+$sql = "SELECT * FROM `boad`";
+$result = $data->query($sql);
 $count = $data->top_count();
 $rows = $data->select_all_l("*", "info", 0, $PAGESIZE, "id", "desc");
 ?>
@@ -41,7 +44,18 @@ $rows = $data->select_all_l("*", "info", 0, $PAGESIZE, "id", "desc");
 <ul id="linklist">
 <li><a href="./about/"<?=mbi_ack(1)?>><?=mbi("1.")?>このサイトについて</a></li>
 <li><a href="./db/"<?=mbi_ack(2)?>><?=mbi("2.")?>データベース</a></li>
-<li><a href="./bbs/"<?=mbi_ack(3)?>><?=mbi("3.")?>掲示板</a></li>
+<?php
+$ak = 2;
+while($array = $result->fetch_array()) {
+	$boad = new Boad($array);
+	$ak++;
+	$accesskey = ($ak < 10) ? mbi_ack($ak) : "";
+	$aklabel = ($ak < 10) ? mbi($ak.'.') : "";
+?>
+<li><a href="./bbs/?id=<?=$boad->sname?>"<?=$accesskey?>><?=$aklabel.$boad->name?></a></li>
+<?php
+}
+?>
 </ul>
 <hr class="normal">
 <div class="cnt">

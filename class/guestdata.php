@@ -179,75 +179,65 @@ class GuestData extends MySQL {
 	// データリンク変換
 	//----------------------------------------
 	function data_link($str) {
-		$pattern = "/##([cimqsz][0-9]+[^0-9#]*)##(pri[0-9]+##)?/";
+		$pattern = "/##([cimqsz])([0-9]+)([^0-9#]*)##(pri([0-9]+)##)?/";
 		$str = preg_replace("/##(get|use|end##)/", "", $str);
-		while(preg_match($pattern, $str, $match)) {
-			preg_match("/([cimqsz])/", $match[1], $tbl);
-			preg_match("/([0-9]+)/", $match[1], $id);
-			$name_str = preg_replace("/[cimqsz0-9#]+/", "", $match[1]);
-			$col = "id";
-			$val = $id[1];
-
-			// データ種別
-			switch($tbl[1]) {
-				case 'c':
-					$table = "class";
-					$link_name = "class";
-					break;
-				case 'i':
-					$table = "items";
-					$link_name = "item";
-					break;
-				case 'm':
-					$table = "monster";
-					$link_name = "monster";
-					$col = array("zone", "id");
-					$val = array(floor($id[1] / 10000), $id[1] % 10000);
-					break;
-				case 'q':
-					$table = "quest";
-					$link_name = "quest";
-					break;
-				case 's':
-					$table = "skill";
-					$link_name = "skill";
-					break;
-				case 'z':
-					$table = "zone";
-					$link_name = "zone";
-			}
-
-			// 値段
-			if(isset($match[2])) {
-				preg_match("/^pri([0-9]+)##$/", $match[2], $price);
-				$price_pattern = "pri".$price[1]."##";
-				$price_text = "(".$price[1]." B)";
-			} else {
-				$price_pattern = "";
-				$price_text = "";
-			}
-
-			// 置換パターン設定
-			if(strlen($name_str)) {
-				$link_text = $name_str;
-				$replace_pattern = "/##".$tbl[1].$id[1].$name_str."##".$price_pattern."/";
-			} else {
-				$s_data = ($table != "monster") ? "name" : "name,nm";
-				$this->select_column($s_data, $table, $col, $val);
-				$row = $this->fetch();
-				$link_text = ($table == "monster" && $row["nm"] == 1) ? "<span class=\"nm\">".$row["name"]."</span>" : $row["name"];
-				$replace_pattern = "/##".$tbl[1].$id[1]."##".$price_pattern."/";
-			}
-
-			// 置換
-			if($table == "zone") {
-				$replacement = '<a href="/db/'.$link_name.'/?id='.$id[1].'">'.$link_text.'</a>';
-			} else {
-				$replacement = '<a href="/db/'.$link_name.'/data/?id='.$id[1].'">'.$link_text.'</a>'.$price_text;
-			}
-			$str = preg_replace($replace_pattern, $replacement, $str);
-		}
+		$str = preg_replace_callback($pattern, array($this, 'textReplace'), $str);
 		return($str);
+	}
+
+	//----------------------------------------
+	// 置換
+	//----------------------------------------
+	function textReplace($matches) {
+		$tb = $matches[1];
+		$id = $matches[2];
+		$label = isset($matches[3]) ? $matches[3] : "";
+		$price = isset($matches[5]) ? $matches[5] : "";
+		$col = "id";
+		$val = $id;
+
+		// データ種別
+		switch($tb) {
+			case 'c':
+				$table = "class";
+				$link = "class/data";
+				break;
+			case 'i':
+				$table = "items";
+				$link = "item/data";
+				break;
+			case 'm':
+				$table = "monster";
+				$link = "monster/data";
+				$col = array("zone", "id");
+				$val = array(floor($id / 10000), $id % 10000);
+				break;
+			case 'q':
+				$table = "quest";
+				$link = "quest/data";
+				break;
+			case 's':
+				$table = "skill";
+				$link = "skill/data";
+				break;
+			case 'z':
+				$table = "zone";
+				$link = "zone";
+				break;
+		}
+
+		// 値段
+		$price_text = ($price != "") ? "($price B)" : "";
+
+		// リンク文
+		if($label == "") {
+			$s_data = ($table != "monster") ? "name" : "name,nm";
+			$this->select_column($s_data, $table, $col, $val);
+			$row = $this->fetch();
+			$label = ($table == "monster" && $row["nm"] == 1) ? "<span class=\"nm\">".$row["name"]."</span>" : $row["name"];
+		}
+
+		return("<a href=\"/db/$link/?id=$id\">$label</a>$price_text");
 	}
 
 	//--------------------------

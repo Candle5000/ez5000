@@ -11,6 +11,7 @@ class Message {
 	public $tmid;
 	public $name;
 	public $comment;
+	public $image;
 	public $ts;
 	public $ip;
 	public $ua;
@@ -18,6 +19,7 @@ class Message {
 	public $mysql;
 	public $boad;
 	public $thread;
+	public static $imgsize = array('mb' => 120, 'sp' => 180, 'pc' => 320);
 
 	//--------------------------
 	// コンストラクタ
@@ -27,6 +29,7 @@ class Message {
 		$this->tmid = $array["tmid"];
 		$this->name = $array["name"];
 		$this->comment = $array["comment"];
+		$this->image = $array["image"];
 		$this->ts = $array["ts"];
 		$this->ip = $array["ip"];
 		$this->ua = $array["ua"];
@@ -40,11 +43,23 @@ class Message {
 	// メッセージ出力
 	//--------------------------
 	public function printMessage() {
+		$size = Message::$imgsize;
 		$reply = ($this->thread->mcount > 999 || $this->thread->locked) ? "返信" : "<a href=\"./form.php?mode=reform&id={$this->boad->sname}&tid={$this->thread->tid}&re={$this->tmid}\">返信</a>";
+		if($this->image != "") {
+			$file_id = "{$this->boad->sname}-{$this->thread->tid}-{$this->tmid}-{$this->image}";
+			$imageinfo = getimagesize("/var/www/img/bbs/$file_id");
+			if($imageinfo[0] > $size[device_info()] || $imageinfo[1] > $size[device_info()]) {
+				$img = "\n<a href=\"/img/bbs/$file_id\"><img src=\"outimg.php?img=$file_id&size={$size[device_info()]}\" class=\"smn\" /></a><br />\n";
+			} else {
+				$img = "\n<a href=\"/img/bbs/$file_id\"><img src=\"/img/bbs/$file_id\" class=\"smn\" /></a><br />\n";
+			}
+		} else {
+			$img = "";
+		}
 ?>
 <hr class="normal">
 <p>
-[<?=$this->tmid?>] By <?=htmlspecialchars($this->name)?><br />
+[<?=$this->tmid?>] By <?=htmlspecialchars($this->name)?><br /><?=$img?>
 <?=$this->textConvert($this->comment)?><br />
 <?=$this->ts?><br />
 [<?=$reply?>] [<a href="./form.php?mode=modify&id=<?=$this->boad->sname?>&tid=<?=$this->thread->tid?>&tmid=<?=$this->tmid?>">編集</a>]
@@ -59,7 +74,7 @@ class Message {
 		$name = str_replace('＃', '#', $name);
 		$array = explode('#', $name, 2);
 		$array[0] = str_replace('/', '', $array[0]);
-		if(isset($array[1])) $array[1] = strtoupper(substr(hash('md5', mb_convert_encoding($array[1], 'EUC-JP', 'UTF-8')), 0, 8));
+		if(isset($array[1]) && $array[1] != "") $array[1] = strtoupper(substr(hash('md5', mb_convert_encoding($array[1], 'EUC-JP', 'UTF-8')), 0, 8));
 		return($array);
 	}
 
@@ -80,21 +95,21 @@ class Message {
 		if($matches[1] != "") {
 			return("<a href=\"{$matches[1]}\" target=\"blank\">".htmlspecialchars($matches[2])."</a>");
 		} else if($matches[3] != "") {
-			$sql = "SELECT 1 FROM `{$this->boad->sname}_m` WHERE `tid`='{$matches[4]}' AND `tmid`='{$matches[5]}'";
+			$sql = "SELECT 1 FROM `message` WHERE `bid`='{$this->boad->bid}' AND `tid`='{$matches[4]}' AND `tmid`='{$matches[5]}'";
 			if($this->mysql->query($sql)->num_rows) {
 				return("<a href=\"./read.php?id=".$this->boad->sname."&tid={$matches[4]}&tmid={$matches[5]}\">".htmlspecialchars($matches[3])."</a>");
 			} else {
 				return(htmlspecialchars($matches[3]));
 			}
 		} else if($matches[6] != "") {
-			$sql = "SELECT 1 FROM `{$this->boad->sname}_t` WHERE `tid`='{$matches[7]}'";
+			$sql = "SELECT 1 FROM `thread` WHERE `bid`='{$this->boad->bid}' AND `tid`='{$matches[7]}'";
 			if($this->mysql->query($sql)->num_rows) {
 				return("<a href=\"./read.php?id=".$this->boad->sname."&tid={$matches[7]}\">".htmlspecialchars($matches[6])."</a>");
 			} else {
 				return(htmlspecialchars($matches[6]));
 			}
 		} else if($matches[8] != "") {
-			$sql = "SELECT 1 FROM `{$this->boad->sname}_m` WHERE `tid`='{$this->thread->tid}' AND `tmid`='{$matches[9]}'";
+			$sql = "SELECT 1 FROM `message` WHERE `bid`='{$this->boad->bid}' AND `tid`='{$this->thread->tid}' AND `tmid`='{$matches[9]}'";
 			if($this->mysql->query($sql)->num_rows) {
 				return("<a href=\"./read.php?id={$this->boad->sname}&tid={$this->thread->tid}&tmid={$matches[9]}\">".htmlspecialchars($matches[8])."</a>");
 			} else {
