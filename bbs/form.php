@@ -87,14 +87,15 @@ if($mode == 1 || $mode == 2) {
 	if(!$result->num_rows) die("ERROR13:存在しないIDです");
 	$thread = new Thread($result->fetch_array());
 	if($thread->mcount > 999) die("ERROR14:スレッドの投稿数が上限に達しています");
+	if($thread->locked) die("ERROR15:スレッドがロックされています");
 }
 
 // メッセージ情報を取得 編集モードのみ
 if($mode == 2) {
 	$sql = "SELECT * FROM `message` WHERE `bid`='{$boad->bid}' AND `tid`='$tid' AND `tmid`='$tmid'";
 	$result = $mysql->query($sql);
-	if($mysql->error) die("ERROR15:存在しないIDです");
-	if(!$result->num_rows) die("ERROR16:メッセージが見つかりません");
+	if($mysql->error) die("ERROR16:存在しないIDです");
+	if(!$result->num_rows) die("ERROR17:メッセージが見つかりません");
 	$message = new Message($result->fetch_array(), $mysql, $boad, $thread);
 }
 
@@ -235,7 +236,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 				if($mysql->error) die("ERROR20:クエリ処理に失敗しました");
 				$next_tid = $result_obj->next_tid;
 				$next_tindex = $result_obj->next_tindex;
-				$sql = "INSERT INTO `thread` (`tid`, `bid`, `title`, `tindex`, `mcount`, `updated`) VALUES($next_tid, '{$boad->bid}', '{$sql_title}', '$next_tindex', '1', NOW())";
+				$sql = "INSERT INTO `thread` (`tid`, `bid`, `title`, `tindex`, `updated`) VALUES($next_tid, '{$boad->bid}', '{$sql_title}', '$next_tindex', NOW())";
 				$mysql->query($sql);
 				if($mysql->error) die("ERROR21:クエリ処理に失敗しました");
 				$sql_sub = "SELECT MAX(`mid`)+1 AS `mid`, '{$boad->bid}' AS `bid`, $next_tid AS `tid`, '1' AS `tmid`, '$sql_name' AS `name`, '$sql_comment' AS `comment`, '$file_id' AS `image`, PASSWORD('$sql_pass') AS `password`, NOW() AS `ts`, '$ip' AS `ip`, '$ua' AS `ua`, '$uid' AS `uid` FROM `message` WHERE `bid`='{$boad->bid}'";
@@ -257,10 +258,10 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 				$sql = "SELECT MAX(`tmid`) AS `max_tmid` FROM `message` WHERE `bid`='{$boad->bid}' AND `tid`='$tid'";
 				$tmid = $mysql->query($sql)->fetch_object()->max_tmid;
 				if($sage) {
-					$sql = "UPDATE `thread` SET `mcount`=`mcount`+1, `updated`=NOW() WHERE `bid`='{$boad->bid}' AND `tid`='$tid'";
+					$sql = "UPDATE `thread` `updated`=NOW() WHERE `bid`='{$boad->bid}' AND `tid`='$tid'";
 				} else {
 					$sql_sub = "SELECT MAX(`tindex`)+1 AS `tindex_max` FROM `thread` WHERE `bid`='{$boad->bid}'";
-					$sql = "UPDATE `thread`, ($sql_sub) AS `thread` SET `tindex`=`thread`.`tindex_max`, `mcount`=`mcount`+1, `updated`=NOW() WHERE `bid`='{$boad->bid}' AND `tid`='$tid'";
+					$sql = "UPDATE `thread`, ($sql_sub) AS `thread` SET `tindex`=`thread`.`tindex_max`, `updated`=NOW() WHERE `bid`='{$boad->bid}' AND `tid`='$tid'";
 				}
 				$mysql->query($sql);
 				if($mysql->error) die("ERROR24:クエリ処理に失敗しました");
