@@ -144,7 +144,7 @@ if($data->is_added("items", $id)) {
 		}
 	}
 
-	$i_use = isset($i_use) ? $data->data_link(implode("<br />\n", $i_use)) : "特になし";
+	$i_use = isset($i_use) ? $data->data_link(implode("<br />\n", array_unique($i_use))) : "特になし";
 
 	/* 入手 */
 	$i = 0;
@@ -184,10 +184,10 @@ if($data->is_added("items", $id)) {
 			$p_id = $product["id"];
 			$p_name = $product["name"];
 			$p_price = preg_match("/##get##i$id##pri([0-9]+)##(.*?)##end##/s", $product["note"], $match) ? "({$match[1]} B)" : "";
-			$p_need = isset($match[2]) ? $data->data_link($match[2]) : "";
+			$p_need = isset($match[2]) ? $match[2] : "";
 			$p_text[] = nl2br("<a href=\"/db/quest/data/?id=$p_id\">$p_name</a>$p_price$p_need");
 		}
-		$i_get[$i]["data"] = implode("<hr class=\"normal\" />\n", $p_text);
+		$i_get[$i]["data"] = $data->data_link(implode("<hr class=\"table\" />\n", $p_text));
 		$i++;
 	}
 

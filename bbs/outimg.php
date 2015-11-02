@@ -1,19 +1,20 @@
 <?php
 require_once("/var/www/functions/template.php");
 
-if(!isset($_GET["img"]) || !isset($_GET["size"])) toppage();
+if(!isset($_GET["img"]) || !isset($_GET["size"]) || !preg_match("/[a-z0-9]+-[0-9]+-[0-9]+-[a-f0-9]+\.[a-z]+/i", $_GET["img"]) || !is_numeric($_GET["size"])) toppage();
 
 $url = "/var/www/img/bbs/".$_GET["img"];
 
 // 出力する画像サイズの指定
 $width = $_GET["size"];
-if($width > 320) $width = 320;
+if($width > 240) $width = 240;
 
 // 元画像のファイルサイズを取得
 try {
 	$imageinfo = @getimagesize($url);
 } catch(RuntimeException $e) {
 	toppage();
+	die();
 }
 $image_w = $imageinfo[0];
 $image_h = $imageinfo[1];
@@ -31,8 +32,23 @@ switch($imageinfo[2]) {
 		break;
 	default:
 		toppage();
+		die();
 		break;
 }
+
+// 圧縮サイズ指定
+switch(device_info()) {
+	case 'mb':
+		$quality = 50;
+		break;
+	case 'sp':
+		$quality = 90;
+		break;
+	case 'pc':
+		$quality = 100;
+		break;
+}
+
 
 // 出力画像サイズより元画像が大きい場合
 if($image_w > $width) {
@@ -64,8 +80,8 @@ if($image_w > $width) {
 	);
 
 	// 画像を出力する
-	header('Content-type: image/png');
-	imagepng($canvas, null, 0, PNG_NO_FILTER);
+	header('Content-type: image/jpeg');
+	imagejpeg($canvas, null, $quality);
 
 	// メモリを開放する
 	imagedestroy($canvas);
@@ -74,22 +90,7 @@ if($image_w > $width) {
 } else {
 
 	// 画像をそのまま出力
-	switch($imageinfo[2]) {
-		case 1:
-			header('Content-type: image/gif');
-			imagegif($image);
-			break;
-		case 2:
-			header('Content-type: image/jpeg');
-			imagejpeg($image);
-			break;
-		case 3:
-			header('Content-type: image/png');
-			imagepng($image);
-			break;
-		default:
-			toppage();
-			break;
-	}
+	header('Content-type: image/jpeg');
+	imagejpeg($image, null, $quality);
 }
 ?>

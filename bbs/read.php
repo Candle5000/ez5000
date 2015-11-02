@@ -51,10 +51,10 @@ $title = htmlspecialchars($boad->name);
 
 // スレッド情報を取得
 if(!isset($_GET["tmid"]) && !isset($_GET["view"]) && !isset($_GET["page"])) {
-	$sql = "UPDATE `thread` SET `acount`=`acount`+1 WHERE `bid`='{$boad->bid}' AND `tid`='$tid'";
+	$sql = "UPDATE `thread` SET `acount`=`acount`+1 WHERE `bid`='{$boad->bid}' AND `tid`='$tid' AND (SELECT '1' FROM `message` WHERE `bid`='{$boad->bid}' AND `tid`='$tid' AND `tmid`='1' AND `deleted`=FALSE)='1'";
 	$mysql->query($sql);
 }
-$sql = "SELECT `thread`.`tid`,`title`,`tindex`,`acount`,COUNT(1) AS `mcount`,`updated`,`locked`,`top` FROM `thread` NATURAL JOIN `message` WHERE `bid`='{$boad->bid}' AND `tid`='$tid' GROUP BY `tid`";
+$sql = "SELECT `thread`.`tid`,`title`,`tindex`,`acount`,COUNT(1) AS `mcount`,`updated`,`locked`,`top`,`pastlog` FROM `thread` NATURAL JOIN `message` WHERE `bid`='{$boad->bid}' AND `tid`='$tid' AND `pastlog`=FALSE AND `deleted`=FALSE AND (SELECT '1' FROM `message` WHERE `bid`='{$boad->bid}' AND `tid`='$tid' AND `tmid`='1' AND `deleted`=FALSE)='1' GROUP BY `tid`";
 $result = $mysql->query($sql);
 if($mysql->error) die("ERROR07:存在しないIDです");
 if(!$result->num_rows) die("ERROR08:存在しないIDです");
@@ -67,7 +67,7 @@ if(!isset($tmid)) {
 
 	// メッセージ情報(1)を取得 ページ0のときのみ
 	if($page == 0 && !isset($_GET["view"])) {
-		$sql = "SELECT * FROM `message` WHERE `bid`='{$boad->bid}' AND `tid`='$tid' AND `tmid`='1'";
+		$sql = "SELECT * FROM `message` WHERE `bid`='{$boad->bid}' AND `tid`='$tid' AND `tmid`='1' AND `deleted`=FALSE";
 		$result = $mysql->query($sql);
 		if($mysql->error) die("ERROR11:存在しないIDです");
 		if(!$result->num_rows) die("ERROR12:存在しないIDです");
@@ -76,10 +76,10 @@ if(!isset($tmid)) {
 
 	// メッセージ情報を取得
 	if($page == 0 && !isset($_GET["view"])) {
-		$sql = "SELECT * FROM `message` WHERE `bid`='{$boad->bid}' AND `tid`='$tid' AND `tmid`>'1' ORDER BY `tmid` DESC LIMIT 0,$LIMIT";
+		$sql = "SELECT * FROM `message` WHERE `bid`='{$boad->bid}' AND `tid`='$tid' AND `tmid`>'1' AND `deleted`=FALSE ORDER BY `tmid` DESC LIMIT 0,$LIMIT";
 	} else {
 		$order = (isset($_GET["view"]) && $_GET["view"] == "asc") ? "ASC" : "DESC";
-		$sql = "SELECT * FROM `message` WHERE `bid`='{$boad->bid}' AND `tid`='$tid' ORDER BY `tmid` $order LIMIT ".($page * $LIMIT).",$LIMIT";
+		$sql = "SELECT * FROM `message` WHERE `bid`='{$boad->bid}' AND `tid`='$tid' AND `deleted`=FALSE ORDER BY `tmid` $order LIMIT ".($page * $LIMIT).",$LIMIT";
 	}
 	$result = $mysql->query($sql);
 	if($mysql->error) die("ERROR13:存在しないIDです");
@@ -102,7 +102,7 @@ if(!isset($tmid)) {
 	//------------------------------
 
 	// メッセージ情報を取得
-	$sql = "SELECT * FROM `message` WHERE `bid`='{$boad->bid}' AND `tid`='$tid' AND `tmid`='$tmid'";
+	$sql = "SELECT * FROM `message` WHERE `bid`='{$boad->bid}' AND `tid`='$tid' AND `tmid`='$tmid' AND `deleted`=FALSE";
 	$result = $mysql->query($sql);
 	if($mysql->error) die("ERROR21:存在しないIDです");
 	if(!$result->num_rows) die("ERROR22:メッセージが存在しません");

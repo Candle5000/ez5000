@@ -81,7 +81,7 @@ $title = $boad->name;
 
 // スレッド情報を取得 返信/編集モードのみ
 if($mode == 1 || $mode == 2) {
-	$sql = "SELECT `thread`.`tid`,`title`,`tindex`,`acount`,COUNT(1) AS `mcount`,`updated`,`locked`,`top` FROM `thread` NATURAL JOIN `message` WHERE `bid`='{$boad->bid}' AND `tid`='$tid' GROUP BY `tid`";
+	$sql = "SELECT `thread`.`tid`,`title`,`tindex`,`acount`,COUNT(1) AS `mcount`,`updated`,`locked`,`top`,`pastlog` FROM `thread` NATURAL JOIN `message` WHERE `bid`='{$boad->bid}' AND `tid`='$tid' AND `pastlog`=FALSE AND (SELECT '1' FROM `message` WHERE `bid`='{$boad->bid}' AND `tid`='$tid' AND `tmid`='1' AND `deleted`=FALSE)='1' GROUP BY `tid`";
 	$result = $mysql->query($sql);
 	if($mysql->error) die("ERROR12:存在しないIDです");
 	if(!$result->num_rows) die("ERROR13:存在しないIDです");
@@ -92,7 +92,7 @@ if($mode == 1 || $mode == 2) {
 
 // メッセージ情報を取得 編集モードのみ
 if($mode == 2) {
-	$sql = "SELECT * FROM `message` WHERE `bid`='{$boad->bid}' AND `tid`='$tid' AND `tmid`='$tmid'";
+	$sql = "SELECT * FROM `message` WHERE `bid`='{$boad->bid}' AND `tid`='$tid' AND `tmid`='$tmid' AND `deleted`=FALSE";
 	$result = $mysql->query($sql);
 	if($mysql->error) die("ERROR16:存在しないIDです");
 	if(!$result->num_rows) die("ERROR17:メッセージが見つかりません");
@@ -197,12 +197,15 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 	}
 
 	// 添付ファイル削除 編集モードのみ
-	$delmedia = (($file_id == "") && isset($_POST["delmedia"]) && $_POST["delmedia"]) ? true : false;
+	$delmedia = (($mode == 2) && ($file_id == "") && isset($_POST["delmedia"]) && $_POST["delmedia"]) ? true : false;
 
 	// 編集パスワード取得
 	$pass = isset($_POST["pass"]) ? $_POST["pass"] : "";
 	if($pass == "") $error_list[] = "パスワードが空です";
 	if(!preg_match("/^[!-~]{4,64}$/", $pass)) $error_list[] = "パスワードは半角英数字と記号のみで4～64文字にしてください";
+
+	// 書き込み削除取得 編集モードのみ
+	$delmessage = (($mode == 2) && isset($_POST["delete"]) && ($_POST["delete"] == 1)) ? true : false;
 
 	// クッキー有効確認
 	if(!isset($_COOKIE["cookiecheck"])) {
@@ -270,25 +273,41 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 				break;
 
 			case 2: // メッセージ編集
-				$sql = "SELECT `password`=PASSWORD('$sql_pass') AS `match` FROM `message` WHERE `bid`='{$boad->bid}' AND `tid`='$tid' AND `tmid`='$tmid' AND `mid`='{$message->mid}'";
+				$sql = "SELECT `password`=PASSWORD('$sql_pass') AS `match` FROM `message` WHERE `bid`='{$boad->bid}' AND `tid`='$tid' AND `tmid`='$tmid' AND `mid`='{$message->mid}' AND `deleted`=FALSE AND (SELECT '1' FROM `thread` WHERE `bid`='{$boad->bid}' AND `tid`='$tid' AND `pastlog`=FALSE)='1'";
 				$result = $mysql->query($sql);
 				if($mysql->error) die("ERROR25:クエリ処理に失敗しました");
 				if(!$result->num_rows) die("ERROR26:メッセージが見つかりません");
 				$array = $result->fetch_array();
 				if($array["match"]) {
-					$sql_img = (!$delmedia && ($file_id == "")) ? "" : "`image`='$file_id', ";
-					$sql = "UPDATE `message` SET `name`='$sql_name', `comment`='$sql_comment', $sql_img`ip`='$ip', `ua`='$ua', `uid`='$uid' WHERE `bid`='{$boad->bid}' AND `tid`='$tid' AND `tmid`='$tmid' AND `mid`='{$message->mid}' AND `password`=PASSWORD('$pass')";
+					// メッセージ編集
+					$sql_img = (!$delmedia && $file_id == "") ? "" : " `image`='$file_id',";
+					$sql_set = (!$delmessage) ? "`name`='$sql_name', `comment`='$sql_comment',$sql_img `ip`='$ip', `ua`='$ua', `uid`='$uid'" : "`deleted`=TRUE";
+					$sql_tmid = ($delmessage && $tmid == 1) ? "" : " AND `tmid`='$tmid'";
+					$sql = "UPDATE `message` SET $sql_set WHERE `bid`='{$boad->bid}' AND `tid`='$tid'$sql_tmid";
 					$mysql->query($sql);
 					if($mysql->error) die("ERROR27:クエリ処理に失敗しました");
-					if($tmid == 1) {
+
+					// スレッド編集
+					if($tmid == 1 && !$delmessage) {
 						$sql = "UPDATE `thread` SET `title`='$sql_title' WHERE `bid`='{$boad->bid}' AND `tid`='$tid'";
 						$mysql->query($sql);
 						if($mysql->error) die("ERROR28:クエリ処理に失敗しました");
 					}
-					if($name_a[0] != $boad->default_name) setcookie("bbs_name", $name_a[0], time() + 604800);
-					if(($message->image != "") && ($delmedia || $file_id != "")) {
+
+					// 名前欄クッキー
+					if(($name_a[0] != $boad->default_name) && !$delmessage) setcookie("bbs_name", $name_a[0], time() + 604800);
+
+					// 添付ファイル削除
+					if(($message->image != "" && ($delmedia || $file_id != "")) || ($message->image != "" && $delmessage && $tmid != 1)) {
 						$filename = "{$boad->sname}-$tid-$tmid-{$message->image}";
 						rename("/var/www/img/bbs/$filename", "/var/www/img/bbs/trash/$filename");
+					} else if($delmessage && $tmid == 1) {
+						$sql = "SELECT `tmid`,`image` FROM `message` WHERE `bid`='{$boad->bid}' AND `tid`='$tid' AND `image`!=''";
+						$result = $mysql->query($sql);
+						while($array = $result->fetch_array()) {
+							$filename = "{$boad->sname}-$tid-{$array["tmid"]}-{$array["image"]}";
+							if(file_exists("/var/www/img/bbs/$filename")) rename("/var/www/img/bbs/$filename", "/var/www/img/bbs/trash/$filename");
+						}
 					}
 				} else {
 					$error_list[] = "パスワードが間違っています";
@@ -296,7 +315,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 				break;
 		}
 
-		if(!isset($error_list)) {
+		if(!isset($error_list) && !$delmessage) {
 
 			// 同一内容投稿防止
 			if($mode == 0 || $mode == 1) $_SESSION["comment"] = $comment;
@@ -429,7 +448,11 @@ if(!($_SERVER["REQUEST_METHOD"] == "POST") || isset($error_list)) {
 <?php
 	if($mode == 2) {
 ?>
-<input type="submit" value=" 編集 ">
+<select name="delete">
+<option value="0">編集する</option>
+<option value="1">削除する</option>
+</select><br />
+<input type="submit" value=" 送信 ">
 <?php
 	} else {
 ?>
@@ -448,7 +471,11 @@ if(!($_SERVER["REQUEST_METHOD"] == "POST") || isset($error_list)) {
 			echo "返信を投稿しました\n";
 			break;
 		case 2:
-			echo "メッセージを編集しました\n";
+			if(!$delmessage) {
+				echo "メッセージを編集しました\n";
+			} else {
+				echo "メッセージを削除しました\n";
+			}
 			break;
 	}
 }
@@ -456,7 +483,7 @@ if(!($_SERVER["REQUEST_METHOD"] == "POST") || isset($error_list)) {
 <hr class="normal">
 <ul id="footlink">
 <?php
-if($mode == 1 || $mode == 2) {
+if(($mode == 1 || $mode == 2) && !(isset($delmessage) && $delmessage && $tmid == 1)) {
 ?>
 <li><a href="/bbs/read.php?id=<?=$boad->sname?>&tid=<?=$thread->tid?>"<?=mbi_ack(7)?>><?=mbi("7.")?>スレッドに戻る</a></li>
 <?php
