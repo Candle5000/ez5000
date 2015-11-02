@@ -45,6 +45,7 @@ class Message {
 	public function printMessage() {
 		$size = Message::$imgsize;
 		$reply = ($this->thread->mcount > 999 || $this->thread->locked) ? "返信" : "<a href=\"./form.php?mode=reform&id={$this->boad->sname}&tid={$this->thread->tid}&re={$this->tmid}\">返信</a>";
+		$modify = ($this->thread->mcount > 999 || $this->thread->locked) ? "編集" : "<a href=\"./form.php?mode=modify&id={$this->boad->sname}&tid={$this->thread->tid}&tmid={$this->tmid}\">編集</a>";
 		if($this->image != "") {
 			$file_id = "{$this->boad->sname}-{$this->thread->tid}-{$this->tmid}-{$this->image}";
 			$imageinfo = getimagesize("/var/www/img/bbs/$file_id");
@@ -62,7 +63,7 @@ class Message {
 [<?=$this->tmid?>] By <?=htmlspecialchars($this->name)?><br /><?=$img?>
 <?=$this->textConvert($this->comment)?><br />
 <?=$this->ts?><br />
-[<?=$reply?>] [<a href="./form.php?mode=modify&id=<?=$this->boad->sname?>&tid=<?=$this->thread->tid?>&tmid=<?=$this->tmid?>">編集</a>]
+[<?=$reply?>] [<?=$modify?>]
 </p>
 <?php
 	}
