@@ -206,6 +206,14 @@ hr.normal {
 	margin:0px 0px;
 	width:auto;
 }
+hr.table {
+	background:#420;
+	border:0;
+	color:#420;
+	height:1px;
+	margin:3px 0px;
+	width:auto;
+}
 p {
 	margin:0px;
 	text-align:left;
