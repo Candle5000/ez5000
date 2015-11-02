@@ -38,14 +38,14 @@ $boad = new Boad($result->fetch_array());
 $title = $boad->name;
 
 // スレッド数を取得
-$sql = "SELECT COUNT(1) AS `count` FROM `thread` WHERE `bid`='{$boad->bid}'";
+$sql = "SELECT COUNT(1) AS `count` FROM `thread` NATURAL JOIN `message` WHERE `bid`='{$boad->bid}' AND `pastlog`=FALSE AND `tmid`='1' AND `deleted`=FALSE";
 $result = $mysql->query($sql);
 if($mysql->error) die("ERROR04:存在しないIDです");
 $array = $result->fetch_array();
 $rows = $array["count"];
 
 // スレッド一覧を取得
-$sql = "SELECT `thread`.`tid`,`title`,`tindex`,`acount`,COUNT(1) AS `mcount`,`updated`,`locked`,`top` FROM `thread` NATURAL JOIN `message` WHERE `bid`='{$boad->bid}' GROUP BY `tid` ORDER BY `top` DESC, `tindex` DESC LIMIT ".($page * $LIMIT).",$LIMIT";
+$sql = "SELECT `thread`.`tid`,`title`,`tindex`,`acount`,COUNT(1) AS `mcount`,`updated`,`locked`,`top` FROM `thread` NATURAL JOIN `message` WHERE `bid`='{$boad->bid}' AND `deleted`=FALSE GROUP BY `tid` ORDER BY `top` DESC, `tindex` DESC LIMIT ".($page * $LIMIT).",$LIMIT";
 $result = $mysql->query($sql);
 if($mysql->error) die("ERROR05:存在しないIDです");
 

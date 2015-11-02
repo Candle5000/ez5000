@@ -16,6 +16,7 @@ class Message {
 	public $ip;
 	public $ua;
 	public $uid;
+	public $deleted;
 	public $mysql;
 	public $boad;
 	public $thread;
@@ -34,6 +35,7 @@ class Message {
 		$this->ip = $array["ip"];
 		$this->ua = $array["ua"];
 		$this->uid = $array["uid"];
+		$this->deleted = $array["deleted"];
 		$this->mysql = $mysql_temp;
 		$this->boad = $boad_temp;
 		$this->thread = $thread_temp;
@@ -43,20 +45,21 @@ class Message {
 	// メッセージ出力
 	//--------------------------
 	public function printMessage() {
-		$size = Message::$imgsize;
-		$reply = ($this->thread->mcount > 999 || $this->thread->locked) ? "返信" : "<a href=\"./form.php?mode=reform&id={$this->boad->sname}&tid={$this->thread->tid}&re={$this->tmid}\">返信</a>";
-		$modify = ($this->thread->mcount > 999 || $this->thread->locked) ? "編集" : "<a href=\"./form.php?mode=modify&id={$this->boad->sname}&tid={$this->thread->tid}&tmid={$this->tmid}\">編集</a>";
-		if($this->image != "") {
-			$file_id = "{$this->boad->sname}-{$this->thread->tid}-{$this->tmid}-{$this->image}";
-			$imageinfo = getimagesize("/var/www/img/bbs/$file_id");
-			if($imageinfo[0] > $size[device_info()] || $imageinfo[1] > $size[device_info()]) {
-				$img = "\n<a href=\"/img/bbs/$file_id\"><img src=\"outimg.php?img=$file_id&size={$size[device_info()]}\" class=\"smn\" /></a><br />\n";
+		if(!$this->deleted) {
+			$size = Message::$imgsize;
+			$reply = ($this->thread->mcount > 999 || $this->thread->locked) ? "返信" : "<a href=\"./form.php?mode=reform&id={$this->boad->sname}&tid={$this->thread->tid}&re={$this->tmid}\">返信</a>";
+			$modify = ($this->thread->mcount > 999 || $this->thread->locked) ? "編集" : "<a href=\"./form.php?mode=modify&id={$this->boad->sname}&tid={$this->thread->tid}&tmid={$this->tmid}\">編集</a>";
+			if($this->image != "") {
+				$file_id = "{$this->boad->sname}-{$this->thread->tid}-{$this->tmid}-{$this->image}";
+				$imageinfo = getimagesize("/var/www/img/bbs/$file_id");
+				if($imageinfo[0] > $size[device_info()] || $imageinfo[1] > $size[device_info()]) {
+					$img = "\n<a href=\"/img/bbs/$file_id\"><img src=\"outimg.php?img=$file_id&size={$size[device_info()]}\" class=\"smn\" /></a><br />\n";
+				} else {
+					$img = "\n<a href=\"/img/bbs/$file_id\"><img src=\"/img/bbs/$file_id\" class=\"smn\" /></a><br />\n";
+				}
 			} else {
-				$img = "\n<a href=\"/img/bbs/$file_id\"><img src=\"/img/bbs/$file_id\" class=\"smn\" /></a><br />\n";
+				$img = "";
 			}
-		} else {
-			$img = "";
-		}
 ?>
 <hr class="normal">
 <p>
@@ -66,6 +69,14 @@ class Message {
 [<?=$reply?>] [<?=$modify?>]
 </p>
 <?php
+		} else {
+?>
+<hr class="normal">
+<p>
+[<?=$this->tmid?>] 削除済
+</p>
+<?php
+		}
 	}
 
 	//--------------------------
@@ -96,22 +107,28 @@ class Message {
 		if($matches[1] != "") {
 			return("<a href=\"{$matches[1]}\" target=\"blank\">".htmlspecialchars($matches[2])."</a>");
 		} else if($matches[3] != "") {
-			$sql = "SELECT 1 FROM `message` WHERE `bid`='{$this->boad->bid}' AND `tid`='{$matches[4]}' AND `tmid`='{$matches[5]}'";
-			if($this->mysql->query($sql)->num_rows) {
+			$sql1 = "SELECT 1 FROM `message` WHERE `bid`='{$this->boad->bid}' AND `tid`='{$matches[4]}' AND `tmid`='{$matches[5]}' AND `deleted`=FALSE";
+			$sql2 = "SELECT 1 FROM `thread` WHERE `bid`='{$this->boad->bid}' AND `tid`='{$matches[4]}' AND `pastlog`=FALSE";
+			$sql = "SELECT ($sql1) AND ($sql2) AS `bool`";
+			if($this->mysql->query($sql)->fetch_object()->bool) {
 				return("<a href=\"./read.php?id=".$this->boad->sname."&tid={$matches[4]}&tmid={$matches[5]}\">".htmlspecialchars($matches[3])."</a>");
 			} else {
 				return(htmlspecialchars($matches[3]));
 			}
 		} else if($matches[6] != "") {
-			$sql = "SELECT 1 FROM `thread` WHERE `bid`='{$this->boad->bid}' AND `tid`='{$matches[7]}'";
-			if($this->mysql->query($sql)->num_rows) {
+			$sql1 = "SELECT 1 FROM `message` WHERE `bid`='{$this->boad->bid}' AND `tid`='{$matches[7]}' AND `tmid`='1' AND `deleted`=FALSE";
+			$sql2 = "SELECT 1 FROM `thread` WHERE `bid`='{$this->boad->bid}' AND `tid`='{$matches[7]}' AND `pastlog`=FALSE";
+			$sql = "SELECT ($sql1) AND ($sql2) AS `bool`";
+			if($this->mysql->query($sql)->fetch_object()->bool) {
 				return("<a href=\"./read.php?id=".$this->boad->sname."&tid={$matches[7]}\">".htmlspecialchars($matches[6])."</a>");
 			} else {
 				return(htmlspecialchars($matches[6]));
 			}
 		} else if($matches[8] != "") {
-			$sql = "SELECT 1 FROM `message` WHERE `bid`='{$this->boad->bid}' AND `tid`='{$this->thread->tid}' AND `tmid`='{$matches[9]}'";
-			if($this->mysql->query($sql)->num_rows) {
+			$sql1 = "SELECT 1 FROM `message` WHERE `bid`='{$this->boad->bid}' AND `tid`='{$this->thread->tid}' AND `tmid`='{$matches[9]}' AND `deleted`=FALSE";
+			$sql2 = "SELECT 1 FROM `thread` WHERE `bid`='{$this->boad->bid}' AND `tid`='{$this->thread->tid}' AND `pastlog`=FALSE";
+			$sql = "SELECT ($sql1) AND ($sql2) AS `bool`";
+			if($this->mysql->query($sql)->fetch_object()->bool) {
 				return("<a href=\"./read.php?id={$this->boad->sname}&tid={$this->thread->tid}&tmid={$matches[9]}\">".htmlspecialchars($matches[8])."</a>");
 			} else {
 				return(htmlspecialchars($matches[8]));
