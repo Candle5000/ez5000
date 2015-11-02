@@ -144,7 +144,7 @@ if($data->is_added("items", $id)) {
 		}
 	}
 
-	$i_use = isset($i_use) ? $data->data_link(implode("<br />\n", $i_use)) : "特になし";
+	$i_use = isset($i_use) ? $data->data_link(implode("<br />\n", array_unique($i_use))) : "特になし";
 
 	/* 入手 */
 	$i = 0;
