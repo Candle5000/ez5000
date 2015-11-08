@@ -225,6 +225,10 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 	if(isset($_SERVER['HTTP_X_JPHONE_UID'])) $uid = $_SERVER['HTTP_X_JPHONE_UID']; // sb
 	if(!isset($uid)) $uid = "";
 
+	// 画像認証
+	$is_mb = (device_info() == 'mb' && $uid != "");
+	if(!$is_mb && (!isset($_SESSION['ImageAuthentication']) || !isset($_POST["authcap"]) || ($_SESSION["ImageAuthentication"] != $_POST["authcap"]))) $error_list[] = "画像認証コードが一致しません";
+
 	if(!isset($error_list)) {
 		$sql_title = $mysql->real_escape_string($title);
 		$sql_name = $mysql->real_escape_string($name_t);
@@ -429,6 +433,13 @@ if(!($_SERVER["REQUEST_METHOD"] == "POST") || isset($error_list)) {
 	if(device_info() == "mb") {
 ?>
 <input type="hidden" name="enc" value="あ">
+<?php
+	} else {
+?>
+<img src="ImageAuthentication.php" /><br />
+画像認証-上記文字を入力してください<br />
+<input type="text" name="authcap">
+<hr class="normal">
 <?php
 	}
 	if($mode == 1 || $mode == 2) {
