@@ -38,161 +38,20 @@ if(mysqli_connect_error()) {
 	die("データベースの接続に失敗しました");
 }
 
-$txtall = "concat(text, ' ', note, ' ')";
-$text_f = "replace($txtall, '\\n', ' ')";
-
-$eqType = array(
-	20 => "短剣",
-	21 => "長剣",
-	22 => "斧",
-	23 => "槌",
-	24 => "杖",
-	25 => "弓",
-	30 => "矢",
-	31 => "盾",
-	32 => "書物",
-	40 => "頭",
-	41 => "胴",
-	42 => "脚",
-	43 => "足",
-	44 => "首",
-	45 => "腰",
-	46 => "背",
-	48 => "装飾品",
-	49 => "魂"
-);
+$sql = "SELECT * FROM `equip_class` ORDER BY `id`";
+$data->query($sql);
+while($array = $data->fetch()) {
+	$eqType["{$array["id"]}"] = $array["name"];
+}
+if(empty($eqType)) die("データ読み込みに失敗しました\n");
 $maxLv = 60;
-$status = array(
-	0 => array("name" => "指定なし", "val" => 0, "where" => ""),
-	110 => array("name" => "DMG", "val" => item_sql_stmax("DMG"), "where" => "$text_f regexp ' DMG[0-9]+(～[0-9]+)?'"),
-	111 => array("name" => "DELAY", "val" => item_sql_stmax("DLY"), "where" => "$text_f regexp ' DLY[0-9]+'"),
-	112 => array("name" => "D/D", "val" => "round(".item_sql_stmax("DMG")." / ".item_sql_stmax("DLY").", 3)", "where" => "$text_f regexp ' DMG[0-9]+(～[0-9]+)?' AND $text_f regexp ' DLY[0-9]+'"),
-	120 => array("name" => "HP", "val" => item_sql_stmax("HP"), "where" => "$text_f regexp ' HP[\\+-]?[0-9]+'"),
-	121 => array("name" => "SP", "val" => item_sql_stmax("SP"), "where" => "$text_f regexp ' SP[\\+-]?[0-9]+'"),
-	122 => array("name" => "STR", "val" => item_sql_stmax("STR"), "where" => "$text_f regexp ' STR([\\+-]?[0-9]+|[0-9]+～[0-9]+)'"),
-	123 => array("name" => "VIT", "val" => item_sql_stmax("VIT"), "where" => "$text_f regexp ' VIT([\\+-]?[0-9]+|[0-9]+～[0-9]+)'"),
-	124 => array("name" => "DEX", "val" => item_sql_stmax("DEX"), "where" => "$text_f regexp ' DEX([\\+-]?[0-9]+|[0-9]+～[0-9]+)'"),
-	125 => array("name" => "AGI", "val" => item_sql_stmax("AGI"), "where" => "$text_f regexp ' AGI([\\+-]?[0-9]+|[0-9]+～[0-9]+)'"),
-	126 => array("name" => "WIS", "val" => item_sql_stmax("WIS"), "where" => "$text_f regexp ' WIS([\\+-]?[0-9]+|[0-9]+～[0-9]+)'"),
-	127 => array("name" => "WIL", "val" => item_sql_stmax("WIL"), "where" => "$text_f regexp ' WIL([\\+-]?[0-9]+|[0-9]+～[0-9]+)'"),
-	130 => array("name" => "攻", "val" => item_sql_stmax("攻"), "where" => "$text_f regexp ' 攻([\\+-]?[0-9]+|[0-9]+～[0-9]+)'"),
-	131 => array("name" => "防", "val" => item_sql_stmax("防"), "where" => "$text_f regexp ' 防([\\+-]?[0-9]+|[0-9]+～[0-9]+)'"),
-	132 => array("name" => "命中", "val" => item_sql_stmax("命中"), "where" => "$text_f regexp ' 命中([\\+-]?[0-9]+|[0-9]+～[0-9]+)'"),
-	133 => array("name" => "回避", "val" => item_sql_stmax("回避"), "where" => "$text_f regexp ' 回避([\\+-]?[0-9]+|[0-9]+～[0-9]+)'"),
-	134 => array("name" => "魔攻", "val" => item_sql_stmax("魔攻"), "where" => "$text_f regexp ' 魔攻([\\+-]?[0-9]+|[0-9]+～[0-9]+)'"),
-	135 => array("name" => "魔防", "val" => item_sql_stmax("魔防"), "where" => "$text_f regexp ' 魔防([\\+-]?[0-9]+|[0-9]+～[0-9]+)'"),
-	136 => array("name" => "魔命", "val" => item_sql_stmax("魔命"), "where" => "$text_f regexp ' 魔命([\\+-]?[0-9]+|[0-9]+～[0-9]+)'"),
-	137 => array("name" => "魔抵", "val" => item_sql_stmax("魔抵"), "where" => "$text_f regexp ' 魔抵([\\+-]?[0-9]+|[0-9]+～[0-9]+)'"),
-	138 => array("name" => "遠攻", "val" => item_sql_stmax("遠攻"), "where" => "$text_f regexp ' 遠攻([\\+-]?[0-9]+|[0-9]+～[0-9]+)'"),
-	139 => array("name" => "遠命", "val" => item_sql_stmax("遠命"), "where" => "$text_f regexp ' 遠命([\\+-]?[0-9]+|[0-9]+～[0-9]+)'"),
-	140 => array("name" => "敵意", "val" => item_sql_stmax("敵意"), "where" => "$text_f regexp ' 敵意([\\+-]?[0-9]+|[0-9]+～[0-9]+)'"),
-	141 => array("name" => "詠唱速度", "val" => item_sql_stmax("詠唱速度"), "where" => "$text_f regexp ' 詠唱速度([\\+-]?[0-9]+|[0-9]+～[0-9]+)'"),
-	142 => array("name" => "攻撃速度", "val" => item_sql_stmax("攻撃速度"), "where" => "$text_f regexp ' 攻撃速度([\\+-]?[0-9]+|[0-9]+～[0-9]+)'"),
-	143 => array("name" => "詠唱中断率", "val" => item_sql_stmax("詠唱中断率"), "where" => "$text_f regexp ' 詠唱中断率([\\+-]?[0-9]+[%]?)'"),
-	144 => array("name" => "攻撃中断率", "val" => item_sql_stmax("攻撃中断率"), "where" => "$text_f regexp ' 攻撃中断率([\\+-]?[0-9]+[%]?)'"),
-	145 => array("name" => "中断率", "val" => item_sql_stmax("中断率"), "where" => "$text_f regexp ' 中断率([\\+-]?[0-9]+[%]?)'"),
-	146 => array("name" => "詠唱妨害", "val" => item_sql_stmax("詠唱妨害"), "where" => "$text_f regexp ' 詠唱妨害([\\+-]?[0-9]+|[0-9]+～[0-9]+)'"),
-	147 => array("name" => "攻撃妨害", "val" => item_sql_stmax("攻撃妨害"), "where" => "$text_f regexp ' 攻撃妨害([\\+-]?[0-9]+|[0-9]+～[0-9]+)'"),
-	148 => array("name" => "妨害", "val" => item_sql_stmax("妨害"), "where" => "$text_f regexp ' 妨害([\\+-]?[0-9]+|[0-9]+～[0-9]+)'"),
-	149 => array("name" => "金属", "val" => item_sql_stmax("金属"), "where" => "$text_f regexp ' 金属([-]?[0-9]+)'"),
-	150 => array("name" => "貫通", "val" => item_sql_stmax("貫通"), "where" => "$text_f regexp ' 貫通([\\+-]?[0-9]+[%]?)'"),
-	151 => array("name" => "H回復量", "val" => item_sql_stmax("H回復量"), "where" => "$text_f regexp ' (H|ヒール)回復(量)?([\\+-]?[0-9]+[%]?)'"),
-	152 => array("name" => "盾防率UP", "val" => 1, "where" => "$text_f regexp ' 盾防(御発動)?率(UP|アップ)'"),
-	153 => array("name" => "PROC率UP", "val" => 1, "where" => "$text_f regexp ' PROC率(UP|アップ)'"),
-	160 => array("name" => "PROC:火属性DMG", "val" => 1, "where" => "$text_f regexp ' PROC(:|：)火属性(DMG|ダメージ)'"),
-	161 => array("name" => "PROC:水属性DMG", "val" => 1, "where" => "$text_f regexp ' PROC(:|：)水属性(DMG|ダメージ)'"),
-	162 => array("name" => "PROC:土属性DMG", "val" => 1, "where" => "$text_f regexp ' PROC(:|：)土属性(DMG|ダメージ)'"),
-	163 => array("name" => "PROC:風属性DMG", "val" => 1, "where" => "$text_f regexp ' PROC(:|：)風属性(DMG|ダメージ)'"),
-	164 => array("name" => "PROC:光属性DMG", "val" => 1, "where" => "$text_f regexp ' PROC(:|：)光属性(DMG|ダメージ)'"),
-	165 => array("name" => "PROC:闇属性DMG", "val" => 1, "where" => "$text_f regexp ' PROC(:|：)闇属性(DMG|ダメージ)'"),
-	167 => array("name" => "PROC:HP吸収", "val" => 1, "where" => "$text_f regexp ' PROC(:|：)HP吸収'"),
-	168 => array("name" => "PROC:SP吸収", "val" => 1, "where" => "$text_f regexp ' PROC(:|：)SP吸収'"),
-	170 => array("name" => "PROC:毒", "val" => 1, "where" => "$text_f regexp ' PROC(:|：)毒'"),
-	171 => array("name" => "PROC:麻痺", "val" => 1, "where" => "$text_f regexp ' PROC(:|：)麻痺'"),
-	172 => array("name" => "PROC:失神", "val" => 1, "where" => "$text_f regexp ' PROC(:|：)失神'"),
-	173 => array("name" => "PROC:スロウ", "val" => 1, "where" => "$text_f regexp ' PROC(:|：)スロウ'"),
-	174 => array("name" => "PROC:防御力DOWN", "val" => 1, "where" => "$text_f regexp ' PROC(:|：)防御力(DOWN|ダウン)'"),
-	175 => array("name" => "PROC:沈黙", "val" => 1, "where" => "$text_f regexp ' PROC(:|：)沈黙'"),
-	180 => array("name" => "HHP", "val" => item_sql_stmax("HHP"), "where" => "$text_f regexp ' HHP([\\+-]?[0-9]+)'"),
-	181 => array("name" => "HSP", "val" => item_sql_stmax("HSP"), "where" => "$text_f regexp ' HSP([\\+-]?[0-9]+)'"),
-	182 => array("name" => "RHP", "val" => item_sql_stmax("RHP"), "where" => "$text_f regexp ' RHP([\\+-]?[0-9]+)'"),
-	183 => array("name" => "RSP", "val" => item_sql_stmax("RSP"), "where" => "$text_f regexp ' RSP([\\+-]?[0-9]+)'"),
-	190 => array("name" => "Crit", "val" => item_sql_stmax("Crit"), "where" => "$text_f regexp ' Crit([\\+-]?[0-9]+[%]?)'"),
-	191 => array("name" => "カウンター", "val" => item_sql_stmax("カウンター"), "where" => "$text_f regexp ' カウンター([\\+-]?[0-9]+[%]?)'"),
-	192 => array("name" => "カウンター妨害", "val" => item_sql_stmax("カウンター妨害"), "where" => "$text_f regexp ' カウンター妨害([\\+-]?[0-9]+[%]?)'"),
-	194 => array("name" => "Crit火", "val" => item_sql_stmax("Crit火"), "where" => "$text_f regexp ' Crit火([\\+-]?[0-9]+[%]?)'"),
-	195 => array("name" => "Crit水", "val" => item_sql_stmax("Crit水"), "where" => "$text_f regexp ' Crit水([\\+-]?[0-9]+[%]?)'"),
-	197 => array("name" => "Crit風", "val" => item_sql_stmax("Crit風"), "where" => "$text_f regexp ' Crit風([\\+-]?[0-9]+[%]?)'"),
-	198 => array("name" => "Crit光", "val" => item_sql_stmax("Crit光"), "where" => "$text_f regexp ' Crit光([\\+-]?[0-9]+[%]?)'"),
-	200 => array("name" => "火命", "val" => item_sql_stmax("火命"), "where" => "$text_f regexp ' 火命([\\+-]?[0-9]+|[0-9]+～[0-9]+)'"),
-	201 => array("name" => "水命", "val" => item_sql_stmax("水命"), "where" => "$text_f regexp ' 水命([\\+-]?[0-9]+|[0-9]+～[0-9]+)'"),
-	202 => array("name" => "土命", "val" => item_sql_stmax("土命"), "where" => "$text_f regexp ' 土命([\\+-]?[0-9]+|[0-9]+～[0-9]+)'"),
-	203 => array("name" => "風命", "val" => item_sql_stmax("風命"), "where" => "$text_f regexp ' 風命([\\+-]?[0-9]+|[0-9]+～[0-9]+)'"),
-	204 => array("name" => "光命", "val" => item_sql_stmax("光命"), "where" => "$text_f regexp ' 光命([\\+-]?[0-9]+|[0-9]+～[0-9]+)'"),
-	205 => array("name" => "闇命", "val" => item_sql_stmax("闇命"), "where" => "$text_f regexp ' 闇命([\\+-]?[0-9]+|[0-9]+～[0-9]+)'"),
-	210 => array("name" => "火攻", "val" => item_sql_stmax("火攻"), "where" => "$text_f regexp ' 火攻([\\+-]?[0-9]+|[0-9]+～[0-9]+)'"),
-	211 => array("name" => "水攻", "val" => item_sql_stmax("水攻"), "where" => "$text_f regexp ' 水攻([\\+-]?[0-9]+|[0-9]+～[0-9]+)'"),
-	212 => array("name" => "土攻", "val" => item_sql_stmax("土攻"), "where" => "$text_f regexp ' 土攻([\\+-]?[0-9]+|[0-9]+～[0-9]+)'"),
-	213 => array("name" => "風攻", "val" => item_sql_stmax("風攻"), "where" => "$text_f regexp ' 風攻([\\+-]?[0-9]+|[0-9]+～[0-9]+)'"),
-	214 => array("name" => "光攻", "val" => item_sql_stmax("光攻"), "where" => "$text_f regexp ' 光攻([\\+-]?[0-9]+|[0-9]+～[0-9]+)'"),
-	215 => array("name" => "闇攻", "val" => item_sql_stmax("闇攻"), "where" => "$text_f regexp ' 闇攻([\\+-]?[0-9]+|[0-9]+～[0-9]+)'"),
-	220 => array("name" => "火抵", "val" => item_sql_stmax("火抵"), "where" => "$text_f regexp ' 火抵([\\+-]?[0-9]+|[0-9]+～[0-9]+)'"),
-	221 => array("name" => "水抵", "val" => item_sql_stmax("水抵"), "where" => "$text_f regexp ' 水抵([\\+-]?[0-9]+|[0-9]+～[0-9]+)'"),
-	222 => array("name" => "土抵", "val" => item_sql_stmax("土抵"), "where" => "$text_f regexp ' 土抵([\\+-]?[0-9]+|[0-9]+～[0-9]+)'"),
-	223 => array("name" => "風抵", "val" => item_sql_stmax("風抵"), "where" => "$text_f regexp ' 風抵([\\+-]?[0-9]+|[0-9]+～[0-9]+)'"),
-	224 => array("name" => "光抵", "val" => item_sql_stmax("光抵"), "where" => "$text_f regexp ' 光抵([\\+-]?[0-9]+|[0-9]+～[0-9]+)'"),
-	225 => array("name" => "闇抵", "val" => item_sql_stmax("闇抵"), "where" => "$text_f regexp ' 闇抵([\\+-]?[0-9]+|[0-9]+～[0-9]+)'"),
-	300 => array("name" => "ドレイク攻", "val" => item_sql_stmax("ドレイク攻"), "where" => "$text_f regexp ' ドレイク攻([\\+-]?[0-9]+|[0-9]+～[0-9]+)'"),
-	303 => array("name" => "狼防", "val" => item_sql_stmax("狼防"), "where" => "$text_f regexp ' 狼防([\\+-]?[0-9]+|[0-9]+～[0-9]+)'"),
-	304 => array("name" => "ヘビ攻", "val" => item_sql_stmax("ヘビ攻"), "where" => "$text_f regexp ' ヘビ攻([\\+-]?[0-9]+|[0-9]+～[0-9]+)'"),
-	305 => array("name" => "ヘビ防", "val" => item_sql_stmax("ヘビ防"), "where" => "$text_f regexp ' ヘビ防([\\+-]?[0-9]+|[0-9]+～[0-9]+)'"),
-	306 => array("name" => "花攻", "val" => item_sql_stmax("花攻"), "where" => "$text_f regexp ' 花攻([\\+-]?[0-9]+|[0-9]+～[0-9]+)'"),
-	309 => array("name" => "ロック防", "val" => item_sql_stmax("ロック防"), "where" => "$text_f regexp ' ロック防([\\+-]?[0-9]+|[0-9]+～[0-9]+)'"),
-	311 => array("name" => "タウルス防", "val" => item_sql_stmax("タウルス防"), "where" => "$text_f regexp ' タウルス防([\\+-]?[0-9]+|[0-9]+～[0-9]+)'"),
-	312 => array("name" => "アシュラ攻", "val" => item_sql_stmax("アシュラ攻"), "where" => "$text_f regexp ' アシュラ攻([\\+-]?[0-9]+|[0-9]+～[0-9]+)'"),
-	314 => array("name" => "ウサギ攻", "val" => item_sql_stmax("ウサギ攻"), "where" => "$text_f regexp ' ウサギ攻([\\+-]?[0-9]+|[0-9]+～[0-9]+)'"),
-	316 => array("name" => "悪魔攻", "val" => item_sql_stmax("悪魔攻"), "where" => "$text_f regexp ' 悪魔攻([\\+-]?[0-9]+|[0-9]+～[0-9]+)'"),
-	317 => array("name" => "悪魔防", "val" => item_sql_stmax("悪魔防"), "where" => "$text_f regexp ' 悪魔防([\\+-]?[0-9]+|[0-9]+～[0-9]+)'"),
-	500 => array("name" => "全攻", "val" => item_sql_stmax("全攻"), "where" => "$text_f regexp ' 全攻([\\+-]?[0-9]+|[0-9]+～[0-9]+)'"),
-	501 => array("name" => "全命", "val" => item_sql_stmax("全命"), "where" => "$text_f regexp ' 全命([\\+-]?[0-9]+|[0-9]+～[0-9]+)'"),
-	502 => array("name" => "全防", "val" => item_sql_stmax("全防"), "where" => "$text_f regexp ' 全防([\\+-]?[0-9]+|[0-9]+～[0-9]+)'"),
-	510 => array("name" => "暗躍", "val" => item_sql_stmax("暗躍"), "where" => "$text_f regexp ' 暗躍([\\+-]?[0-9]+|[0-9]+～[0-9]+)'"),
-	511 => array("name" => "結界無効", "val" => item_sql_stmax("結界無効"), "where" => "$text_f regexp ' 結界無効([\\+-]?[0-9]+[%]?)'"),
-	512 => array("name" => "消費SP減少", "val" => 1, "where" => "$text_f regexp ' 消費SP減少'"),
-	520 => array("name" => "毒抵", "val" => item_sql_stmax("毒抵"), "where" => "$text_f regexp ' 毒抵([\\+-]?[0-9]+[%]?)'"),
-	521 => array("name" => "暗闇抵", "val" => item_sql_stmax("暗闇抵"), "where" => "$text_f regexp ' 暗闇抵([\\+-]?[0-9]+[%]?)'"),
-	522 => array("name" => "麻痺抵", "val" => item_sql_stmax("麻痺抵"), "where" => "$text_f regexp ' 麻痺抵([\\+-]?[0-9]+[%]?)'"),
-	523 => array("name" => "沈黙抵", "val" => item_sql_stmax("沈黙抵"), "where" => "$text_f regexp ' 沈黙抵([\\+-]?[0-9]+[%]?)'"),
-	524 => array("name" => "失神抵", "val" => item_sql_stmax("失神抵"), "where" => "$text_f regexp ' 失神抵([\\+-]?[0-9]+[%]?)'"),
-	525 => array("name" => "睡眠抵", "val" => item_sql_stmax("睡眠抵"), "where" => "$text_f regexp ' 睡眠抵([\\+-]?[0-9]+[%]?)'"),
-	526 => array("name" => "窒息抵", "val" => item_sql_stmax("窒息抵"), "where" => "$text_f regexp ' 窒息抵([\\+-]?[0-9]+[%]?)'"),
-	527 => array("name" => "鈍足抵", "val" => item_sql_stmax("鈍足抵"), "where" => "$text_f regexp ' 鈍足抵([\\+-]?[0-9]+[%]?)'"),
-	528 => array("name" => "禁足抵", "val" => item_sql_stmax("禁足抵"), "where" => "$text_f regexp ' 禁足抵([\\+-]?[0-9]+[%]?)'"),
-	529 => array("name" => "スロウ抵", "val" => item_sql_stmax("スロウ抵"), "where" => "$text_f regexp ' スロウ抵([\\+-]?[0-9]+[%]?)'"),
-	530 => array("name" => "恐怖抵", "val" => item_sql_stmax("恐怖抵"), "where" => "$text_f regexp ' 恐怖抵([\\+-]?[0-9]+[%]?)'"),
-	600 => array("name" => "攻撃ブースト", "val" => 1, "where" => "$text_f regexp ' 攻撃ブースト'"),
-	601 => array("name" => "魔法ブースト", "val" => 1, "where" => "$text_f regexp ' 魔法ブースト'"),
-	602 => array("name" => "スキルブースト", "val" => 1, "where" => "$text_f regexp ' スキルブースト'"),
-	610 => array("name" => "CSP", "val" => item_sql_stmax("CSP"), "where" => "$text_f regexp ' CSP([\\+-]?[0-9]+|[0-9]+～[0-9]+)'"),
-	611 => array("name" => "チャージ", "val" => item_sql_stmax("チャージ"), "where" => "$text_f regexp ' チャージ([\\+-]?[0-9]+|[0-9]+～[0-9]+)'"),
-	612 => array("name" => "気合", "val" => item_sql_stmax("気合"), "where" => "$text_f regexp ' 気合([\\+-]?[0-9]+|[0-9]+～[0-9]+)'"),
-	613 => array("name" => "メタルアタック", "val" => item_sql_stmax("メタルアタック"), "where" => "$text_f regexp ' メタルアタック([\\+-]?[0-9]+[%]?)'"),
-	614 => array("name" => "メタルガード", "val" => item_sql_stmax("メタルガード"), "where" => "$text_f regexp ' メタルガード([\\+-]?[0-9]+[%]?)'"),
-	615 => array("name" => "金属値UP", "val" => 1, "where" => "$text_f regexp ' 金属値UP'"),
-	616 => array("name" => "矢強化", "val" => 1, "where" => "$text_f regexp ' 矢強化'"),
-	617 => array("name" => "EXPUP", "val" => item_sql_stmax("EXPUP"), "where" => "$text_f regexp ' EXPUP[0-9]+'"),
-	618 => array("name" => "SD", "val" => item_sql_stmax("SD"), "where" => "$text_f regexp ' SD([\\+-]?[0-9]+[%]?)'"),
-	619 => array("name" => "SW", "val" => item_sql_stmax("SW"), "where" => "$text_f regexp ' SW([\\+-]?[0-9]+[%]?)'"),
-	620 => array("name" => "SPマジック", "val" => item_sql_stmax("SPマジック"), "where" => "$text_f regexp ' SPマジック([\\+-]?[0-9]+|[0-9]+～[0-9]+)'"),
-	621 => array("name" => "毒軽減", "val" => 1, "where" => "$text_f regexp ' 毒軽減'"),
-	622 => array("name" => "武器強化", "val" => item_sql_stmax("武器強化"), "where" => "$text_f regexp ' 武器強化([\\+-]?[0-9]+|[0-9]+～[0-9]+)'"),
-	623 => array("name" => "アンデッド特", "val" => item_sql_stmax("アンデッド特"), "where" => "$text_f regexp ' アンデッド特([\\+-]?[0-9]+|[0-9]+～[0-9]+)'"),
-	624 => array("name" => "CritダメージUP", "val" => 1, "where" => "$text_f regexp ' CritダメージUP'"),
-	625 => array("name" => "反撃", "val" => item_sql_stmax("反撃"), "where" => "$text_f regexp ' 反撃([\\+-]?[0-9]+|[0-9]+～[0-9]+)'"),
-	671 => array("name" => "TRAP:麻痺", "val" => 1, "where" => "$text_f regexp ' TRAP(:|：)麻痺'"),
-	673 => array("name" => "TRAP:スロウ", "val" => 1, "where" => "$text_f regexp ' TRAP(:|：)スロウ'"),
-	675 => array("name" => "TRAP:沈黙", "val" => 1, "where" => "$text_f regexp ' TRAP(:|：)沈黙'"),
-);
+$sql = "SELECT * FROM `parameter` ORDER BY `id`";
+$data->query($sql);
+$status[0] = "指定なし";
+while($array = $data->fetch()) {
+	$status["{$array["id"]}"] = $array["name"];
+}
+if(count($status) < 2) die("データ読み込みに失敗しました\n");
 
 // 装備種別フォーム入力取得
 if(!$error) {
@@ -353,75 +212,75 @@ if(!$error) {
 
 // SQL文生成
 if(!$error) {
-	$lv_loc = "locate('Lv', $txtall)";
-	$lv_end = "locate(' ', $text_f, $lv_loc)";
-	$lv_txt = "substring($txtall, $lv_loc, $lv_end - $lv_loc)";
-	$lv_val = "substring($txtall, $lv_loc + 2, $lv_end - $lv_loc - 2)";
-	$lv_num = "case when $lv_txt like '%→%' then substring($lv_val, 1, locate('→', $lv_val) - 1) else replace($lv_val, '～', '') end";
 
 	// column
-	$sql_column = "id,name";
-	if($st1 != 0) $sql_column .= ",{$status["$st1"]["val"]} + 0 as st1";
-	if($st2 != 0) $sql_column .= ",{$status["$st2"]["val"]} + 0 as st2";
-	if($sum_sort != 0) $sql_column .= ",{$status["$st1"]["val"]} + {$status["$st2"]["val"]} as sum";
+	$sql_column = "`items`.`id`,`name`,`lv_min`,`lv_max`";
+	if($st1 != 0) $sql_column .= ",`st1`.`value_max` AS `val1`";
+	if($st2 != 0) $sql_column .= ",`st2`.`value_max` AS `val2`";
+	if($sum_sort != 0) $sql_column .= ",`st1`.`value_max` + `st2`.`value_max` AS `sum`";
+
+	// from
+	$sql_from = "(`items` NATURAL JOIN `equip`)";
+	if($st1 != 0) $sql_from .= ",`equip_parameter` AS `st1`";
+	if($st2 != 0) $sql_from .= ",`equip_parameter` AS `st2`";
 
 	// where
-	$sql_where = "hidden = 0";
+	$sql_where = "`hidden`='0'";
 	foreach($eq_list as $eq) {
-		$sql_eqtype[] = "id BETWEEN ".($eq * 1000 + 1)." AND ".($eq * 1000 + 1000);
+		//$sql_eqtype[] = "`id` BETWEEN '".($eq * 1000 + 1)."' AND '".($eq * 1000 + 1000)."'";
+		$sql_eqtype[] = "'$eq'";
 	}
 	if(isset($sql_eqtype)) {
-		$sql_where .= " AND (".implode(" OR ", $sql_eqtype).")";
-	} else {
-		$sql_where .= " AND (id BETWEEN 20001 AND 50000)";
+		$sql_where .= " AND `class_id` IN (".implode(", ", $sql_eqtype).")";
 	}
-	$sql_where .= " AND ($lv_num) >= $lv_min AND ($lv_num) <= $lv_max";
+	$sql_where .= " AND (`lv_min` BETWEEN '$lv_min' AND '$lv_max')";
 	if($bol == 1) {
-		$sql_where .= " AND $text_f NOT regexp 'Lv[0-9]+→[0-9]+' AND $text_f NOT like '%～%～%'";
+		$sql_where .= " AND `lv_max`='-1'";
 	} else if($bol == 2) {
-		$sql_where .= " AND ($text_f regexp 'Lv[0-9]+→[0-9]+' OR $text_f like '%～%～%')";
+		$sql_where .= " AND `lv_max`!='-1'";
 	}
 	if($rare == 1) {
-		$sql_where .= " AND rare = 0";
+		$sql_where .= " AND `rare`='0'";
 	} else if($rare == 2) {
-		$sql_where .= " AND rare = 1";
+		$sql_where .= " AND `rare`='1'";
 	}
 	if($notrade == 1) {
-		$sql_where .= " AND notrade = 0";
+		$sql_where .= " AND `notrade`='0'";
 	} else if($notrade == 2) {
-		$sql_where .= " AND notrade = 1";
+		$sql_where .= " AND `notrade`='1'";
 	}
 	if($metal == 1) {
-		$sql_where .= " AND $text_f like '%[%]%'";
+		$sql_where .= " AND NOT `is_metal`";
 	} else if($metal == 2) {
-		$sql_where .= " AND $text_f like '%<%>%'";
+		$sql_where .= " AND `is_metal`";
 	}
-	if($st1 != 0) $sql_where .= " AND ".$status["$st1"]["where"];
-	if($st2 != 0) $sql_where .= " AND ".$status["$st2"]["where"];
+	if($st1 != 0) $sql_where .= " AND `id`=`st1`.`item_id` AND `st1`.`parameter_id`='$st1' AND NOT `st1`.`adversity`";
+	if($st2 != 0) $sql_where .= " AND `id`=`st2`.`item_id` AND `st2`.`parameter_id`='$st2' AND NOT `st2`.`adversity`";
 
 	// order
 	$sql_order = "";
 	if($sum_sort != 0) {
-		$sql_order .= ($sum_sort == 1) ? "sum desc, " : "sum asc, ";
-		$sql_order .= ($sort1 == 0) ? "st1 desc, " : "st1 asc, ";
-		$sql_order .= ($sort2 == 0) ? "st2 desc, " : "st2 asc, ";
+		$sql_order .= ($sum_sort == 1) ? "`sum` DESC, " : "`sum`, ";
+		$sql_order .= ($sort1 == 0) ? "`val1` DESC, " : "`val1`, ";
+		$sql_order .= ($sort2 == 0) ? "`val2` DESC, " : "`val2`, ";
 	} else {
 		if($st2 != 0) {
-			$sql_order .= ($sort1 == 0) ? "st1 desc, " : "st1 asc, ";
-			$sql_order .= ($sort2 == 0) ? "st2 desc, " : "st2 asc, ";
+			$sql_order .= ($sort1 == 0) ? "`val1` DESC, " : "`val1`, ";
+			$sql_order .= ($sort2 == 0) ? "`val2` DESC, " : "`val2`, ";
 		} else if ($st1 != 0) {
-			$sql_order .= ($sort1 == 0) ? "st1 desc, " : "st1 asc, ";
+			$sql_order .= ($sort1 == 0) ? "`val1` DESC, " : "`val1`, ";
 		}
 	}
-	$sql_order .= "id asc";
+	$sql_order .= "`id`";
 
 	// limit
 	$sql_limit = ($page * $PAGE_SIZE).",$PAGE_SIZE";
 
-	$sql = "SELECT id FROM items WHERE $sql_where";
+	$sql = "SELECT COUNT(1) AS `rows` FROM $sql_from WHERE $sql_where";
 	$data->query($sql);
-	$rows = $data->rows();
-	$sql = "SELECT $sql_column FROM items WHERE $sql_where ORDER BY $sql_order LIMIT $sql_limit";
+	$result = $data->fetch();
+	$rows = $result["rows"];
+	$sql = "SELECT $sql_column FROM $sql_from WHERE $sql_where ORDER BY $sql_order LIMIT $sql_limit";
 	$data->query($sql);
 }
 ?>
@@ -542,7 +401,7 @@ for($i = 1; $i <= 2; $i++) {
 	foreach($status as $st_id => $st_data) {
 		$selected = (!$error && (($i == 1 && $st1 == $st_id) || ($i == 2 && $st2 == $st_id))) ? " selected" : "";
 ?>
-<option value="<?=$st_id?>"<?=$selected?>><?=$st_data["name"]?></option>
+<option value="<?=$st_id?>"<?=$selected?>><?=$st_data?></option>
 <?php
 	}
 ?>
@@ -623,12 +482,14 @@ if(!$error) {
 			$name = $row["name"];
 			$id_f = isset($data->is_admin) ? sprintf("%d:", $id) : "";
 			$info = "";
+			if($status["$st1"] == "D/D") $row["val1"] = str_pad($row["val1"], 5, 0, STR_PAD_RIGHT);
+			if($status["$st2"] == "D/D") $row["val2"] = str_pad($row["val2"], 5, 0, STR_PAD_RIGHT);
 			if($st1 != 0) {
-				$info .= "<br />└{$status["$st1"]["name"]}:{$row["st1"]}";
+				$info .= "<br />└{$status["$st1"]}:".$row["val1"];
 				if($st2 != 0) {
-					$info .= " {$status["$st2"]["name"]}:{$row["st2"]}";
+					$info .= " {$status["$st2"]}:".$row["val2"];
 					if($sum_sort != 0) {
-						$info .= " 合計:{$row["sum"]}";
+						$info .= " 合計:".$row["sum"];
 					}
 				}
 			}
