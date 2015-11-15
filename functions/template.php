@@ -94,6 +94,23 @@ function device_info() {
 
 	if(empty($device_info)) {
 		$device_info = 'pc';
+	} else if($device_info = 'mb') {
+		// IPチェック
+		$this_ip = $_SERVER["SERVER_ADDR"];
+		$is_mobile = false;
+		include("mobile_ip_list.php");
+
+		foreach($mobile_ip_list as $permit_ip){
+			list($p_ip, $mask_bit) = explode("/", $permit_ip);
+			$ip_long = ip2long($p_ip) >> (32 - $mask_bit);
+			$p_ip_long = ip2long($this_ip) >> (32 - $mask_bit);
+			if ($ip_long == $p_ip_long) {
+				$is_mobile = true;
+				break;
+			}
+		}
+
+		if(!$is_mobile) $device_info = 'pc';
 	}
 	return $device_info;
 }
