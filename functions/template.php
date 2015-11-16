@@ -94,7 +94,7 @@ function device_info() {
 
 	if(empty($device_info)) {
 		$device_info = 'pc';
-	} else if($device_info = 'mb') {
+	} else if($device_info == 'mb') {
 		// IPチェック
 		$this_ip = $_SERVER["SERVER_ADDR"];
 		$is_mobile = false;
