@@ -3,6 +3,8 @@ phpinfo.php
 *.swp
 *.ico
 *.png
+functions/mobile_ip_list.php
 img/
 lefko/
+html/
 bbs/font/

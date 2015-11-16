@@ -1,8 +1,8 @@
 <?php
 //==============================
-// BBS用 Boadクラス
+// BBS用 Boardクラス
 //==============================
-class Boad {
+class Board {
 
 	//--------------------------
 	// 変数の宣言
@@ -18,7 +18,7 @@ class Boad {
 	//--------------------------
 	// コンストラクタ
 	//--------------------------
-	function Boad($array) {
+	function Board($array) {
 		$this->bid = $array["bid"];
 		$this->sname = $array["sname"];
 		$this->name = $array["name"];
