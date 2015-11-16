@@ -3,7 +3,7 @@
 // スレッド一覧
 //=====================================
 require_once("/var/www/bbs/class/mysql.php");
-require_once("/var/www/bbs/class/boad.php");
+require_once("/var/www/bbs/class/board.php");
 require_once("/var/www/bbs/class/thread.php");
 require_once("/var/www/functions/template.php");
 $LIMIT = 20;
@@ -29,23 +29,23 @@ $mysql = new MySQL($userName, $password, $database);
 if($mysql->connect_error) die("データベースの接続に失敗しました");
 
 // 掲示板情報を取得
-$sql = "UPDATE `boad` SET `count`=`count`+1 WHERE `sname`='$id'";
+$sql = "UPDATE `board` SET `count`=`count`+1 WHERE `sname`='$id'";
 $mysql->query($sql);
-$sql = "SELECT * FROM `boad` WHERE `sname`='$id'";
+$sql = "SELECT * FROM `board` WHERE `sname`='$id'";
 $result = $mysql->query($sql);
 if(!$result->num_rows) die("ERROR03:存在しないIDです");
-$boad = new Boad($result->fetch_array());
-$title = $boad->name;
+$board = new Board($result->fetch_array());
+$title = $board->name;
 
 // スレッド数を取得
-$sql = "SELECT COUNT(1) AS `count` FROM `thread` NATURAL JOIN `message` WHERE `bid`='{$boad->bid}' AND `pastlog`=FALSE AND `tmid`='1' AND `deleted`=FALSE";
+$sql = "SELECT COUNT(1) AS `count` FROM `thread` NATURAL JOIN `message` WHERE `bid`='{$board->bid}' AND `pastlog`=FALSE AND `tmid`='1' AND `deleted`=FALSE";
 $result = $mysql->query($sql);
 if($mysql->error) die("ERROR04:存在しないIDです");
 $array = $result->fetch_array();
 $rows = $array["count"];
 
 // スレッド一覧を取得
-$sql = "SELECT `thread`.`tid`,`title`,`tindex`,`acount`,COUNT(1) AS `mcount`,`updated`,`locked`,`top` FROM `thread` NATURAL JOIN `message` WHERE `bid`='{$boad->bid}' AND `deleted`=FALSE GROUP BY `tid` ORDER BY `top` DESC, `tindex` DESC LIMIT ".($page * $LIMIT).",$LIMIT";
+$sql = "SELECT `thread`.`tid`,`title`,`tindex`,`acount`,COUNT(1) AS `mcount`,`updated`,`locked`,`top` FROM `thread` NATURAL JOIN `message` WHERE `bid`='{$board->bid}' AND `deleted`=FALSE GROUP BY `tid` ORDER BY `top` DESC, `tindex` DESC LIMIT ".($page * $LIMIT).",$LIMIT";
 $result = $mysql->query($sql);
 if($mysql->error) die("ERROR05:存在しないIDです");
 
@@ -68,10 +68,10 @@ if((($page + 1) * $LIMIT) < $rows) {
 </head>
 <body>
 <div id="all">
-<h1><?=$boad->name?></h1>
+<h1><?=$board->name?></h1>
 <hr class="normal">
 <p>
-[<a href="./form.php?mode=thform&id=<?=$boad->sname?>"<?=mbi_ack(8)?>><?=mbi("8.")?>新規スレ</a>]
+[<a href="./form.php?mode=thform&id=<?=$board->sname?>"<?=mbi_ack(8)?>><?=mbi("8.")?>新規スレ</a>]
 </p>
 <hr class="normal">
 <div id="pagelink"><?=$pagelink?></div>
@@ -91,7 +91,7 @@ if($result->num_rows) {
 			$marker = "▽";
 		}
 ?>
-<li><span class="nc5"><?=$marker?></span><a href="./read.php?id=<?=$boad->sname?>&tid=<?=$thread->tid?>"><?=htmlspecialchars($thread->title)."(".$thread->mcount.")"?></a><?=$new?></li>
+<li><span class="nc5"><?=$marker?></span><a href="./read.php?id=<?=$board->sname?>&tid=<?=$thread->tid?>"><?=htmlspecialchars($thread->title)."(".$thread->mcount.")"?></a><?=$new?></li>
 <?php
 	}
 } else {
@@ -108,7 +108,7 @@ if($result->num_rows) {
 <li><a href="/"<?=mbi_ack(0)?>><?=mbi("0.")?>トップページ</a></li>
 </ul>
 <?php
-pagefoot($boad->count);
+pagefoot($board->count);
 ?>
 </div>
 </body>

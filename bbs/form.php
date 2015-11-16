@@ -3,7 +3,7 @@
 // 書き込みフォーム
 //=====================================
 require_once("/var/www/bbs/class/mysql.php");
-require_once("/var/www/bbs/class/boad.php");
+require_once("/var/www/bbs/class/board.php");
 require_once("/var/www/bbs/class/thread.php");
 require_once("/var/www/bbs/class/message.php");
 require_once("/var/www/functions/template.php");
@@ -73,15 +73,15 @@ $mysql = new MySQL($userName, $password, $database);
 if($mysql->connect_error) die("データベースの接続に失敗しました");
 
 // 掲示板情報を取得
-$sql = "SELECT * FROM `boad` WHERE `sname`='$id'";
+$sql = "SELECT * FROM `board` WHERE `sname`='$id'";
 $result = $mysql->query($sql);
 if(!$result->num_rows) die("ERROR11:存在しないIDです");
-$boad = new Boad($result->fetch_array());
-$title = $boad->name;
+$board = new Board($result->fetch_array());
+$title = $board->name;
 
 // スレッド情報を取得 返信/編集モードのみ
 if($mode == 1 || $mode == 2) {
-	$sql = "SELECT `thread`.`tid`,`title`,`tindex`,`acount`,COUNT(1) AS `mcount`,`updated`,`locked`,`top`,`pastlog` FROM `thread` NATURAL JOIN `message` WHERE `bid`='{$boad->bid}' AND `tid`='$tid' AND `pastlog`=FALSE AND (SELECT '1' FROM `message` WHERE `bid`='{$boad->bid}' AND `tid`='$tid' AND `tmid`='1' AND `deleted`=FALSE)='1' GROUP BY `tid`";
+	$sql = "SELECT `thread`.`tid`,`title`,`tindex`,`acount`,COUNT(1) AS `mcount`,`updated`,`locked`,`top`,`pastlog` FROM `thread` NATURAL JOIN `message` WHERE `bid`='{$board->bid}' AND `tid`='$tid' AND `pastlog`=FALSE AND (SELECT '1' FROM `message` WHERE `bid`='{$board->bid}' AND `tid`='$tid' AND `tmid`='1' AND `deleted`=FALSE)='1' GROUP BY `tid`";
 	$result = $mysql->query($sql);
 	if($mysql->error) die("ERROR12:存在しないIDです");
 	if(!$result->num_rows) die("ERROR13:存在しないIDです");
@@ -92,11 +92,11 @@ if($mode == 1 || $mode == 2) {
 
 // メッセージ情報を取得 編集モードのみ
 if($mode == 2) {
-	$sql = "SELECT * FROM `message` WHERE `bid`='{$boad->bid}' AND `tid`='$tid' AND `tmid`='$tmid' AND `deleted`=FALSE";
+	$sql = "SELECT * FROM `message` WHERE `bid`='{$board->bid}' AND `tid`='$tid' AND `tmid`='$tmid' AND `deleted`=FALSE";
 	$result = $mysql->query($sql);
 	if($mysql->error) die("ERROR16:存在しないIDです");
 	if(!$result->num_rows) die("ERROR17:メッセージが見つかりません");
-	$message = new Message($result->fetch_array(), $mysql, $boad, $thread);
+	$message = new Message($result->fetch_array(), $mysql, $board, $thread);
 }
 
 if($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -134,8 +134,8 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 	$name_a = Message::tripConvert($name);
 	$name = $name_a[0];
 	if($name_a[0] == "") {
-		if($boad->default_name != "") {
-			$name_a[0] = $boad->default_name;
+		if($board->default_name != "") {
+			$name_a[0] = $board->default_name;
 		} else {
 			$error_list[] = "お名前が空です";
 		}
@@ -238,46 +238,46 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 		switch($mode) {
 
 			case 0: // スレッド作成
-				$sql = "SELECT MAX(`tid`)+1 AS `next_tid`, MAX(`tindex`)+1 AS `next_tindex` FROM `thread` WHERE `bid`='{$boad->bid}'";
+				$sql = "SELECT MAX(`tid`)+1 AS `next_tid`, MAX(`tindex`)+1 AS `next_tindex` FROM `thread` WHERE `bid`='{$board->bid}'";
 				$result_obj = $mysql->query($sql)->fetch_object();
 				if($mysql->error) die("ERROR20:クエリ処理に失敗しました");
 				$next_tid = $result_obj->next_tid;
 				$next_tindex = $result_obj->next_tindex;
-				$sql = "INSERT INTO `thread` (`tid`, `bid`, `title`, `tindex`, `updated`) VALUES($next_tid, '{$boad->bid}', '{$sql_title}', '$next_tindex', NOW())";
+				$sql = "INSERT INTO `thread` (`tid`, `bid`, `title`, `tindex`, `updated`) VALUES($next_tid, '{$board->bid}', '{$sql_title}', '$next_tindex', NOW())";
 				$mysql->query($sql);
 				if($mysql->error) die("ERROR21:クエリ処理に失敗しました");
-				$sql_sub = "SELECT MAX(`mid`)+1 AS `mid`, '{$boad->bid}' AS `bid`, $next_tid AS `tid`, '1' AS `tmid`, '$sql_name' AS `name`, '$sql_comment' AS `comment`, '$file_id' AS `image`, PASSWORD('$sql_pass') AS `password`, NOW() AS `ts`, '$ip' AS `ip`, '$ua' AS `ua`, '$uid' AS `uid` FROM `message` WHERE `bid`='{$boad->bid}'";
+				$sql_sub = "SELECT MAX(`mid`)+1 AS `mid`, '{$board->bid}' AS `bid`, $next_tid AS `tid`, '1' AS `tmid`, '$sql_name' AS `name`, '$sql_comment' AS `comment`, '$file_id' AS `image`, PASSWORD('$sql_pass') AS `password`, NOW() AS `ts`, '$ip' AS `ip`, '$ua' AS `ua`, '$uid' AS `uid` FROM `message` WHERE `bid`='{$board->bid}'";
 				$sql = "INSERT INTO `message` (`mid`, `bid`, `tid`, `tmid`, `name`, `comment`, `image`, `password`, `ts`, `ip`, `ua`, `uid`) $sql_sub";
 				$mysql->query($sql);
 				if($mysql->error) die("ERROR22:クエリ処理に失敗しました");
-				if($name_a[0] != $boad->default_name) setcookie("bbs_name", $name_a[0], time() + 604800);
+				if($name_a[0] != $board->default_name) setcookie("bbs_name", $name_a[0], time() + 604800);
 				$_SESSION["thposttime"] = time() + 300;
 				$tid = $next_tid;
 				$tmid = 1;
 				break;
 
 			case 1: // 返信投稿
-				$sql_max_mid = "SELECT MAX(`mid`)+1 FROM `message` WHERE `bid`='{$boad->bid}'";
-				$sql_sub = "SELECT ($sql_max_mid) AS `mid`, '{$boad->bid}' AS `bid`, '$tid' AS `tid`, MAX(`tmid`)+1 AS `tmid`, '$sql_name' AS `name`, '$sql_comment' AS `comment`, '$file_id' AS `image`, PASSWORD('$sql_pass') AS `password`, NOW() AS `ts`, '$ip' AS `ip`, '$ua' AS `ua`, '$uid' AS `uid` FROM `message` WHERE `bid`='{$boad->bid}' AND `tid`='$tid'";
+				$sql_max_mid = "SELECT MAX(`mid`)+1 FROM `message` WHERE `bid`='{$board->bid}'";
+				$sql_sub = "SELECT ($sql_max_mid) AS `mid`, '{$board->bid}' AS `bid`, '$tid' AS `tid`, MAX(`tmid`)+1 AS `tmid`, '$sql_name' AS `name`, '$sql_comment' AS `comment`, '$file_id' AS `image`, PASSWORD('$sql_pass') AS `password`, NOW() AS `ts`, '$ip' AS `ip`, '$ua' AS `ua`, '$uid' AS `uid` FROM `message` WHERE `bid`='{$board->bid}' AND `tid`='$tid'";
 				$sql = "INSERT INTO `message` (`mid`, `bid`, `tid`, `tmid`, `name`, `comment`, `image`, `password`, `ts`, `ip`, `ua`, `uid`) $sql_sub";
 				$mysql->query($sql);
 				if($mysql->error) die("ERROR23:クエリ処理に失敗しました");
-				$sql = "SELECT MAX(`tmid`) AS `max_tmid` FROM `message` WHERE `bid`='{$boad->bid}' AND `tid`='$tid'";
+				$sql = "SELECT MAX(`tmid`) AS `max_tmid` FROM `message` WHERE `bid`='{$board->bid}' AND `tid`='$tid'";
 				$tmid = $mysql->query($sql)->fetch_object()->max_tmid;
 				if($sage) {
-					$sql = "UPDATE `thread` SET `updated`=NOW() WHERE `bid`='{$boad->bid}' AND `tid`='$tid'";
+					$sql = "UPDATE `thread` SET `updated`=NOW() WHERE `bid`='{$board->bid}' AND `tid`='$tid'";
 				} else {
-					$sql_sub = "SELECT MAX(`tindex`)+1 AS `tindex_max` FROM `thread` WHERE `bid`='{$boad->bid}'";
-					$sql = "UPDATE `thread`, ($sql_sub) AS `thread` SET `tindex`=`thread`.`tindex_max`, `updated`=NOW() WHERE `bid`='{$boad->bid}' AND `tid`='$tid'";
+					$sql_sub = "SELECT MAX(`tindex`)+1 AS `tindex_max` FROM `thread` WHERE `bid`='{$board->bid}'";
+					$sql = "UPDATE `thread`, ($sql_sub) AS `thread` SET `tindex`=`thread`.`tindex_max`, `updated`=NOW() WHERE `bid`='{$board->bid}' AND `tid`='$tid'";
 				}
 				$mysql->query($sql);
 				if($mysql->error) die("ERROR24:クエリ処理に失敗しました");
-				if($name_a[0] != $boad->default_name) setcookie("bbs_name", $name_a[0], time() + 604800);
+				if($name_a[0] != $board->default_name) setcookie("bbs_name", $name_a[0], time() + 604800);
 				$_SESSION["reposttime"] = time() + 60;
 				break;
 
 			case 2: // メッセージ編集
-				$sql = "SELECT `password`=PASSWORD('$sql_pass') AS `match` FROM `message` WHERE `bid`='{$boad->bid}' AND `tid`='$tid' AND `tmid`='$tmid' AND `mid`='{$message->mid}' AND `deleted`=FALSE AND (SELECT '1' FROM `thread` WHERE `bid`='{$boad->bid}' AND `tid`='$tid' AND `pastlog`=FALSE)='1'";
+				$sql = "SELECT `password`=PASSWORD('$sql_pass') AS `match` FROM `message` WHERE `bid`='{$board->bid}' AND `tid`='$tid' AND `tmid`='$tmid' AND `mid`='{$message->mid}' AND `deleted`=FALSE AND (SELECT '1' FROM `thread` WHERE `bid`='{$board->bid}' AND `tid`='$tid' AND `pastlog`=FALSE)='1'";
 				$result = $mysql->query($sql);
 				if($mysql->error) die("ERROR25:クエリ処理に失敗しました");
 				if(!$result->num_rows) die("ERROR26:メッセージが見つかりません");
@@ -287,29 +287,29 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 					$sql_img = (!$delmedia && $file_id == "") ? "" : " `image`='$file_id',";
 					$sql_set = (!$delmessage) ? "`name`='$sql_name', `comment`='$sql_comment',$sql_img `ip`='$ip', `ua`='$ua', `uid`='$uid'" : "`deleted`=TRUE";
 					$sql_tmid = ($delmessage && $tmid == 1) ? "" : " AND `tmid`='$tmid'";
-					$sql = "UPDATE `message` SET $sql_set WHERE `bid`='{$boad->bid}' AND `tid`='$tid'$sql_tmid";
+					$sql = "UPDATE `message` SET $sql_set WHERE `bid`='{$board->bid}' AND `tid`='$tid'$sql_tmid";
 					$mysql->query($sql);
 					if($mysql->error) die("ERROR27:クエリ処理に失敗しました");
 
 					// スレッド編集
 					if($tmid == 1 && !$delmessage) {
-						$sql = "UPDATE `thread` SET `title`='$sql_title' WHERE `bid`='{$boad->bid}' AND `tid`='$tid'";
+						$sql = "UPDATE `thread` SET `title`='$sql_title' WHERE `bid`='{$board->bid}' AND `tid`='$tid'";
 						$mysql->query($sql);
 						if($mysql->error) die("ERROR28:クエリ処理に失敗しました");
 					}
 
 					// 名前欄クッキー
-					if(($name_a[0] != $boad->default_name) && !$delmessage) setcookie("bbs_name", $name_a[0], time() + 604800);
+					if(($name_a[0] != $board->default_name) && !$delmessage) setcookie("bbs_name", $name_a[0], time() + 604800);
 
 					// 添付ファイル削除
 					if(($message->image != "" && ($delmedia || $file_id != "")) || ($message->image != "" && $delmessage && $tmid != 1)) {
-						$filename = "{$boad->sname}-$tid-$tmid-{$message->image}";
+						$filename = "{$board->sname}-$tid-$tmid-{$message->image}";
 						rename("/var/www/img/bbs/$filename", "/var/www/img/bbs/trash/$filename");
 					} else if($delmessage && $tmid == 1) {
-						$sql = "SELECT `tmid`,`image` FROM `message` WHERE `bid`='{$boad->bid}' AND `tid`='$tid' AND `image`!=''";
+						$sql = "SELECT `tmid`,`image` FROM `message` WHERE `bid`='{$board->bid}' AND `tid`='$tid' AND `image`!=''";
 						$result = $mysql->query($sql);
 						while($array = $result->fetch_array()) {
-							$filename = "{$boad->sname}-$tid-{$array["tmid"]}-{$array["image"]}";
+							$filename = "{$board->sname}-$tid-{$array["tmid"]}-{$array["image"]}";
 							if(file_exists("/var/www/img/bbs/$filename")) rename("/var/www/img/bbs/$filename", "/var/www/img/bbs/trash/$filename");
 						}
 					}
@@ -326,7 +326,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 
 			// ファイルアップロード
 			if(is_uploaded_file($_FILES["media"]["tmp_name"])) {
-				$file_path = "/var/www/img/bbs/{$boad->sname}-$tid-$tmid-$file_id";
+				$file_path = "/var/www/img/bbs/{$board->sname}-$tid-$tmid-$file_id";
 				if(move_uploaded_file($_FILES["media"]["tmp_name"], $file_path)) {
 					chmod($file_path, 0644);
 				}
@@ -373,11 +373,11 @@ if(!($_SERVER["REQUEST_METHOD"] == "POST") || isset($error_list)) {
 ?>
 <html>
 <head>
-<?=pagehead($boad->name)?>
+<?=pagehead($board->name)?>
 </head>
 <body>
 <div id="all">
-<h1><?=$boad->name?></h1>
+<h1><?=$board->name?></h1>
 <hr class="normal">
 <h2><?=$title?></h2>
 <?php
@@ -496,11 +496,11 @@ if(!($_SERVER["REQUEST_METHOD"] == "POST") || isset($error_list)) {
 <?php
 if(($mode == 1 || $mode == 2) && !(isset($delmessage) && $delmessage && $tmid == 1)) {
 ?>
-<li><a href="/bbs/read.php?id=<?=$boad->sname?>&tid=<?=$thread->tid?>"<?=mbi_ack(7)?>><?=mbi("7.")?>スレッドに戻る</a></li>
+<li><a href="/bbs/read.php?id=<?=$board->sname?>&tid=<?=$thread->tid?>"<?=mbi_ack(7)?>><?=mbi("7.")?>スレッドに戻る</a></li>
 <?php
 }
 ?>
-<li><a href="/bbs/?id=<?=$boad->sname?>"<?=mbi_ack(8)?>><?=mbi("8.").$boad->name?></a></li>
+<li><a href="/bbs/?id=<?=$board->sname?>"<?=mbi_ack(8)?>><?=mbi("8.").$board->name?></a></li>
 <li><a href="/bbs/"<?=mbi_ack(9)?>><?=mbi("9.")?>掲示板一覧</a></li>
 <li><a href="/"<?=mbi_ack(0)?>><?=mbi("0.")?>トップページ</a></li>
 </ul>
