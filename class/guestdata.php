@@ -27,12 +27,12 @@ class GuestData extends MySQL {
 	//--------------------------
 	// 全件から指定数取得
 	//--------------------------
-	function select_all_l($data, $table, $start, $limit, $key, $order) {
+	function select_all_l($data, $table, $start, $limit, $order) {
 		$s_id = preg_match("/[A-Z]+/", $table) ? "lv" : "id";
 		$this->sql = "SELECT $s_id FROM $table";
 		$this->query($this->sql);
 		$r = $this->rows();
-		$this->sql = "SELECT $data FROM $table ORDER BY $key $order LIMIT $start,$limit";
+		$this->sql = "SELECT $data FROM $table ORDER BY $order LIMIT $start,$limit";
 		$this->query($this->sql);
 		return($r);
 	}

@@ -27,7 +27,7 @@ if(mysqli_connect_error()) {
 $sql = "SELECT * FROM `board`";
 $result = $data->query($sql);
 $count = $data->top_count();
-$rows = $data->select_all_l("*", "info", 0, $PAGESIZE, "id", "desc");
+$rows = $data->select_all_l("*", "info", 0, $PAGESIZE, "id desc");
 ?>
 <html>
 <head>
