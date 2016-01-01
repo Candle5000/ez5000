@@ -88,7 +88,7 @@ if(isset($login_err)) echo $login_err;
 <?php
 } else {
 //ログイン済
-$count = $data->select_all_l("*", $table, $page, $PAGESIZE, "id", "desc");
+$count = $data->select_all_l("*", $table, $page, $PAGESIZE, "id desc");
 ?>
 <h3>* * Infomation List * *</h3>
 <?=$form->start()?>

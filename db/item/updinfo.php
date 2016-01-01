@@ -47,9 +47,9 @@ if(isset($_GET["page"])) {
 }
 
 if(isset($data->is_admin)) {
-	$rows = $data->select_all_l("id,name,updated,hidden", "items", $page * $LIMIT, $LIMIT, "updated", "desc");
+	$rows = $data->select_all_l("id,name,updated,hidden", "items", $page * $LIMIT, $LIMIT, "updated desc, id");
 } else {
-	$rows = $data->select_column_p("id,name,updated,hidden", "items", "hidden=0", $page * $LIMIT, $LIMIT, "updated desc");
+	$rows = $data->select_column_p("id,name,updated,hidden", "items", "hidden=0", $page * $LIMIT, $LIMIT, "updated desc, id");
 }
 
 if(($page > 0) && ($rows > 0)) {

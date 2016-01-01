@@ -44,7 +44,7 @@ if($data->rows()) {
 	$zoneData = $data->fetch();
 	$zoneName = $zoneData["name"];
 	$m_categoryId = $monster["category"];
-	$m_categoryName = $category[$m_categoryId];
+	$m_categoryName = $category[$m_categoryId] ?: "不明";
 	$data->select_column("id", "monster", "category", $m_categoryId);
 	$link_id = ($data->rows() < 5) ? 900 : $m_categoryId;
 	$m_image = (file_exists("/var/www/img/monster/".sprintf("%03d", $monster["image"]).".gif")) ? sprintf("%5d", $monster["image"]) : "00000";
