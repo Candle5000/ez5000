@@ -44,7 +44,7 @@ if(isset($_GET["page"])) {
 	$page = 0;
 }
 
-$rows = $data->select_all_l("id", "updinfo", $page * $LIMIT, $LIMIT, "id", "desc");
+$rows = $data->select_all_l("id", "updinfo", $page * $LIMIT, $LIMIT, "id desc");
 
 if(($page > 0) && ($rows > 0)) {
 	$pagelink = "<a href=\"./updinfo.php?page=".($page - 1)."\"".mbi_ack("*").">".mbi("*.")."前のページ</a> | ";

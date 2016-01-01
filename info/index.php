@@ -36,7 +36,7 @@ $data = new GuestData($userName, $password, $database);
 if(mysqli_connect_error()) {
 	die("データベースの接続に失敗しました");
 }
-$rows = $data->select_all_l("*", "info", ($page * $PAGESIZE), $PAGESIZE, "id", "desc");
+$rows = $data->select_all_l("*", "info", ($page * $PAGESIZE), $PAGESIZE, "id desc");
 
 if(($page > 0) && ($rows > 0)) {
 	$pagelink = "<a href=\"./?page=".($page - 1)."\"".mbi_ack("*").">".mbi("*.")."前のページ</a> | ";
