@@ -102,19 +102,19 @@ if(device_info() == "mb" && isset($words) && isset($_POST["enc"])) {
 
 // 検索
 if(isset($words)) {
-	$table = ($tid > 0) ? "`message`" : "`message` NATURAL JOIN `thread`";
+	$table = ($tid > 0) ? "`message`" : "`message` INNER JOIN `thread` ON `message`.`bid`=`thread`.`bid` AND `message`.`tid`=`thread`.`tid`";
 	switch($target) {
 		case 'comment':
 			$target = "`comment`";
 			break;
 		case 'title':
-			$target = "`title`";
+			$target = ($tid > 0) ? "CONCAT(`comment`,' ',`name`)" : "`title`";
 			break;
 		case 'name':
 			$target = "`name`";
 			break;
 		default:
-			$target = "CONCAT(`comment`,' ',`title`,' ',`name`)";
+			$target = ($tid > 0) ? "CONCAT(`comment`,' ',`name`)" : "CONCAT(`comment`,' ',`title`,' ',`name`)";
 			break;
 	}
 	$input = preg_replace("/~/", "～", mb_convert_kana($words,"asKV"));
@@ -129,13 +129,13 @@ if(isset($words)) {
 	if(count($like_list) > 0) {
 		$column = "";
 		$where = implode(" $mode ", $like_list);
-		$where_add = ($tid > 0) ? "`bid`='{$board->bid}' AND `tid`='$tid'" : "`bid`='{$board->bid}'";
-		$where_add .= " AND `pastlog`=FALSE AND `deleted`=FALSE";
+		$where_add = ($tid > 0) ? "`bid`='{$board->bid}' AND `tid`='$tid'" : "`thread`.`bid`='{$board->bid}' AND `pastlog`=FALSE";
+		$where_add .= " AND `deleted`=FALSE";
 		$sql = "SELECT COUNT(*) AS `count` FROM $table WHERE ($where) AND $where_add";
 		$count = $mysql->query($sql)->fetch_object()->count;
 		$sql = "SELECT * FROM $table WHERE ($where) AND $where_add ORDER BY `mid` DESC LIMIT $start,10";
-		$result = $mysql->query($sql);
 		echo $sql;
+		$result = $mysql->query($sql);
 		while($array = $result->fetch_array()) {
 			if($tid == 0) {
 				$sql = "SELECT `thread`.`tid`,`title`,`tindex`,`acount`,COUNT(1) AS `mcount`,`updated`,`locked`,`top`,`pastlog` FROM `thread` NATURAL JOIN `message` WHERE `bid`='{$board->bid}' AND `tid`='{$array["tid"]}' AND `pastlog`=FALSE AND `deleted`=FALSE AND (SELECT '1' FROM `message` WHERE `bid`='{$board->bid}' AND `tid`='{$array["tid"]}' AND `tmid`='1' AND `deleted`=FALSE)='1' GROUP BY `tid`";
@@ -197,7 +197,7 @@ if($tid > 0) {
 <option value="all">すべて</option>
 <option value="comment">本文</option>
 <?php
-if($tid > 0) {
+if($tid == 0) {
 ?>
 <option value="title">タイトル</option>
 <?php
