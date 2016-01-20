@@ -128,7 +128,6 @@ if(isset($words)) {
 		$where_add = ($tid > 0) ? "`bid`='{$board->bid}' AND `tid`='$tid'" : "`thread`.`bid`='{$board->bid}' AND `pastlog`=FALSE";
 		$where_add .= " AND `deleted`=FALSE";
 		$sql = "SELECT SQL_CALC_FOUND_ROWS * FROM $table WHERE ($where) AND $where_add ORDER BY `mid` DESC LIMIT $start,10";
-		echo $sql;
 		$result = $mysql->query($sql);
 		$sql = "SELECT FOUND_ROWS() AS `count`";
 		$count = $mysql->query($sql)->fetch_object()->count;
