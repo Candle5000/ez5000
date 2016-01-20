@@ -132,6 +132,10 @@
 	text-align:center;
 	font-weight:bold;
 }
+.error {
+	color:#C00;
+	font-weight:bold;
+}
 
 /* Tag */
 a:active,a:hover,a:link,a:visited {
