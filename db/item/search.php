@@ -44,7 +44,7 @@ if(isset($_GET["mode"])) {
 	$mode = "AND";
 }
 
-if(isset($_GET["page"])) {
+if(isset($_GET["page"]) && !is_array($_GET["page"])) {
 	if(preg_match("/[^0-9]/", $_GET["page"])) {
 		$page = 0;
 	} else {
@@ -54,7 +54,7 @@ if(isset($_GET["page"])) {
 	$page = 0;
 }
 
-if(isset($_GET["words"])) {
+if(isset($_GET["words"]) && !is_array($_GET["words"])) {
 	$words = $_GET["words"];
 	if(device_info() == 'mb' && isset($_GET["enc"])) {
 		if(isset($_GET["enc"])) {

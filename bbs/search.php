@@ -10,19 +10,6 @@ require_once("/var/www/functions/template.php");
 require_once("/var/www/functions/form.php");
 session_start();
 
-// 掲示板ID取得
-if(!isset($_GET["id"])) die("ERROR01:IDがありません");
-$id = $_GET["id"];
-if(!preg_match("/^[a-zA-Z0-9]{1,16}$/", $id)) die("ERROR02:無効なIDです");
-
-// スレッドID取得
-$tid = isset($_GET["tid"]) ? $_GET["tid"] : 0;
-if(!preg_match("/^[0-9]{1,9}$/", $tid)) die("ERROR03:無効なIDです");
-
-// 送信先設定
-$url = $_SERVER["PHP_SELF"];
-if($tid > 0) $url .= "?tid=$tid";
-
 $user_file = "/etc/mysql-user/user5000.ini";
 if($fp_user = fopen($user_file, "r")) {
 	$userName = rtrim(fgets($fp_user));
@@ -33,6 +20,15 @@ if($fp_user = fopen($user_file, "r")) {
 }
 $mysql = new MySQL($userName, $password, $database);
 if($mysql->connect_error) die("データベースの接続に失敗しました");
+
+// 掲示板ID取得
+if(!isset($_GET["id"]) && !is_array($_GET["id"])) die("ERROR01:IDがありません");
+$id = $_GET["id"];
+if(!preg_match("/^[a-zA-Z0-9]{1,16}$/", $id)) die("ERROR02:無効なIDです");
+
+// スレッドID取得
+$tid = (isset($_GET["tid"]) && is_numeric($_GET["tid"])) ? $_GET["tid"] : 0;
+if(!preg_match("/^[0-9]{1,9}$/", $tid)) die("ERROR03:無効なIDです");
 
 // 掲示板情報を取得
 $sql = "SELECT * FROM `board` WHERE `sname`='$id'";
@@ -50,10 +46,10 @@ if($tid > 0) {
 }
 
 // 検索ワード
-if(isset($_GET["words"])) {
-	$words = @strval($_GET["words"]);
-} else if(isset($_POST["words"])) {
-	$words = @strval($_POST["words"]);
+if(isset($_GET["words"]) && !is_array($_GET["words"])) {
+	$words = $_GET["words"];
+} else if(isset($_POST["words"]) && !is_array($_POST["words"])) {
+	$words = $_POST["words"];
 }
 
 // 検索モード
@@ -62,7 +58,7 @@ if(isset($_GET["mode"])) {
 } else if(isset($_POST["mode"])) {
 	$mode = $_POST["mode"];
 } else {
-	$mode = 'and';
+	$mode = 'AND';
 }
 $mode = ($mode == 'OR') ? 'OR' : 'AND';
 
@@ -86,7 +82,7 @@ if(isset($_GET["page"]) && is_numeric($_GET["page"]) && $_GET["page"] > 0) {
 }
 
 // 文字コード確認 フィーチャーフォンのみ
-if(device_info() == "mb" && isset($words) && isset($_POST["enc"])) {
+if(device_info() == "mb" && isset($words) && isset($_POST["enc"]) && !is_array($_POST["enc"])) {
 	switch("あ") {
 		case mb_convert_encoding($_POST["enc"], "UTF-8", "SJIS-WIN"):
 			$words = mb_convert_encoding($words, "UTF-8", "SJIS-WIN");
@@ -131,11 +127,11 @@ if(isset($words)) {
 		$where = implode(" $mode ", $like_list);
 		$where_add = ($tid > 0) ? "`bid`='{$board->bid}' AND `tid`='$tid'" : "`thread`.`bid`='{$board->bid}' AND `pastlog`=FALSE";
 		$where_add .= " AND `deleted`=FALSE";
-		$sql = "SELECT COUNT(*) AS `count` FROM $table WHERE ($where) AND $where_add";
-		$count = $mysql->query($sql)->fetch_object()->count;
-		$sql = "SELECT * FROM $table WHERE ($where) AND $where_add ORDER BY `mid` DESC LIMIT $start,10";
+		$sql = "SELECT SQL_CALC_FOUND_ROWS * FROM $table WHERE ($where) AND $where_add ORDER BY `mid` DESC LIMIT $start,10";
 		echo $sql;
 		$result = $mysql->query($sql);
+		$sql = "SELECT FOUND_ROWS() AS `count`";
+		$count = $mysql->query($sql)->fetch_object()->count;
 		while($array = $result->fetch_array()) {
 			if($tid == 0) {
 				$sql = "SELECT `thread`.`tid`,`title`,`tindex`,`acount`,COUNT(1) AS `mcount`,`updated`,`locked`,`top`,`pastlog` FROM `thread` NATURAL JOIN `message` WHERE `bid`='{$board->bid}' AND `tid`='{$array["tid"]}' AND `pastlog`=FALSE AND `deleted`=FALSE AND (SELECT '1' FROM `message` WHERE `bid`='{$board->bid}' AND `tid`='{$array["tid"]}' AND `tmid`='1' AND `deleted`=FALSE)='1' GROUP BY `tid`";
