@@ -51,9 +51,9 @@ if($tid > 0) {
 
 // 検索ワード
 if(isset($_GET["words"])) {
-	$words = $_GET["words"];
+	$words = @strval($_GET["words"]);
 } else if(isset($_POST["words"])) {
-	$words = $_POST["words"];
+	$words = @strval($_POST["words"]);
 }
 
 // 検索モード
