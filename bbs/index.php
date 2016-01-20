@@ -71,7 +71,7 @@ if((($page + 1) * $LIMIT) < $rows) {
 <h1><?=$board->name?></h1>
 <hr class="normal">
 <p>
-[<a href="./form.php?mode=thform&id=<?=$board->sname?>"<?=mbi_ack(8)?>><?=mbi("8.")?>新規スレ</a>]
+[<a href="./form.php?mode=thform&id=<?=$board->sname?>"<?=mbi_ack(8)?>><?=mbi("8.")?>新規スレ</a>] [<a href="./search.php?id=<?=$board->sname?>"<?=mbi_ack(4)?>><?=mbi("4.")?>検索</a>]
 </p>
 <hr class="normal">
 <div id="pagelink"><?=$pagelink?></div>

@@ -55,11 +55,17 @@ class Message {
 			$modify = ($this->thread->mcount > 999 || $this->thread->locked) ? "編集" : "<a href=\"./form.php?mode=modify&id={$this->board->sname}&tid={$this->thread->tid}&tmid={$this->tmid}\">編集</a>";
 			if($this->image != "") {
 				$file_id = "{$this->board->sname}-{$this->thread->tid}-{$this->tmid}-{$this->image}";
-				$imageinfo = getimagesize("/var/www/img/bbs/$file_id");
-				if($imageinfo[0] > $limit[device_info()]['width'] || $imageinfo[1] > $limit[device_info()]['width'] || filesize("/var/www/img/bbs/$file_id") > $limit[device_info()]['size']) {
-					$img = "\n<a href=\"/img/bbs/$file_id\"><img src=\"outimg.php?img=$file_id&size={$limit[device_info()]['width']}\" class=\"smn\" /></a><br />\n";
+				if(file_exists("/var/www/img/bbs/$file_id")) {
+					$imageinfo = @getimagesize("/var/www/img/bbs/$file_id");
+					if(!$imageinfo || !$imageinfo[0]) {
+						$img = "<p class=\"error\">[画像の読み込みに失敗しました]</p>";
+					} else if($imageinfo[0] > $limit[device_info()]['width'] || $imageinfo[1] > $limit[device_info()]['width'] || filesize("/var/www/img/bbs/$file_id") > $limit[device_info()]['size']) {
+						$img = "\n<a href=\"/img/bbs/$file_id\"><img src=\"outimg.php?img=$file_id&size={$limit[device_info()]['width']}\" class=\"smn\" /></a><br />\n";
+					} else {
+						$img = "\n<a href=\"/img/bbs/$file_id\"><img src=\"/img/bbs/$file_id\" class=\"smn\" /></a><br />\n";
+					}
 				} else {
-					$img = "\n<a href=\"/img/bbs/$file_id\"><img src=\"/img/bbs/$file_id\" class=\"smn\" /></a><br />\n";
+					$img = "<p class=\"error\">[画像が存在しません]</p>";
 				}
 			} else {
 				$img = "";
@@ -67,7 +73,8 @@ class Message {
 ?>
 <hr class="normal">
 <p>
-[<?=$this->tmid?>] By <?=htmlspecialchars($this->name)?><br /><?=$img?>
+[<?=$this->tmid?>] By <?=htmlspecialchars($this->name)?><br />
+<?=$img?>
 <?=$this->textConvert($this->comment)?><br />
 <?=$this->ts?><br />
 [<?=$reply?>] [<?=$modify?>]
@@ -81,6 +88,38 @@ class Message {
 </p>
 <?php
 		}
+	}
+
+	//--------------------------
+	// 検索メッセージ出力
+	//--------------------------
+	public function printSearchedMessage() {
+		$limit = Message::$imgsize;
+		$thread_link = "<a href=\"./read.php?id={$this->board->sname}&tid={$this->thread->tid}\">{$this->thread->title}</a>";
+		$reply = ($this->thread->mcount > 999 || $this->thread->locked) ? "返信" : "<a href=\"./form.php?mode=reform&id={$this->board->sname}&tid={$this->thread->tid}&re={$this->tmid}\">返信</a>";
+		$modify = ($this->thread->mcount > 999 || $this->thread->locked) ? "編集" : "<a href=\"./form.php?mode=modify&id={$this->board->sname}&tid={$this->thread->tid}&tmid={$this->tmid}\">編集</a>";
+		if($this->image != "") {
+			$file_id = "{$this->board->sname}-{$this->thread->tid}-{$this->tmid}-{$this->image}";
+			$imageinfo = getimagesize("/var/www/img/bbs/$file_id");
+			if($imageinfo[0] > $limit[device_info()]['width'] || $imageinfo[1] > $limit[device_info()]['width'] || filesize("/var/www/img/bbs/$file_id") > $limit[device_info()]['size']) {
+				$img = "\n<a href=\"/img/bbs/$file_id\"><img src=\"outimg.php?img=$file_id&size={$limit[device_info()]['width']}\" class=\"smn\" /></a><br />\n";
+			} else {
+				$img = "\n<a href=\"/img/bbs/$file_id\"><img src=\"/img/bbs/$file_id\" class=\"smn\" /></a><br />\n";
+			}
+		} else {
+			$img = "";
+		}
+?>
+<hr class="normal">
+<p>
+[<?=$thread_link?>]<br />
+[<?=$this->tmid?>] By <?=htmlspecialchars($this->name)?><br />
+<?=$img?>
+<?=$this->textConvert($this->comment)?><br />
+<?=$this->ts?><br />
+[<?=$reply?>] [<?=$modify?>]
+</p>
+<?php
 	}
 
 	//--------------------------
