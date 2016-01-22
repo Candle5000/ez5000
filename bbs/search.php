@@ -22,7 +22,7 @@ $mysql = new MySQL($userName, $password, $database);
 if($mysql->connect_error) die("データベースの接続に失敗しました");
 
 // 掲示板ID取得
-if(!isset($_GET["id"]) && !is_array($_GET["id"])) die("ERROR01:IDがありません");
+if(!isset($_GET["id"]) || !is_array($_GET["id"])) die("ERROR01:IDがありません");
 $id = $_GET["id"];
 if(!preg_match("/^[a-zA-Z0-9]{1,16}$/", $id)) die("ERROR02:無効なIDです");
 
@@ -46,37 +46,29 @@ if($tid > 0) {
 }
 
 // 検索ワード
-if(isset($_GET["words"]) && !is_array($_GET["words"])) {
-	$words = $_GET["words"];
-} else if(isset($_POST["words"]) && !is_array($_POST["words"])) {
-	$words = $_POST["words"];
-}
+if(isset($_REQUEST["words"]) && !is_array($_REQUEST["words"])) {
+	$words = $_REQUEST["words"];
+} 
 
 // 検索モード
-if(isset($_GET["mode"])) {
-	$mode = $_GET["mode"];
-} else if(isset($_POST["mode"])) {
-	$mode = $_POST["mode"];
+if(isset($_REQUEST["mode"])) {
+	$mode = $_REQUEST["mode"];
 } else {
 	$mode = 'AND';
 }
 $mode = ($mode == 'OR') ? 'OR' : 'AND';
 
 // 検索対象
-if(isset($_GET["target"])) {
-	$target = $_GET["target"];
-} else if(isset($_POST["target"])) {
-	$target = $_POST["target"];
+if(isset($_REQUEST["target"])) {
+	$target = $_REQUEST["target"];
 } else {
 	$target = 'all';
 }
 $target = ($target == 'comment' || $target == 'title' || $target == 'name') ? $target : 'all';
 
 // ページ
-if(isset($_GET["page"]) && is_numeric($_GET["page"]) && $_GET["page"] > 0) {
-	$page = $_GET["page"];
-} else if(isset($_POST["page"]) && is_numeric($_POST["page"]) && $_POST["page"] > 0) {
-	$page = $_POST["page"];
+if(isset($_REQUEST["page"]) && is_numeric($_REQUEST["page"]) && $_REQUEST["page"] > 0) {
+	$page = $_REQUEST["page"];
 } else {
 	$page = 0;
 }
