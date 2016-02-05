@@ -78,7 +78,7 @@ if($rows > 0) {
 	$upd = 0;
 	while($row = $data->fetch()) {
 		$id = $row["id"];
-		$groupName = $group[item_group_id($id)];
+		$groupName = isset($group[item_group_id($id)]) ? $group[item_group_id($id)] : "不明";
 		$name = $row["hidden"] ? "<span class=\"nm\">".$row["name"]."</span>" : $row["name"];
 		$id_f = isset($data->is_admin) ? sprintf("%d:", $id) : "";
 		if($updflag = ($upd != $row["updated"])) {
