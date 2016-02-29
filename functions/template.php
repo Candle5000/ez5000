@@ -204,6 +204,6 @@ function pagefoot($count) {
 <?=$count_text?>
 Eternal Zone (C) Ateam Inc.<br />
 Web Design By Candle
-<div>
+</div>
 <?php
 }
