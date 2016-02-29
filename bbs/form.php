@@ -329,6 +329,39 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 				$file_path = "/var/www/img/bbs/{$board->sname}-$tid-$tmid-$file_id";
 				if(move_uploaded_file($_FILES["media"]["tmp_name"], $file_path)) {
 					chmod($file_path, 0644);
+
+					// サムネイル保存
+					$file_path_s = "/var/www/img/bbs/s-{$board->sname}-$tid-$tmid-$file_id";
+					$width = 120;
+					$quality = 50;
+					$image_w = $imageinfo[0];
+					$image_h = $imageinfo[1];
+					switch($imageinfo[2]) {
+						case 1:
+							$image = imagecreatefromgif($file_path);
+							break;
+						case 2:
+							$image = imagecreatefromjpeg($file_path);
+							break;
+						case 3:
+							$image = imagecreatefrompng($file_path);
+							break;
+					}
+					if($image_w > $width || $image_h > $width) {
+						$proportion = $image_w / $image_h;
+						$height = $width / $proportion;
+						if($proportion > 1) {
+							$height = $width;
+							$width = $width * $proportion;
+							$canvas = imagecreatetruecolor($width, $height);
+							imagecopyresampled($canvas, $image, 0, 0, 0, 0, $width, $height, $image_w, $image_h);
+							imagejpeg($canvas, $file_path_s, $quality);
+							imagedestroy($canvas);
+						}
+					} else {
+						imagejpeg($image, $file_path_s, $quality);
+					}
+					chmod($file_path_s, 0644);
 				}
 			}
 		}
