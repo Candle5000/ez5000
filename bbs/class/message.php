@@ -57,15 +57,16 @@ class Message {
 				$file_id = "{$this->board->sname}-{$this->thread->tid}-{$this->tmid}-{$this->image}";
 				if(file_exists("/var/www/img/bbs/$file_id")) {
 					$imageinfo = @getimagesize("/var/www/img/bbs/$file_id");
+					$imagesize = ceil(filesize("/var/www/img/bbs/$file_id") / 1024);
 					if(!$imageinfo || !$imageinfo[0]) {
-						$img = "<p class=\"error\">[画像の読み込みに失敗しました]</p>";
-					} else if($imageinfo[0] > $limit[device_info()]['width'] || $imageinfo[1] > $limit[device_info()]['width'] || filesize("/var/www/img/bbs/$file_id") > $limit[device_info()]['size']) {
-						$img = "\n<a href=\"/img/bbs/$file_id\"><img src=\"outimg.php?img=$file_id&size={$limit[device_info()]['width']}\" class=\"smn\" /></a><br />\n";
+						$img = "<span class=\"error block cnt\">[画像の読み込みに失敗しました]</span>";
+					} else if(file_exists("/var/www/img/bbs/$file_id.png")) {
+						$img = "<a href=\"/img/bbs/$file_id\"><img src=\"/img/bbs/$file_id.png\" class=\"smn\" /><span class=\"block cnt\">[$imagesize KB]</span></a>\n";
 					} else {
-						$img = "\n<a href=\"/img/bbs/$file_id\"><img src=\"/img/bbs/$file_id\" class=\"smn\" /></a><br />\n";
+						$img = "<a href=\"/img/bbs/$file_id\"><span class=\"block cnt\">[サムネイルがありません]<br />\n[$imagesize KB]</span></a>\n";
 					}
 				} else {
-					$img = "<p class=\"error\">[画像が存在しません]</p>";
+					$img = "<span class=\"error block cnt\">[画像が存在しません]</span>\n";
 				}
 			} else {
 				$img = "";
@@ -100,11 +101,18 @@ class Message {
 		$modify = ($this->thread->mcount > 999 || $this->thread->locked) ? "編集" : "<a href=\"./form.php?mode=modify&id={$this->board->sname}&tid={$this->thread->tid}&tmid={$this->tmid}\">編集</a>";
 		if($this->image != "") {
 			$file_id = "{$this->board->sname}-{$this->thread->tid}-{$this->tmid}-{$this->image}";
-			$imageinfo = getimagesize("/var/www/img/bbs/$file_id");
-			if($imageinfo[0] > $limit[device_info()]['width'] || $imageinfo[1] > $limit[device_info()]['width'] || filesize("/var/www/img/bbs/$file_id") > $limit[device_info()]['size']) {
-				$img = "\n<a href=\"/img/bbs/$file_id\"><img src=\"outimg.php?img=$file_id&size={$limit[device_info()]['width']}\" class=\"smn\" /></a><br />\n";
+			if(file_exists("/var/www/img/bbs/$file_id")) {
+				$imageinfo = @getimagesize("/var/www/img/bbs/$file_id");
+				$imagesize = ceil(filesize("/var/www/img/bbs/$file_id") / 1024);
+				if(!$imageinfo || !$imageinfo[0]) {
+					$img = "<span class=\"error block cnt\">[画像の読み込みに失敗しました]</span>";
+				} else if(file_exists("/var/www/img/bbs/$file_id.png")) {
+					$img = "<a href=\"/img/bbs/$file_id\"><img src=\"/img/bbs/$file_id.png\" class=\"smn\" /><span class=\"block cnt\">[$imagesize KB]</span></a>\n";
+				} else {
+					$img = "<a href=\"/img/bbs/$file_id\"><span class=\"block cnt\">[サムネイルがありません]<br />\n[$imagesize KB]</span></a>\n";
+				}
 			} else {
-				$img = "\n<a href=\"/img/bbs/$file_id\"><img src=\"/img/bbs/$file_id\" class=\"smn\" /></a><br />\n";
+					$img = "<span class=\"error block cnt\">[画像が存在しません]</span>\n";
 			}
 		} else {
 			$img = "";
