@@ -304,13 +304,15 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 					// 添付ファイル削除
 					if(($message->image != "" && ($delmedia || $file_id != "")) || ($message->image != "" && $delmessage && $tmid != 1)) {
 						$filename = "{$board->sname}-$tid-$tmid-{$message->image}";
-						rename("/var/www/img/bbs/$filename", "/var/www/img/bbs/trash/$filename");
+						if(file_exists("/var/www/img/bbs/$filename")) rename("/var/www/img/bbs/$filename", "/var/www/img/bbs/trash/$filename");
+						if(file_exists("/var/www/img/bbs/$filename.png")) rename("/var/www/img/bbs/$filename.png", "/var/www/img/bbs/trash/$filename.png");
 					} else if($delmessage && $tmid == 1) {
 						$sql = "SELECT `tmid`,`image` FROM `message` WHERE `bid`='{$board->bid}' AND `tid`='$tid' AND `image`!=''";
 						$result = $mysql->query($sql);
 						while($array = $result->fetch_array()) {
 							$filename = "{$board->sname}-$tid-{$array["tmid"]}-{$array["image"]}";
 							if(file_exists("/var/www/img/bbs/$filename")) rename("/var/www/img/bbs/$filename", "/var/www/img/bbs/trash/$filename");
+							if(file_exists("/var/www/img/bbs/$filename.png")) rename("/var/www/img/bbs/$filename.png", "/var/www/img/bbs/trash/$filename.png");
 						}
 					}
 				} else {
@@ -331,37 +333,15 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 					chmod($file_path, 0644);
 
 					// サムネイル保存
-					$file_path_s = "/var/www/img/bbs/s-{$board->sname}-$tid-$tmid-$file_id";
+					$file_path_t = "$file_path.png";
 					$width = 120;
-					$quality = 50;
-					$image_w = $imageinfo[0];
-					$image_h = $imageinfo[1];
-					switch($imageinfo[2]) {
-						case 1:
-							$image = imagecreatefromgif($file_path);
-							break;
-						case 2:
-							$image = imagecreatefromjpeg($file_path);
-							break;
-						case 3:
-							$image = imagecreatefrompng($file_path);
-							break;
-					}
-					if($image_w > $width || $image_h > $width) {
-						$proportion = $image_w / $image_h;
-						$height = $width / $proportion;
-						if($proportion > 1) {
-							$height = $width;
-							$width = $width * $proportion;
-							$canvas = imagecreatetruecolor($width, $height);
-							imagecopyresampled($canvas, $image, 0, 0, 0, 0, $width, $height, $image_w, $image_h);
-							imagejpeg($canvas, $file_path_s, $quality);
-							imagedestroy($canvas);
-						}
-					} else {
-						imagejpeg($image, $file_path_s, $quality);
-					}
-					chmod($file_path_s, 0644);
+					$color_bit = 16;
+					$imagick = new Imagick($file_path);
+					$img_size = $imagick->getImageGeometry();
+					if($img_size["width"] > $width || $img_size["height"] > $width) $imagick->thumbnailImage($width, $width, true);
+					$imagick->posterizeImage(16, true);
+					$imagick->writeImage($file_path_t);
+					chmod($file_path_t, 0644);
 				}
 			}
 		}

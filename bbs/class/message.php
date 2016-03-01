@@ -60,8 +60,8 @@ class Message {
 					$imagesize = ceil(filesize("/var/www/img/bbs/$file_id") / 1024);
 					if(!$imageinfo || !$imageinfo[0]) {
 						$img = "<span class=\"error block cnt\">[画像の読み込みに失敗しました]</span>";
-					} else if(file_exists("/var/www/img/bbs/s-$file_id")) {
-						$img = "<a href=\"/img/bbs/$file_id\"><img src=\"/img/bbs/s-$file_id\" class=\"smn\" /><span class=\"block cnt\">[$imagesize KB]</span></a>\n";
+					} else if(file_exists("/var/www/img/bbs/$file_id.png")) {
+						$img = "<a href=\"/img/bbs/$file_id\"><img src=\"/img/bbs/$file_id.png\" class=\"smn\" /><span class=\"block cnt\">[$imagesize KB]</span></a>\n";
 					} else {
 						$img = "<a href=\"/img/bbs/$file_id\"><span class=\"block cnt\">[サムネイルがありません]<br />\n[$imagesize KB]</span></a>\n";
 					}
@@ -106,8 +106,8 @@ class Message {
 				$imagesize = ceil(filesize("/var/www/img/bbs/$file_id") / 1024);
 				if(!$imageinfo || !$imageinfo[0]) {
 					$img = "<span class=\"error block cnt\">[画像の読み込みに失敗しました]</span>";
-				} else if(file_exists("/var/www/img/bbs/s-$file_id")) {
-					$img = "<a href=\"/img/bbs/$file_id\"><img src=\"/img/bbs/s-$file_id\" class=\"smn\" /><span class=\"block cnt\">[$imagesize KB]</span></a>\n";
+				} else if(file_exists("/var/www/img/bbs/$file_id.png")) {
+					$img = "<a href=\"/img/bbs/$file_id\"><img src=\"/img/bbs/$file_id.png\" class=\"smn\" /><span class=\"block cnt\">[$imagesize KB]</span></a>\n";
 				} else {
 					$img = "<a href=\"/img/bbs/$file_id\"><span class=\"block cnt\">[サムネイルがありません]<br />\n[$imagesize KB]</span></a>\n";
 				}
