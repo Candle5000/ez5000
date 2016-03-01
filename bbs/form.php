@@ -304,13 +304,15 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 					// 添付ファイル削除
 					if(($message->image != "" && ($delmedia || $file_id != "")) || ($message->image != "" && $delmessage && $tmid != 1)) {
 						$filename = "{$board->sname}-$tid-$tmid-{$message->image}";
-						rename("/var/www/img/bbs/$filename", "/var/www/img/bbs/trash/$filename");
+						if(file_exists("/var/www/img/bbs/$filename")) rename("/var/www/img/bbs/$filename", "/var/www/img/bbs/trash/$filename");
+						if(file_exists("/var/www/img/bbs/$filename.png")) rename("/var/www/img/bbs/$filename.png", "/var/www/img/bbs/trash/$filename.png");
 					} else if($delmessage && $tmid == 1) {
 						$sql = "SELECT `tmid`,`image` FROM `message` WHERE `bid`='{$board->bid}' AND `tid`='$tid' AND `image`!=''";
 						$result = $mysql->query($sql);
 						while($array = $result->fetch_array()) {
 							$filename = "{$board->sname}-$tid-{$array["tmid"]}-{$array["image"]}";
 							if(file_exists("/var/www/img/bbs/$filename")) rename("/var/www/img/bbs/$filename", "/var/www/img/bbs/trash/$filename");
+							if(file_exists("/var/www/img/bbs/$filename.png")) rename("/var/www/img/bbs/$filename.png", "/var/www/img/bbs/trash/$filename.png");
 						}
 					}
 				} else {
@@ -329,6 +331,17 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 				$file_path = "/var/www/img/bbs/{$board->sname}-$tid-$tmid-$file_id";
 				if(move_uploaded_file($_FILES["media"]["tmp_name"], $file_path)) {
 					chmod($file_path, 0644);
+
+					// サムネイル保存
+					$file_path_t = "$file_path.png";
+					$width = 120;
+					$color_bit = 16;
+					$imagick = new Imagick($file_path);
+					$img_size = $imagick->getImageGeometry();
+					if($img_size["width"] > $width || $img_size["height"] > $width) $imagick->thumbnailImage($width, $width, true);
+					$imagick->posterizeImage(16, true);
+					$imagick->writeImage($file_path_t);
+					chmod($file_path_t, 0644);
 				}
 			}
 		}

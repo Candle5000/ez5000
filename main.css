@@ -126,6 +126,9 @@
 .rgt {
 	text-align:right;
 }
+.block {
+	display:block;
+}
 .ocb {
 	background-color:#FFB43C;
 	color:#420;
