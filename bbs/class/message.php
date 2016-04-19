@@ -12,19 +12,18 @@ class Message {
 	public $name;
 	public $comment;
 	public $image;
-	public $ts;
+	public $post_ts;
+	public $update_ts;
+	public $update_cnt;
 	public $ip;
+	public $hostname;
 	public $ua;
 	public $uid;
-	public $deleted;
+	public $user_id;
 	public $mysql;
 	public $board;
 	public $thread;
-	public static $imgsize = array(
-		'mb' => array('width' => 100, 'size' => 16000),
-		'sp' => array('width' => 160, 'size' => 64000),
-		'pc' => array('width' => 240, 'size' => 96000)
-	);
+	public $mode;
 
 	//--------------------------
 	// コンストラクタ
@@ -35,11 +34,15 @@ class Message {
 		$this->name = $array["name"];
 		$this->comment = $array["comment"];
 		$this->image = $array["image"];
-		$this->ts = $array["ts"];
+		$this->post_ts = $array["post_ts"];
+		$this->update_ts = $array["update_ts"];
+		$this->update_cnt = $array["update_cnt"];
 		$this->ip = $array["ip"];
+		$this->hostname = $array["hostname"];
 		$this->ua = $array["ua"];
 		$this->uid = $array["uid"];
-		$this->deleted = $array["deleted"];
+		$this->user_id = $array["user_id"];
+		$this->mode = 0;
 		$this->mysql = $mysql_temp;
 		$this->board = $board_temp;
 		$this->thread = $thread_temp;
@@ -49,58 +52,13 @@ class Message {
 	// メッセージ出力
 	//--------------------------
 	public function printMessage() {
-		if(!$this->deleted) {
-			$limit = Message::$imgsize;
-			$reply = ($this->thread->mcount > 999 || $this->thread->locked) ? "返信" : "<a href=\"./form.php?mode=reform&id={$this->board->sname}&tid={$this->thread->tid}&re={$this->tmid}\">返信</a>";
-			$modify = ($this->thread->mcount > 999 || $this->thread->locked) ? "編集" : "<a href=\"./form.php?mode=modify&id={$this->board->sname}&tid={$this->thread->tid}&tmid={$this->tmid}\">編集</a>";
-			if($this->image != "") {
-				$file_id = "{$this->board->sname}-{$this->thread->tid}-{$this->tmid}-{$this->image}";
-				if(file_exists("/var/www/img/bbs/$file_id")) {
-					$imageinfo = @getimagesize("/var/www/img/bbs/$file_id");
-					$imagesize = ceil(filesize("/var/www/img/bbs/$file_id") / 1024);
-					if(!$imageinfo || !$imageinfo[0]) {
-						$img = "<span class=\"error block cnt\">[画像の読み込みに失敗しました]</span>";
-					} else if(file_exists("/var/www/img/bbs/$file_id.png")) {
-						$img = "<a href=\"/img/bbs/$file_id\"><img src=\"/img/bbs/$file_id.png\" class=\"smn\" /><span class=\"block cnt\">[$imagesize KB]</span></a>\n";
-					} else {
-						$img = "<a href=\"/img/bbs/$file_id\"><span class=\"block cnt\">[サムネイルがありません]<br />\n[$imagesize KB]</span></a>\n";
-					}
-				} else {
-					$img = "<span class=\"error block cnt\">[画像が存在しません]</span>\n";
-				}
-			} else {
-				$img = "";
-			}
-?>
-<hr class="normal">
-<p>
-[<?=$this->tmid?>] By <?=htmlspecialchars($this->name)?><br />
-<?=$img?>
-<?=$this->textConvert($this->comment)?><br />
-<?=$this->ts?><br />
-[<?=$reply?>] [<?=$modify?>]
-</p>
-<?php
-		} else {
-?>
-<hr class="normal">
-<p>
-[<?=$this->tmid?>] 削除済
-</p>
-<?php
-		}
-	}
-
-	//--------------------------
-	// 検索メッセージ出力
-	//--------------------------
-	public function printSearchedMessage() {
 		$limit = Message::$imgsize;
-		$thread_link = "<a href=\"./read.php?id={$this->board->sname}&tid={$this->thread->tid}\">{$this->thread->title}</a>";
-		$reply = ($this->thread->mcount > 999 || $this->thread->locked) ? "返信" : "<a href=\"./form.php?mode=reform&id={$this->board->sname}&tid={$this->thread->tid}&re={$this->tmid}\">返信</a>";
-		$modify = ($this->thread->mcount > 999 || $this->thread->locked) ? "編集" : "<a href=\"./form.php?mode=modify&id={$this->board->sname}&tid={$this->thread->tid}&tmid={$this->tmid}\">編集</a>";
+		$thread_link = ($this->mode == 1) ? "[<a href=\"./read.php?id={$this->board->name}&tid={$this->thread->tid}\">{$this->thread->title}</a>]<br />" : "";
+		$reply = ($this->thread->message_cnt > 999 || $this->thread->locked) ? "返信" : "<a href=\"./form.php?mode=reform&id={$this->board->name}&tid={$this->thread->tid}&re={$this->tmid}\">返信</a>";
+		$modify = ($this->thread->message_cnt > 999 || $this->thread->locked) ? "編集" : "<a href=\"./form.php?mode=modify&id={$this->board->name}&tid={$this->thread->tid}&tmid={$this->tmid}\">編集</a>";
+		$updinfo = ($this->update_cnt > 0) ? "最終更新:{$this->update_ts}({$this->update_cnt}回更新)<br />" : "";
 		if($this->image != "") {
-			$file_id = "{$this->board->sname}-{$this->thread->tid}-{$this->tmid}-{$this->image}";
+			$file_id = "{$this->board->name}-{$this->thread->tid}-{$this->tmid}-{$this->image}";
 			if(file_exists("/var/www/img/bbs/$file_id")) {
 				$imageinfo = @getimagesize("/var/www/img/bbs/$file_id");
 				$imagesize = ceil(filesize("/var/www/img/bbs/$file_id") / 1024);
@@ -112,7 +70,7 @@ class Message {
 					$img = "<a href=\"/img/bbs/$file_id\"><span class=\"block cnt\">[サムネイルがありません]<br />\n[$imagesize KB]</span></a>\n";
 				}
 			} else {
-					$img = "<span class=\"error block cnt\">[画像が存在しません]</span>\n";
+				$img = "<span class=\"error block cnt\">[画像が存在しません]</span>\n";
 			}
 		} else {
 			$img = "";
@@ -120,14 +78,23 @@ class Message {
 ?>
 <hr class="normal">
 <p>
-[<?=$thread_link?>]<br />
+<?=$thread_link?>
 [<?=$this->tmid?>] By <?=htmlspecialchars($this->name)?><br />
 <?=$img?>
 <?=$this->textConvert($this->comment)?><br />
-<?=$this->ts?><br />
+<?=$this->update_ts?><br />
+<?=$updinfo?>
 [<?=$reply?>] [<?=$modify?>]
 </p>
 <?php
+	}
+
+	//--------------------------
+	// 検索メッセージ出力
+	//--------------------------
+	public function printSearchedMessage() {
+		$this->mode = 1;
+		$this->printMessage();
 	}
 
 	//--------------------------
@@ -162,7 +129,7 @@ class Message {
 			$sql2 = "SELECT 1 FROM `thread` WHERE `bid`='{$this->board->bid}' AND `tid`='{$matches[4]}' AND `pastlog`=FALSE";
 			$sql = "SELECT ($sql1) AND ($sql2) AS `bool`";
 			if($this->mysql->query($sql)->fetch_object()->bool) {
-				return("<a href=\"./read.php?id=".$this->board->sname."&tid={$matches[4]}&tmid={$matches[5]}\">".htmlspecialchars($matches[3])."</a>");
+				return("<a href=\"./read.php?id=".$this->board->name."&tid={$matches[4]}&tmid={$matches[5]}\">".htmlspecialchars($matches[3])."</a>");
 			} else {
 				return(htmlspecialchars($matches[3]));
 			}
@@ -171,7 +138,7 @@ class Message {
 			$sql2 = "SELECT 1 FROM `thread` WHERE `bid`='{$this->board->bid}' AND `tid`='{$matches[7]}' AND `pastlog`=FALSE";
 			$sql = "SELECT ($sql1) AND ($sql2) AS `bool`";
 			if($this->mysql->query($sql)->fetch_object()->bool) {
-				return("<a href=\"./read.php?id=".$this->board->sname."&tid={$matches[7]}\">".htmlspecialchars($matches[6])."</a>");
+				return("<a href=\"./read.php?id=".$this->board->name."&tid={$matches[7]}\">".htmlspecialchars($matches[6])."</a>");
 			} else {
 				return(htmlspecialchars($matches[6]));
 			}
@@ -180,7 +147,7 @@ class Message {
 			$sql2 = "SELECT 1 FROM `thread` WHERE `bid`='{$this->board->bid}' AND `tid`='{$this->thread->tid}' AND `pastlog`=FALSE";
 			$sql = "SELECT ($sql1) AND ($sql2) AS `bool`";
 			if($this->mysql->query($sql)->fetch_object()->bool) {
-				return("<a href=\"./read.php?id={$this->board->sname}&tid={$this->thread->tid}&tmid={$matches[9]}\">".htmlspecialchars($matches[8])."</a>");
+				return("<a href=\"./read.php?id={$this->board->name}&tid={$this->thread->tid}&tmid={$matches[9]}\">".htmlspecialchars($matches[8])."</a>");
 			} else {
 				return(htmlspecialchars($matches[8]));
 			}
