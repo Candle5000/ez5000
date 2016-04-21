@@ -37,11 +37,11 @@ class Message {
 		$this->post_ts = $array["post_ts"];
 		$this->update_ts = $array["update_ts"];
 		$this->update_cnt = $array["update_cnt"];
-		$this->ip = $array["ip"];
-		$this->hostname = $array["hostname"];
-		$this->ua = $array["ua"];
-		$this->uid = $array["uid"];
-		$this->user_id = $array["user_id"];
+		$this->ip = isset($array["ip"]) ? $array["ip"] : "";
+		$this->hostname = isset($array["hostname"]) ? $array["hostname"] : "";
+		$this->ua = isset($array["ua"]) ? $array["ua"] : "";
+		$this->uid = isset($array["uid"]) ? $array["uid"] : "";
+		$this->user_id = isset($array["user_id"]) ? $array["user_id"] : "";
 		$this->mode = 0;
 		$this->mysql = $mysql_temp;
 		$this->board = $board_temp;
@@ -52,7 +52,6 @@ class Message {
 	// メッセージ出力
 	//--------------------------
 	public function printMessage() {
-		$limit = Message::$imgsize;
 		$thread_link = ($this->mode == 1) ? "[<a href=\"./read.php?id={$this->board->name}&tid={$this->thread->tid}\">{$this->thread->title}</a>]<br />" : "";
 		$reply = ($this->thread->message_cnt > 999 || $this->thread->locked) ? "返信" : "<a href=\"./form.php?mode=reform&id={$this->board->name}&tid={$this->thread->tid}&re={$this->tmid}\">返信</a>";
 		$modify = ($this->thread->message_cnt > 999 || $this->thread->locked) ? "編集" : "<a href=\"./form.php?mode=modify&id={$this->board->name}&tid={$this->thread->tid}&tmid={$this->tmid}\">編集</a>";
@@ -125,8 +124,8 @@ class Message {
 		if($matches[1] != "") {
 			return("<a href=\"{$matches[1]}\" target=\"blank\">".htmlspecialchars($matches[2])."</a>");
 		} else if($matches[3] != "") {
-			$sql1 = "SELECT 1 FROM `message` WHERE `bid`='{$this->board->bid}' AND `tid`='{$matches[4]}' AND `tmid`='{$matches[5]}' AND `deleted`=FALSE";
-			$sql2 = "SELECT 1 FROM `thread` WHERE `bid`='{$this->board->bid}' AND `tid`='{$matches[4]}' AND `pastlog`=FALSE";
+			$sql1 = "SELECT 1 FROM `message` WHERE `bid`='{$this->board->bid}' AND `tid`='{$matches[4]}' AND `tmid`='{$matches[5]}'";
+			$sql2 = "SELECT 1 FROM `thread` WHERE `bid`='{$this->board->bid}' AND `tid`='{$matches[4]}'";
 			$sql = "SELECT ($sql1) AND ($sql2) AS `bool`";
 			if($this->mysql->query($sql)->fetch_object()->bool) {
 				return("<a href=\"./read.php?id=".$this->board->name."&tid={$matches[4]}&tmid={$matches[5]}\">".htmlspecialchars($matches[3])."</a>");
@@ -134,8 +133,8 @@ class Message {
 				return(htmlspecialchars($matches[3]));
 			}
 		} else if($matches[6] != "") {
-			$sql1 = "SELECT 1 FROM `message` WHERE `bid`='{$this->board->bid}' AND `tid`='{$matches[7]}' AND `tmid`='1' AND `deleted`=FALSE";
-			$sql2 = "SELECT 1 FROM `thread` WHERE `bid`='{$this->board->bid}' AND `tid`='{$matches[7]}' AND `pastlog`=FALSE";
+			$sql1 = "SELECT 1 FROM `message` WHERE `bid`='{$this->board->bid}' AND `tid`='{$matches[7]}' AND `tmid`='1'";
+			$sql2 = "SELECT 1 FROM `thread` WHERE `bid`='{$this->board->bid}' AND `tid`='{$matches[7]}'";
 			$sql = "SELECT ($sql1) AND ($sql2) AS `bool`";
 			if($this->mysql->query($sql)->fetch_object()->bool) {
 				return("<a href=\"./read.php?id=".$this->board->name."&tid={$matches[7]}\">".htmlspecialchars($matches[6])."</a>");
@@ -143,8 +142,8 @@ class Message {
 				return(htmlspecialchars($matches[6]));
 			}
 		} else if($matches[8] != "") {
-			$sql1 = "SELECT 1 FROM `message` WHERE `bid`='{$this->board->bid}' AND `tid`='{$this->thread->tid}' AND `tmid`='{$matches[9]}' AND `deleted`=FALSE";
-			$sql2 = "SELECT 1 FROM `thread` WHERE `bid`='{$this->board->bid}' AND `tid`='{$this->thread->tid}' AND `pastlog`=FALSE";
+			$sql1 = "SELECT 1 FROM `message` WHERE `bid`='{$this->board->bid}' AND `tid`='{$this->thread->tid}' AND `tmid`='{$matches[9]}'";
+			$sql2 = "SELECT 1 FROM `thread` WHERE `bid`='{$this->board->bid}' AND `tid`='{$this->thread->tid}'";
 			$sql = "SELECT ($sql1) AND ($sql2) AS `bool`";
 			if($this->mysql->query($sql)->fetch_object()->bool) {
 				return("<a href=\"./read.php?id={$this->board->name}&tid={$this->thread->tid}&tmid={$matches[9]}\">".htmlspecialchars($matches[8])."</a>");
