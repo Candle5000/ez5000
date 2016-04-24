@@ -81,7 +81,7 @@ class Message {
 [<?=$this->tmid?>] By <?=htmlspecialchars($this->name)?><br />
 <?=$img?>
 <?=$this->textConvert($this->comment)?><br />
-<?=$this->update_ts?><br />
+<?=$this->post_ts?><br />
 <?=$updinfo?>
 [<?=$reply?>] [<?=$modify?>]
 </p>
