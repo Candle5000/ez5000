@@ -52,7 +52,7 @@ while($array = $result->fetch_array()) {
 	$accesskey = ($ak < 10) ? mbi_ack($ak) : "";
 	$aklabel = ($ak < 10) ? mbi($ak.'.') : "";
 ?>
-<li><a href="./bbs/?id=<?=$board->sname?>"<?=$accesskey?>><?=$aklabel.$board->name?></a></li>
+<li><a href="./bbs/?id=<?=$board->name?>"<?=$accesskey?>><?=$aklabel.$board->title?></a></li>
 <?php
 }
 ?>

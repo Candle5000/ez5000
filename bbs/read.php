@@ -43,18 +43,21 @@ $mysql = new MySQL($userName, $password, $database);
 if($mysql->connect_error) die("データベースの接続に失敗しました");
 
 // 掲示板情報を取得
-$sql = "SELECT * FROM `board` WHERE `sname`='$id'";
+$sql = "SELECT * FROM `board` WHERE `name`='$id'";
 $result = $mysql->query($sql);
 if(!$result->num_rows) die("ERROR06:存在しないIDです");
 $board = new Board($result->fetch_array());
-$title = htmlspecialchars($board->name);
+$title = htmlspecialchars($board->title);
 
 // スレッド情報を取得
 if(!isset($_GET["tmid"]) && !isset($_GET["view"]) && !isset($_GET["page"])) {
-	$sql = "UPDATE `thread` SET `acount`=`acount`+1 WHERE `bid`='{$board->bid}' AND `tid`='$tid' AND (SELECT '1' FROM `message` WHERE `bid`='{$board->bid}' AND `tid`='$tid' AND `tmid`='1' AND `deleted`=FALSE)='1'";
+	$sql = "UPDATE `thread` SET `access_cnt`=`access_cnt`+1 WHERE `bid`='{$board->bid}' AND `tid`='$tid'";
 	$mysql->query($sql);
 }
-$sql = "SELECT `thread`.`tid`,`title`,`tindex`,`acount`,COUNT(1) AS `mcount`,`updated`,`locked`,`top`,`pastlog` FROM `thread` NATURAL JOIN `message` WHERE `bid`='{$board->bid}' AND `tid`='$tid' AND `pastlog`=FALSE AND `deleted`=FALSE AND (SELECT '1' FROM `message` WHERE `bid`='{$board->bid}' AND `tid`='$tid' AND `tmid`='1' AND `deleted`=FALSE)='1' GROUP BY `tid`";
+$sql = "SELECT `T`.`tid`,`subject`,`tindex`,`access_cnt`,COUNT(1) AS `message_cnt`,`update_ts`,`locked`,`top`,`next_tmid`";
+$sql .= " FROM (SELECT * FROM `thread` WHERE `bid`='{$board->bid}' AND `tid`='$tid') AS `T`";
+$sql .= " JOIN (SELECT tid FROM `message` WHERE `bid`='{$board->bid}' AND `tid`='$tid') AS `M`";
+$sql .= " ON `T`.`tid`=`M`.`tid` GROUP BY `tid`";
 $result = $mysql->query($sql);
 if($mysql->error) die("ERROR07:存在しないIDです");
 if(!$result->num_rows) die("ERROR08:存在しないIDです");
@@ -67,7 +70,8 @@ if(!isset($tmid)) {
 
 	// メッセージ情報(1)を取得 ページ0のときのみ
 	if($page == 0 && !isset($_GET["view"])) {
-		$sql = "SELECT * FROM `message` WHERE `bid`='{$board->bid}' AND `tid`='$tid' AND `tmid`='1' AND `deleted`=FALSE";
+		$sql = "SELECT `mid`,`tmid`,`name`,`comment`,`image`,`post_ts`,`update_ts`,`update_cnt`";
+		$sql .= " FROM `message` WHERE `bid`='{$board->bid}' AND `tid`='$tid' AND `tmid`='1'";
 		$result = $mysql->query($sql);
 		if($mysql->error) die("ERROR11:存在しないIDです");
 		if(!$result->num_rows) die("ERROR12:存在しないIDです");
@@ -76,22 +80,26 @@ if(!isset($tmid)) {
 
 	// メッセージ情報を取得
 	if($page == 0 && !isset($_GET["view"])) {
-		$sql = "SELECT * FROM `message` WHERE `bid`='{$board->bid}' AND `tid`='$tid' AND `tmid`>'1' AND `deleted`=FALSE ORDER BY `tmid` DESC LIMIT 0,$LIMIT";
+		$sql = "SELECT `mid`,`tmid`,`name`,`comment`,`image`,`post_ts`,`update_ts`,`update_cnt`";
+		$sql .= " FROM `message` WHERE `bid`='{$board->bid}' AND `tid`='$tid' AND `tmid`>'1'";
+		$sql .= " ORDER BY `tmid` DESC LIMIT 0,$LIMIT";
 	} else {
 		$order = (isset($_GET["view"]) && $_GET["view"] == "asc") ? "ASC" : "DESC";
-		$sql = "SELECT * FROM `message` WHERE `bid`='{$board->bid}' AND `tid`='$tid' AND `deleted`=FALSE ORDER BY `tmid` $order LIMIT ".($page * $LIMIT).",$LIMIT";
+		$sql = "SELECT `mid`,`tmid`,`name`,`comment`,`image`,`post_ts`,`update_ts`,`update_cnt`";
+		$sql .= " FROM `message` WHERE `bid`='{$board->bid}' AND `tid`='$tid'";
+		$sql .= " ORDER BY `tmid` $order LIMIT ".($page * $LIMIT).",$LIMIT";
 	}
 	$result = $mysql->query($sql);
 	if($mysql->error) die("ERROR13:存在しないIDです");
 
 	// ページ切り替えリンク生成
 	$view = isset($_GET["view"]) ? ($_GET["view"] == "asc") ? "&view=asc" : "&view=desc" : "";
-	if(($page > 0) && ($thread->mcount > 0)) {
+	if(($page > 0) && ($thread->message_cnt > 0)) {
 		$pagelink = "<a href=\"./read.php?id=$id&tid=$tid$view&page=".($page - 1)."\"".mbi_ack("*").">".mbi("*.")."前のページ</a> | ";
 	} else {
 		$pagelink = mbi("*.")."前のページ | ";
 	}
-	if((($page + 1) * $LIMIT) < $thread->mcount) {
+	if((($page + 1) * $LIMIT) < $thread->message_cnt) {
 		$pagelink .= "<a href=\"./read.php?id=$id&tid=$tid$view&page=".($page + 1)."\"".mbi_ack("#").">".mbi("#.")."次のページ</a>";
 	} else {
 		$pagelink .= mbi("#.")."次のページ";
@@ -102,7 +110,8 @@ if(!isset($tmid)) {
 	//------------------------------
 
 	// メッセージ情報を取得
-	$sql = "SELECT * FROM `message` WHERE `bid`='{$board->bid}' AND `tid`='$tid' AND `tmid`='$tmid' AND `deleted`=FALSE";
+	$sql = "SELECT `mid`,`tmid`,`name`,`comment`,`image`,`post_ts`,`update_ts`,`update_cnt`";
+	$sql .= " FROM `message` WHERE `bid`='{$board->bid}' AND `tid`='$tid' AND `tmid`='$tmid'";
 	$result = $mysql->query($sql);
 	if($mysql->error) die("ERROR21:存在しないIDです");
 	if(!$result->num_rows) die("ERROR22:メッセージが存在しません");
@@ -116,18 +125,18 @@ if(!isset($tmid)) {
 </head>
 <body>
 <div id="all">
-<h1><?=htmlspecialchars($board->name)?></h1>
+<h1><?=htmlspecialchars($board->title)?></h1>
 <hr class="normal">
-<h2>[<?=$thread->tid?>] <?=htmlspecialchars($thread->title)?></h2>
+<h2>[<?=$thread->tid?>] <?=htmlspecialchars($thread->subject)?></h2>
 <hr class="normal">
 <p>
 <?php
 $reply = mbi("2.")."返信";
-$reply = ($thread->mcount > 999 || $thread->locked) ? "[$reply]" : "[<a href=\"./form.php?mode=reform&id=".$board->sname."&tid=$tid\"".mbi_ack(2).">$reply</a>]";
-$search = "[<a href=\"./search.php?id={$board->sname}&tid=$tid\">検索</a>]";
+$reply = ($thread->message_cnt > 999 || $thread->locked) ? "[$reply]" : "[<a href=\"./form.php?mode=reform&id=".$board->name."&tid=$tid\"".mbi_ack(2).">$reply</a>]";
+$search = "[<a href=\"./search.php?id={$board->name}&tid=$tid\">検索</a>]";
 if(device_info() == 'mb') $search .= "<br />";
-$old = "[<a href=\"./read.php?id={$board->sname}&tid=$tid&view=asc&page=0\"".mbi_ack(4).">".mbi("4.")."最古</a>]";
-$new = "[<a href=\"./read.php?id={$board->sname}&tid=$tid&view=desc&page=0\"".mbi_ack(6).">".mbi("6.")."最新</a>]";
+$old = "[<a href=\"./read.php?id={$board->name}&tid=$tid&view=asc&page=0\"".mbi_ack(4).">".mbi("4.")."最古</a>]";
+$new = "[<a href=\"./read.php?id={$board->name}&tid=$tid&view=desc&page=0\"".mbi_ack(6).">".mbi("6.")."最新</a>]";
 ?>
 <?=$reply?> <?=$search?> <?=$old?> <?=$new?>
 </p>
@@ -135,12 +144,12 @@ $new = "[<a href=\"./read.php?id={$board->sname}&tid=$tid&view=desc&page=0\"".mb
 <div class="cnt"><?=$pagelink?></div>
 <?php
 if($page == 0 && !isset($_GET["view"]) && !isset($tmid)) {
-	$fmessage->printMessage($mysql, $board, $thread);
+	$fmessage->printMessage();
 }
 
 while($array = $result->fetch_array()) {
 	$message = new Message($array, $mysql, $board, $thread);
-	$message->printMessage($mysql, $board, $thread);
+	$message->printMessage();
 }
 ?>
 <hr class="normal">
@@ -154,7 +163,7 @@ if(!isset($tmid)) {
 <input name="id" type="hidden" value="<?=$id?>">
 <input name="tid" type="hidden" value="<?=$tid?>">
 <?=(isset($_GET["view"]) ? "<input name=\"view\" type=\"hidden\" value=\"{$_GET["view"]}\">\n" : "")?>
-<input name="page" type="text" maxlength="3" value="<?=$page?>" size="4">/<?=(ceil($thread->mcount / $LIMIT) - 1)?>
+<input name="page" type="text" maxlength="3" value="<?=$page?>" size="4">/<?=(ceil($thread->message_cnt / $LIMIT) - 1)?>
 <input type="submit" value="ページへ移動">
 </form>
 <hr class="normal">
@@ -165,15 +174,15 @@ if(!isset($tmid)) {
 <?php
 if(isset($tmid)) {
 ?>
-<li><a href="/bbs/read.php?id=<?=$board->sname?>&tid=<?=$thread->tid?>"<?=mbi_ack(8)?>><?=mbi("8.")?>スレッドに戻る</a></li>
+<li><a href="/bbs/read.php?id=<?=$board->name?>&tid=<?=$thread->tid?>"<?=mbi_ack(8)?>><?=mbi("8.")?>スレッドに戻る</a></li>
 <?php
 }
 ?>
-<li><a href="/bbs/?id=<?=$board->sname?>"<?=mbi_ack(9)?>><?=mbi("9.")?><?=$board->name?></a></li>
+<li><a href="/bbs/?id=<?=$board->name?>"<?=mbi_ack(9)?>><?=mbi("9.")?><?=$board->title?></a></li>
 <li><a href="/"<?=mbi_ack(0)?>><?=mbi("0.")?>トップページ</a></li>
 </ul>
 <?php
-pagefoot($thread->acount);
+pagefoot($thread->access_cnt);
 ?>
 </div>
 </body>

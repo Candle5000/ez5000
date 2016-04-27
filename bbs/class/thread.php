@@ -8,28 +8,30 @@ class Thread {
 	// 変数の宣言
 	//--------------------------
 	public $tid;
-	public $title;
+	public $subject;
 	public $tindex;
 	public $readpass;
 	public $writepass;
-	public $acount;
-	public $mcount;
-	public $updated;
+	public $access_cnt;
+	public $message_cnt;
+	public $update_ts;
 	public $locked;
 	public $top;
+	public $next_tmid;
 
 	//--------------------------
 	// コンストラクタ
 	//--------------------------
 	function Thread($array) {
 		$this->tid = $array["tid"];
-		$this->title = $array["title"];
+		$this->subject = $array["subject"];
 		$this->tindex = $array["tindex"];
-		$this->acount = $array["acount"];
-		$this->mcount = $array["mcount"];
-		$this->updated = $array["updated"];
+		$this->access_cnt = $array["access_cnt"];
+		$this->message_cnt = $array["message_cnt"];
+		$this->update_ts = $array["update_ts"];
 		$this->locked = $array["locked"];
 		$this->top = $array["top"];
+		$this->next_tmid = $array["next_tmid"];
 	}
 }
 ?>

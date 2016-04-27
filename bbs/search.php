@@ -31,7 +31,7 @@ $tid = (isset($_GET["tid"]) && is_numeric($_GET["tid"])) ? $_GET["tid"] : 0;
 if(!preg_match("/^[0-9]{1,9}$/", $tid)) die("ERROR03:無効なIDです");
 
 // 掲示板情報を取得
-$sql = "SELECT * FROM `board` WHERE `sname`='$id'";
+$sql = "SELECT * FROM `board` WHERE `name`='$id'";
 $result = $mysql->query($sql);
 if(!$result->num_rows) die("ERROR11:存在しないIDです");
 $board = new Board($result->fetch_array());
@@ -39,7 +39,10 @@ $title = $board->name;
 
 // スレッド情報を取得
 if($tid > 0) {
-	$sql = "SELECT `thread`.`tid`,`title`,`tindex`,`acount`,COUNT(1) AS `mcount`,`updated`,`locked`,`top`,`pastlog` FROM `thread` NATURAL JOIN `message` WHERE `bid`='{$board->bid}' AND `tid`='$tid' AND `pastlog`=FALSE AND `deleted`=FALSE AND (SELECT '1' FROM `message` WHERE `bid`='{$board->bid}' AND `tid`='$tid' AND `tmid`='1' AND `deleted`=FALSE)='1' GROUP BY `tid`";
+	$sql = "SELECT `T`.`tid`,`subject`,`tindex`,`access_cnt`,COUNT(1) AS `message_cnt`,`update_ts`,`locked`,`top`,`next_tmid`";
+	$sql .= " FROM (SELECT * FROM `thread` WHERE `bid`='{$board->bid}' AND `tid`='$tid') AS `T`";
+	$sql .= " JOIN (SELECT tid FROM `message` WHERE `bid`='{$board->bid}' AND `tid`='$tid') AS `M`";
+	$sql .= " ON `T`.`tid`=`M`.`tid` GROUP BY `tid`";
 	$result = $mysql->query($sql);
 	if(!$result->num_rows) die("ERROR12:存在しないIDです");
 	$thread = new Thread($result->fetch_array());
@@ -96,21 +99,30 @@ if(device_info() == "mb" && isset($words) && isset($_POST["enc"]) && !is_array($
 	}
 }
 
+$selected = array("comment" => "", "title" => "", "name" => "");
+
 // 検索
 if(isset($words)) {
 	$table = ($tid > 0) ? "`message`" : "`message` INNER JOIN `thread` ON `message`.`bid`=`thread`.`bid` AND `message`.`tid`=`thread`.`tid`";
 	switch($target) {
 		case 'comment':
 			$target = "`comment`";
+			$target_l = "comment";
+			$selected["comment"] = " selected";
 			break;
 		case 'title':
-			$target = ($tid > 0) ? "CONCAT(`comment`,' ',`name`)" : "`title`";
+			$target = ($tid > 0) ? "CONCAT(`comment`,' ',`name`)" : "`subject`";
+			$target_l = "title";
+			$selected["title"] = " selected";
 			break;
 		case 'name':
 			$target = "`name`";
+			$target_l = "name";
+			$selected["name"] = " selected";
 			break;
 		default:
-			$target = ($tid > 0) ? "CONCAT(`comment`,' ',`name`)" : "CONCAT(`comment`,' ',`title`,' ',`name`)";
+			$target = ($tid > 0) ? "CONCAT(`comment`,' ',`name`)" : "CONCAT(`comment`,' ',`subject`,' ',`name`)";
+			$target_l = "";
 			break;
 	}
 	$input = preg_replace("/~/", "～", mb_convert_kana($words,"asKV"));
@@ -125,15 +137,17 @@ if(isset($words)) {
 	if(count($like_list) > 0) {
 		$column = "";
 		$where = implode(" $mode ", $like_list);
-		$where_add = ($tid > 0) ? "`bid`='{$board->bid}' AND `tid`='$tid'" : "`thread`.`bid`='{$board->bid}' AND `pastlog`=FALSE";
-		$where_add .= " AND `deleted`=FALSE";
+		$where_add = ($tid > 0) ? "`bid`='{$board->bid}' AND `tid`='$tid'" : "`thread`.`bid`='{$board->bid}'";
 		$sql = "SELECT SQL_CALC_FOUND_ROWS * FROM $table WHERE ($where) AND $where_add ORDER BY `mid` DESC LIMIT $start,10";
 		$result = $mysql->query($sql);
 		$sql = "SELECT FOUND_ROWS() AS `count`";
 		$count = $mysql->query($sql)->fetch_object()->count;
 		while($array = $result->fetch_array()) {
 			if($tid == 0) {
-				$sql = "SELECT `thread`.`tid`,`title`,`tindex`,`acount`,COUNT(1) AS `mcount`,`updated`,`locked`,`top`,`pastlog` FROM `thread` NATURAL JOIN `message` WHERE `bid`='{$board->bid}' AND `tid`='{$array["tid"]}' AND `pastlog`=FALSE AND `deleted`=FALSE AND (SELECT '1' FROM `message` WHERE `bid`='{$board->bid}' AND `tid`='{$array["tid"]}' AND `tmid`='1' AND `deleted`=FALSE)='1' GROUP BY `tid`";
+				$sql = "SELECT `T`.`tid`,`subject`,`tindex`,`access_cnt`,COUNT(1) AS `message_cnt`,`update_ts`,`locked`,`top`,`next_tmid`";
+				$sql .= " FROM (SELECT * FROM `thread` WHERE `bid`='{$board->bid}' AND `tid`='{$array["tid"]}') AS `T`";
+				$sql .= " JOIN (SELECT tid FROM `message` WHERE `bid`='{$board->bid}' AND `tid`='{$array["tid"]}') AS `M`";
+				$sql .= " ON `T`.`tid`=`M`.`tid` GROUP BY `tid`";
 				$thread = new Thread($mysql->query($sql)->fetch_array());
 			}
 			$message_list[] = new Message($array, $mysql, $board, $thread);
@@ -145,7 +159,7 @@ if(isset($words)) {
 	// ページリンク
 	$link = "./search.php?id=$id";
 	if($tid > 0) $link .= "&tid=$tid";
-	$link .= "&words=".urlencode($words)."&mode=$mode&target=$target";
+	$link .= "&words=".urlencode($words)."&mode=$mode&target=$target_l";
 	if(($page > 0) && ($count > 0)) {
 		$pagelink = "<a href=\"$link&page=".($page - 1)."\"".mbi_ack("*").">".mbi("*.")."前のページ</a> | ";
 	} else {
@@ -160,11 +174,11 @@ if(isset($words)) {
 ?>
 <html>
 <head>
-<?=pagehead($board->name)?>
+<?=pagehead($board->title)?>
 </head>
 <body>
 <div id="all">
-<h1><?=$board->name?></h1>
+<h1><?=$board->title?></h1>
 <hr class="normal">
 <h2>メッセージ検索</h2>
 <hr class="normal">
@@ -190,15 +204,15 @@ if($tid > 0) {
 <label><input type="radio" name="mode" <?=form_radio_checked("OR", $mode)?>>OR</label>
 <label>対象:<select name="target">
 <option value="all">すべて</option>
-<option value="comment">本文</option>
+<option value="comment"<?=$selected["comment"]?>>本文</option>
 <?php
 if($tid == 0) {
 ?>
-<option value="title">タイトル</option>
+<option value="title"<?=$selected["title"]?>>タイトル</option>
 <?php
 }
 ?>
-<option value="name">投稿者</option>
+<option value="name"<?=$selected["name"]?>>投稿者</option>
 </select></label>
 <input type="hidden" name="page" value="0">
 <?php
@@ -250,7 +264,7 @@ if($tid > 0) {
 <?php
 }
 ?>
-<li><a href="/bbs/?id=<?=$board->sname?>"<?=mbi_ack(8)?>><?=mbi("8.").$board->name?></a></li>
+<li><a href="/bbs/?id=<?=$board->name?>"<?=mbi_ack(8)?>><?=mbi("8.").$board->title?></a></li>
 <li><a href="/"<?=mbi_ack(0)?>><?=mbi("0.")?>トップページ</a></li>
 </ul>
 <?php
