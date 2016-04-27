@@ -387,6 +387,13 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 							}
 							$sql = "DELETE FROM `message` WHERE `bid`='{$board->bid}' AND `tid`='$tid' AND `tmid`='$tmid'";
 							$mysql->query($sql);
+							$sql = "UPDATE `thread` AS `T`,";
+							$sql .= " (SELECT MAX(`post_ts`) AS `pts`, MAX(`mid`) AS `tindex`";
+							$sql .= " FROM `message` WHERE `bid`='{$board->bid}' AND `tid`='$tid') AS `M`";
+							$sql .= " SET `T`.`update_ts`=`M`.`pts`,";
+							$sql .= " `T`.`tindex`=`M`.`tindex`";
+							$sql .= " WHERE `bid`='{$board->bid}' AND `tid`='$tid'";
+							$mysql->query($sql);
 							if($mysql->error) {
 								$mysql->rollback();
 								die("ERROR228:クエリ処理に失敗しました");
