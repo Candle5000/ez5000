@@ -29,23 +29,28 @@ $mysql = new MySQL($userName, $password, $database);
 if($mysql->connect_error) die("データベースの接続に失敗しました");
 
 // 掲示板情報を取得
-$sql = "UPDATE `board` SET `count`=`count`+1 WHERE `sname`='$id'";
+$sql = "UPDATE `board` SET `access_cnt`=`access_cnt`+1 WHERE `name`='$id'";
 $mysql->query($sql);
-$sql = "SELECT * FROM `board` WHERE `sname`='$id'";
+$sql = "SELECT * FROM `board` WHERE `name`='$id'";
 $result = $mysql->query($sql);
 if(!$result->num_rows) die("ERROR03:存在しないIDです");
 $board = new Board($result->fetch_array());
-$title = $board->name;
+$title = $board->title;
 
 // スレッド数を取得
-$sql = "SELECT COUNT(1) AS `count` FROM `thread` NATURAL JOIN `message` WHERE `bid`='{$board->bid}' AND `pastlog`=FALSE AND `tmid`='1' AND `deleted`=FALSE";
+$sql = "SELECT COUNT(1) AS `count` FROM `thread` WHERE `bid`='{$board->bid}'";
 $result = $mysql->query($sql);
 if($mysql->error) die("ERROR04:存在しないIDです");
 $array = $result->fetch_array();
 $rows = $array["count"];
 
 // スレッド一覧を取得
-$sql = "SELECT `thread`.`tid`,`title`,`tindex`,`acount`,COUNT(1) AS `mcount`,`updated`,`locked`,`top` FROM `thread` NATURAL JOIN `message` WHERE `bid`='{$board->bid}' AND `deleted`=FALSE GROUP BY `tid` ORDER BY `top` DESC, `tindex` DESC LIMIT ".($page * $LIMIT).",$LIMIT";
+$sql = "SELECT `T`.`tid`,`subject`,`tindex`,`access_cnt`,COUNT(1) AS `message_cnt`,`update_ts`,`locked`,`top`,`next_tmid`";
+$sql .= " FROM (SELECT * FROM `thread` WHERE `bid`='{$board->bid}') AS `T`";
+$sql .= " JOIN (SELECT tid FROM `message` WHERE `bid`='{$board->bid}') AS `M`";
+$sql .= " ON `T`.`tid`=`M`.`tid`";
+$sql .= " GROUP BY `tid` ORDER BY `T`.`top` DESC,`tindex` DESC";
+$sql .= " LIMIT ".($page * $LIMIT).",$LIMIT";
 $result = $mysql->query($sql);
 if($mysql->error) die("ERROR05:存在しないIDです");
 
@@ -68,10 +73,10 @@ if((($page + 1) * $LIMIT) < $rows) {
 </head>
 <body>
 <div id="all">
-<h1><?=$board->name?></h1>
+<h1><?=$board->title?></h1>
 <hr class="normal">
 <p>
-[<a href="./form.php?mode=thform&id=<?=$board->sname?>"<?=mbi_ack(8)?>><?=mbi("8.")?>新規スレ</a>] [<a href="./search.php?id=<?=$board->sname?>"<?=mbi_ack(4)?>><?=mbi("4.")?>検索</a>]
+[<a href="./form.php?mode=thform&id=<?=$board->name?>"<?=mbi_ack(8)?>><?=mbi("8.")?>新規スレ</a>] [<a href="./search.php?id=<?=$board->name?>"<?=mbi_ack(4)?>><?=mbi("4.")?>検索</a>]
 </p>
 <hr class="normal">
 <div id="pagelink"><?=$pagelink?></div>
@@ -82,7 +87,7 @@ if($result->num_rows) {
 	$date = date("Y-m-d H:i:s", strtotime("-2 day"));
 	while($array = $result->fetch_array()) {
 		$thread = new Thread($array);
-		$new = (strtotime($date) < strtotime($thread->updated)) ? "<span class=\"nc6\">New</span>" : "";
+		$new = (strtotime($date) < strtotime($thread->update_ts)) ? "<span class=\"nc6\">New</span>" : "";
 		if($thread->locked) {
 			$marker = "※";
 		} else if($thread->top) {
@@ -91,7 +96,7 @@ if($result->num_rows) {
 			$marker = "▽";
 		}
 ?>
-<li><span class="nc5"><?=$marker?></span><a href="./read.php?id=<?=$board->sname?>&tid=<?=$thread->tid?>"><?=htmlspecialchars($thread->title)."(".$thread->mcount.")"?></a><?=$new?></li>
+<li><span class="nc5"><?=$marker?></span><a href="./read.php?id=<?=$board->name?>&tid=<?=$thread->tid?>"><?=htmlspecialchars($thread->subject)."(".$thread->message_cnt.")"?></a><?=$new?></li>
 <?php
 	}
 } else {
@@ -108,7 +113,7 @@ if($result->num_rows) {
 <li><a href="/"<?=mbi_ack(0)?>><?=mbi("0.")?>トップページ</a></li>
 </ul>
 <?php
-pagefoot($board->count);
+pagefoot($board->access_cnt);
 ?>
 </div>
 </body>
