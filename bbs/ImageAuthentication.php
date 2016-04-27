@@ -17,7 +17,10 @@ session_start();
  */
   //$font_Text = 'あいうえおかきくけこさしすせとたちつてとなにぬねのはひふへほまみむめもやゆよわん';
   //$font_Text = 'あいうえおかきくけこさしすせとたちつてとなにぬねのはひふへほまみむめもやゆよわんABCDEFGHIJKLMNOPQRSTUVWXYZGabcdefghijklmnopqrstuvwxyz';
-  $font_Text = 'あいうえおかきくけこさしすせとたちつてとなにぬねのはひふへほまみむめもやゆよわをんがぎぐげござじずぜぞだぢづでどばびぶべぼぱぴぷぺぽ';
+  $font_Text = 'あいうえおかきくけこさしすせとたちつてとなにぬねのはひふへほまみむめもやゆよわをん';
+  $font_Text .= 'あいうえおかきくけこさしすせとたちつてとなにぬねのはひふへほまみむめもやゆよわをん';
+  $font_Text .= 'あいうえおがぎぐげござじずぜぞだぢづでどなにぬねのばびぶべぼまみむめもやゆよわをん';
+  $font_Text .= 'あいうえおがぎぐげござじずぜぞだぢづでどなにぬねのぱぴぷぺぽまみむめもやゆよわをん';
   //$font_Text = 'ABCDEFGHIJKLMNOPQRSTUVWXYZGabcdefghijklmnopqrstuvwxyz0123456789';
 
 /*
