@@ -301,7 +301,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 					die("ERROR205:クエリ処理に失敗しました");
 				}
 				$array = $result_obj->fetch_array();
-				$archive_tid = $array["archive_tid"]
+				$archive_tid = $array["archive_tid"];
 
 				// 過去ログ移動処理
 				if($archive_tid != "0") {
@@ -345,7 +345,11 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 				break;
 
 			case 1: // 返信投稿
+
+				// トランザクションの開始
 				$mysql->begin_transaction(MYSQLI_TRANS_START_READ_WRITE);
+
+				// 次のメッセージIDを取得
 				$sql = "SELECT `next_mid`, `next_tmid` FROM `thread` AS `T` JOIN `board` AS `B`";
 				$sql .= " ON `T`.`bid`=`B`.`bid` WHERE `tid`='{$thread->tid}'";
 				$result_obj = $mysql->query($sql);
@@ -356,6 +360,8 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 				$array = $result_obj->fetch_array();
 				$next_mid = $array["next_mid"];
 				$next_tmid = $array["next_tmid"];
+
+				// 新規メッセージを登録
 				$sql = "INSERT INTO `message` (`mid`, `bid`, `tid`, `tmid`, `name`,";
 				$sql .= " `comment`, `image`, `password`, `post_ts`, `ip`, `ua`, `uid`)";
 				$sql .= " VALUES ('$next_mid', '{$board->bid}', '{$thread->tid}', '$next_tmid',";
@@ -366,6 +372,8 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 					$mysql->rollback();
 					die("ERROR212:クエリ処理に失敗しました");
 				}
+
+				// スレッドを上げない/上げる
 				if($sage) {
 					$sql = "UPDATE `thread` SET `next_tmid`=`next_tmid`+1, `update_ts`=NOW() WHERE `bid`='{$board->bid}' AND `tid`='$tid'";
 				} else {
@@ -376,13 +384,17 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 					$mysql->rollback();
 					die("ERROR213:クエリ処理に失敗しました");
 				}
-				$sql = "UPDATE `board` SET `next_tid`=`next_tid`+1, `next_mid`=`next_mid`+1";
+
+				// 次のメッセージIDを更新
+				$sql = "UPDATE `board` SET `next_mid`=`next_mid`+1";
 				$sql .= " WHERE `bid`='{$board->bid}'";
 				$mysql->query($sql);
 				if($mysql->error) {
 					$mysql->rollback();
 					die("ERROR214:クエリ処理に失敗しました");
 				}
+
+				// トランザクションのコミット
 				$mysql->commit();
 				$tmid = $next_tmid;
 				if($name_a[0] != $board->default_name) setcookie("bbs_name", $name_a[0], time() + 604800);
