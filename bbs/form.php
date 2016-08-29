@@ -305,7 +305,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 
 				// 過去ログ移動処理
 				if($archive_tid != "0") {
-					$sql = "INSERT INTO `thread_pastlog`";
+					$sql = "INSERT INTO `thread_archive`";
 					$sql .= " SELECT `bid`, `tid`, `subject`, `tindex`, `readpass`, `writepass`, `access_cnt`, `next_tmid`, `update_ts`, `locked`, `top`";
 					$sql .= " FROM `thread` WHERE `bid`='{$board->bid}' AND `tid`='$archive_tid'";
 					$mysql->query($sql);
@@ -313,7 +313,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 						$mysql->rollback();
 						die("ERROR206:クエリ処理に失敗しました");
 					}
-					$sql = "INSERT INTO `message_pastlog`";
+					$sql = "INSERT INTO `message_archive`";
 					$sql .= " SELECT `bid` ,`mid`, `tid`, `tmid`, `name`, `comment`, `image`, `post_ts`, `update_ts`, `update_cnt`, `ip`, `hostname`, `ua`, `uid`, `user_id`";
 					$sql .= " FROM message WHERE `bid`='{$board->bid}' AND `tid`='$archive_tid'";
 					$mysql->query($sql);
@@ -392,6 +392,54 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 				if($mysql->error) {
 					$mysql->rollback();
 					die("ERROR214:クエリ処理に失敗しました");
+				}
+
+				// 過去ログ移動チェック
+				$sql = "SELECT IF(";
+				$sql .= "(SELECT COUNT(1) FROM thread T JOIN message M ON T.bid = M.bid AND T.tid = M.tid WHERE T.bid = '{$board->bid}' AND T.tindex = ";
+				$sql .= "(SELECT MIN(tindex) FROM thread WHERE bid = '{$board->bid}')) <= ";
+				$sql .= "(SELECT COUNT(1) - 223 FROM message WHERE bid = '{$board->bid}'), ";
+				$sql .= "(SELECT tid FROM thread WHERE bid = '{$board->bid}' AND tindex = ";
+				$sql .= "(SELECT MIN(tindex) FROM thread WHERE bid = '{$board->bid}')), ";
+				$sql .= "0) AS archive_tid";
+				$result_obj = $mysql->query($sql);
+				if($mysql->error || !$result_obj->num_rows) {
+					$mysql->rollback();
+					die("ERROR215:クエリ処理に失敗しました");
+				}
+				$array = $result_obj->fetch_array();
+				$archive_tid = $array["archive_tid"];
+
+				// 過去ログ移動処理
+				if($archive_tid != "0") {
+					$sql = "INSERT INTO `thread_archive`";
+					$sql .= " SELECT `bid`, `tid`, `subject`, `tindex`, `readpass`, `writepass`, `access_cnt`, `next_tmid`, `update_ts`, `locked`, `top`";
+					$sql .= " FROM `thread` WHERE `bid`='{$board->bid}' AND `tid`='$archive_tid'";
+					$mysql->query($sql);
+					if($mysql->error) {
+						$mysql->rollback();
+						die("ERROR216:クエリ処理に失敗しました");
+					}
+					$sql = "INSERT INTO `message_archive`";
+					$sql .= " SELECT `bid` ,`mid`, `tid`, `tmid`, `name`, `comment`, `image`, `post_ts`, `update_ts`, `update_cnt`, `ip`, `hostname`, `ua`, `uid`, `user_id`";
+					$sql .= " FROM message WHERE `bid`='{$board->bid}' AND `tid`='$archive_tid'";
+					$mysql->query($sql);
+					if($mysql->error) {
+						$mysql->rollback();
+						die("ERROR217:クエリ処理に失敗しました");
+					}
+					$sql = "DELETE FROM `thread` WHERE `bid`='{$board->bid}' AND `tid`='$archive_tid'";
+					$mysql->query($sql);
+					if($mysql->error) {
+						$mysql->rollback();
+						die("ERROR218:クエリ処理に失敗しました");
+					}
+					$sql = "DELETE FROM `message` WHERE `bid`='{$board->bid}' AND `tid`='$archive_tid'";
+					$mysql->query($sql);
+					if($mysql->error) {
+						$mysql->rollback();
+						die("ERROR219:クエリ処理に失敗しました");
+					}
 				}
 
 				// トランザクションのコミット
