@@ -174,7 +174,7 @@ if(isset($tmid)) {
 <li><a href="/"<?=mbi_ack(0)?>><?=mbi("0.")?>トップページ</a></li>
 </ul>
 <?php
-pagefoot($board->access_cnt);
+pagefoot($board->access_cnt_archive);
 ?>
 </div>
 </body>
