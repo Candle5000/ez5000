@@ -11,6 +11,7 @@ class Board {
 	public $sname;
 	public $name;
 	public $access_cnt;
+	public $access_cnt_archive;
 	public $allow_readpass;
 	public $allow_writepass;
 	public $default_name;
@@ -30,6 +31,7 @@ class Board {
 		$this->name = $array["name"];
 		$this->title = $array["title"];
 		$this->access_cnt = $array["access_cnt"];
+		$this->access_cnt_archive = $array["access_cnt_archive"];
 		$this->allow_readpass = $array["allow_readpass"];
 		$this->allow_writepass = $array["allow_writepass"];
 		$this->default_name = $array["default_name"];
