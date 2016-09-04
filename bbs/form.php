@@ -398,7 +398,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 				$sql = "SELECT IF(";
 				$sql .= "(SELECT COUNT(1) FROM thread T JOIN message M ON T.bid = M.bid AND T.tid = M.tid WHERE T.bid = '{$board->bid}' AND T.tindex = ";
 				$sql .= "(SELECT MIN(tindex) FROM thread WHERE bid = '{$board->bid}')) <= ";
-				$sql .= "(SELECT COUNT(1) - 223 FROM message WHERE bid = '{$board->bid}'), ";
+				$sql .= "(SELECT COUNT(1) - 50000 FROM message WHERE bid = '{$board->bid}'), ";
 				$sql .= "(SELECT tid FROM thread WHERE bid = '{$board->bid}' AND tindex = ";
 				$sql .= "(SELECT MIN(tindex) FROM thread WHERE bid = '{$board->bid}')), ";
 				$sql .= "0) AS archive_tid";

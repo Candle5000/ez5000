@@ -1,6 +1,6 @@
 <?php
 //=====================================
-// スレッド一覧
+// 過去ログスレッド一覧
 //=====================================
 require_once("/var/www/bbs/class/mysql.php");
 require_once("/var/www/bbs/class/board.php");
@@ -75,6 +75,8 @@ if((($page + 1) * $LIMIT) < $rows) {
 <body>
 <div id="all">
 <h1><?=$board->title?></h1>
+<hr class="normal">
+<p>過去ログ</p>
 <hr class="normal">
 <div id="pagelink"><?=$pagelink?></div>
 <hr class="normal">
