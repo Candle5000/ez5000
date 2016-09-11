@@ -27,7 +27,7 @@ function selfpage() {
 //----------------------------------------
 function device_info() {
 	$device = "";
-	$ua = $_SERVER["HTTP_USER_AGENT"];
+	$ua = isset($_SERVER["HTTP_USER_AGENT"]) ? $_SERVER["HTTP_USER_AGENT"] : "";
 	$sphs = array(
 		'iPhone',
 		'iPod',
