@@ -194,7 +194,7 @@ if(device_info() == 'mb') {
 $text = isset($words) ? htmlentities($words, ENT_QUOTES, "utf-8") : "";
 if($tid > 0) {
 ?>
-スレッド:<?=$thread->title?><br />
+スレッド:<?=$thread->subject?><br />
 <?php
 }
 ?>
@@ -260,7 +260,7 @@ if(isset($words)) {
 <?php
 if($tid > 0) {
 ?>
-<li><a href="/bbs/read.php?id=<?=$board->sname?>&tid=<?=$thread->tid?>"<?=mbi_ack(7)?>><?=mbi("7.")?>スレッドに戻る</a></li>
+<li><a href="/bbs/read.php?id=<?=$board->name?>&tid=<?=$thread->tid?>"<?=mbi_ack(7)?>><?=mbi("7.")?>スレッドに戻る</a></li>
 <?php
 }
 ?>

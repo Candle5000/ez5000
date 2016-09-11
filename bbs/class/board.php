@@ -8,8 +8,8 @@ class Board {
 	// 変数の宣言
 	//--------------------------
 	public $bid;
-	public $sname;
 	public $name;
+	public $title;
 	public $access_cnt;
 	public $access_cnt_archive;
 	public $allow_readpass;
