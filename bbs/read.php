@@ -54,10 +54,9 @@ if(!isset($_GET["tmid"]) && !isset($_GET["view"]) && !isset($_GET["page"])) {
 	$sql = "UPDATE `thread` SET `access_cnt`=`access_cnt`+1 WHERE `bid`='{$board->bid}' AND `tid`='$tid'";
 	$mysql->query($sql);
 }
-$sql = "SELECT `T`.`tid`,`subject`,`tindex`,`access_cnt`,COUNT(1) AS `message_cnt`,`update_ts`,`locked`,`top`,`next_tmid`";
-$sql .= " FROM (SELECT * FROM `thread` WHERE `bid`='{$board->bid}' AND `tid`='$tid') AS `T`";
-$sql .= " JOIN (SELECT tid FROM `message` WHERE `bid`='{$board->bid}' AND `tid`='$tid') AS `M`";
-$sql .= " ON `T`.`tid`=`M`.`tid` GROUP BY `tid`";
+$sql = "SELECT T.tid,T.subject,T.tindex,T.access_cnt,COUNT(1) message_cnt,T.update_ts,T.locked,T.top,T.next_tmid";
+$sql .= " FROM thread T JOIN message M ON T.bid = M.bid AND T.tid = M.tid";
+$sql .= " WHERE T.bid = '{$board->bid}' AND T.tid = '$tid' GROUP BY T.tid";
 $result = $mysql->query($sql);
 if($mysql->error) die("ERROR07:存在しないIDです");
 if(!$result->num_rows) die("ERROR08:存在しないIDです");

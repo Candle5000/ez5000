@@ -49,11 +49,9 @@ $array = $result->fetch_array();
 $rows = $array["count"];
 
 // スレッド一覧を取得
-$sql = "SELECT `T`.`tid`,`subject`,`tindex`,`access_cnt`,COUNT(1) AS `message_cnt`,`update_ts`,`locked`,`top`,`next_tmid`";
-$sql .= " FROM (SELECT * FROM `thread` WHERE `bid`='{$board->bid}') AS `T`";
-$sql .= " JOIN (SELECT tid FROM `message` WHERE `bid`='{$board->bid}') AS `M`";
-$sql .= " ON `T`.`tid`=`M`.`tid`";
-$sql .= " GROUP BY `tid` ORDER BY `T`.`top` DESC,`tindex` DESC";
+$sql = "SELECT T.tid,T.subject,T.tindex,T.access_cnt,COUNT(1) message_cnt,T.update_ts,T.locked,T.top,T.next_tmid";
+$sql .= " FROM thread T JOIN message M ON T.bid = M.bid AND T.tid = M.tid WHERE T.bid = '{$board->bid}'";
+$sql .= " GROUP BY T.tid ORDER BY T.top DESC, T.tindex DESC";
 $sql .= " LIMIT ".($page * $LIMIT).",$LIMIT";
 $result = $mysql->query($sql);
 if($mysql->error) die("ERROR05:存在しないIDです");
