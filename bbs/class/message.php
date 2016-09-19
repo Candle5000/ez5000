@@ -135,7 +135,7 @@ class Message {
 			$sql1 = "SELECT 1 FROM `message` WHERE `bid`='{$this->board->bid}' AND `tid`='{$matches[4]}' AND `tmid`='{$matches[5]}'";
 			$sql2 = "SELECT 1 FROM `thread` WHERE `bid`='{$this->board->bid}' AND `tid`='{$matches[4]}'";
 			$sql = "SELECT ($sql1) AND ($sql2) AS `bool`";
-			if($this->mysql->query($sql)->fetch_object()->bool) {
+			if($this->mode != 2 && $this->mysql->query($sql)->fetch_object()->bool) {
 				return("<a href=\"./read.php?id=".$this->board->name."&tid={$matches[4]}&tmid={$matches[5]}\">".htmlspecialchars($matches[3])."</a>");
 			} else {
 				return(htmlspecialchars($matches[3]));
@@ -144,7 +144,7 @@ class Message {
 			$sql1 = "SELECT 1 FROM `message` WHERE `bid`='{$this->board->bid}' AND `tid`='{$matches[7]}' AND `tmid`='1'";
 			$sql2 = "SELECT 1 FROM `thread` WHERE `bid`='{$this->board->bid}' AND `tid`='{$matches[7]}'";
 			$sql = "SELECT ($sql1) AND ($sql2) AS `bool`";
-			if($this->mysql->query($sql)->fetch_object()->bool) {
+			if($this->mode != 2 && $this->mysql->query($sql)->fetch_object()->bool) {
 				return("<a href=\"./read.php?id=".$this->board->name."&tid={$matches[7]}\">".htmlspecialchars($matches[6])."</a>");
 			} else {
 				return(htmlspecialchars($matches[6]));
@@ -153,7 +153,7 @@ class Message {
 			$sql1 = "SELECT 1 FROM `message` WHERE `bid`='{$this->board->bid}' AND `tid`='{$this->thread->tid}' AND `tmid`='{$matches[9]}'";
 			$sql2 = "SELECT 1 FROM `thread` WHERE `bid`='{$this->board->bid}' AND `tid`='{$this->thread->tid}'";
 			$sql = "SELECT ($sql1) AND ($sql2) AS `bool`";
-			if($this->mysql->query($sql)->fetch_object()->bool) {
+			if($this->mode != 2 && $this->mysql->query($sql)->fetch_object()->bool) {
 				return("<a href=\"./read.php?id={$this->board->name}&tid={$this->thread->tid}&tmid={$matches[9]}\">".htmlspecialchars($matches[8])."</a>");
 			} else {
 				return(htmlspecialchars($matches[8]));
