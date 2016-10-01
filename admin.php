@@ -1,6 +1,6 @@
 <?php
 //=====================================
-// 管理者用 インフォメーション 追加 更新 削除
+// 管理者用 メニューページ
 //=====================================
 require_once("/var/www/class/mysql.php");
 require_once("/var/www/class/guestdata.php");
@@ -9,11 +9,6 @@ require_once("/var/www/class/form.php");
 require_once("/var/www/functions/template.php");
 require_once("/var/www/functions/xml/info_form_upd.php");
 $form_login_xml = "/var/www/functions/xml/admin_login_form.xml";
-$form_add_xml = "/var/www/functions/xml/info_form_add.xml";
-$PAGESIZE = 20;
-$table = "info";
-
-$page = 0;
 
 session_start();
 
@@ -41,32 +36,6 @@ if(isset($_SERVER["REQUEST_METHOD"]) == "POST" && !isset($login_err)) {
 		session_destroy();
 		selfpage();
 	}
-
-	// 新規作成
-	if(isset($_POST["submit_add"])) {
-		$cols = array("id","subject","info");
-		$_POST["new_id"] = preg_replace("/[\/]/", "-", $_POST["new_id"]);
-		foreach($cols as $col) {
-			$values[] = isset($_POST["new_".$col]) ? "'".$_POST["new_".$col]."'" : 0;
-		}
-		$cols = implode(",", $cols);
-		$values = implode(",", $values);
-		$data->insert_data($table, $cols, $values);
-	}
-
-	// 変更
-	if(isset($_POST["submit_upd"])) {
-		$id = key($_POST["submit_upd"]);
-		$target = "id='$id'";
-		$cols = array("subject","info");
-		foreach($cols as $col) {
-			$values[] = isset($_POST[$col][$id]) ? preg_replace("/[\r][\n]/", "\n", $_POST[$col][$id]) : 0;
-		}
-		$data->update_data($table, $cols, $values, $target);
-	}
-
-	//ページの選択
-	if(isset($_POST["page"])) $page = $_POST["page"];
 }
 ?>
 <html>
@@ -88,33 +57,30 @@ if(isset($login_err)) echo $login_err;
 <?php
 } else {
 //ログイン済
-$count = $data->select_all_l("*", $table, $page, $PAGESIZE, "id desc");
 ?>
-<h3>* * Infomation List * *</h3>
-<a href="/admin.php">管理メニューに戻る</a>
+<h3>* * 管理メニュー * *</h3>
 <?=$form->start()?>
 <?=$form->submit("logout", "ログアウト")?>
-<div>
-インフォメーションに新規追加<br>
-<?=$form->load_xml_file($form_add_xml)?>
-</div>
-<hr>
-ページ
-<?=$form->build_select_page($count, $PAGESIZE, $page)?>
-<hr>
-<?php
-	while($row = $data->fetch()){
-?>
-<hr>
-<div>
-<?=$form->load_xml_string(xml_info_form_upd($row))?>
-</div>
-<?php
-	}
-?>
-<hr>
-<?=$count?>件ヒット
 </form>
+<div style="color:#F00;">[管理補佐の方へ]<br>
+権限のない機能は使用しないでください。<br>
+データの削除は管理人に申請してください。</div>
+<ul>
+<li><a href="/info/admin.php">インフォメーション</a></li>
+<li><a href="/db/update/admin.php">アプリ更新情報</a></li>
+<li><a href="/db/item/admin.php">アイテムデータ</a></li>
+<li><a href="/db/zone/admin.php">ゾーンデータ</a></li>
+<li><a href="/db/monster/admin.php">モンスターデータ</a></li>
+<li><a href="/db/quest/admin.php">クエストデータ</a></li>
+<li><a href="/db/class/admin.php">クラスデータ</a></li>
+<li><a href="/db/class/data/admin.php">ステータスデータ</a></li>
+<li><a href="/db/class/skill/admin.php">戦闘/属性スキルデータ</a></li>
+<li><a href="/db/skill/admin.php">スキルデータ</a></li>
+</ul>
+<hr>
+<a href="/" target="_blank">トップページを開く</a>
+<hr>
+<hr>
 </body>
 </html>
 <?php
