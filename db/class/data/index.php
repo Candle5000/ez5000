@@ -6,7 +6,7 @@ require_once("../../../class/mysql.php");
 require_once("../../../class/guestdata.php");
 require_once("../../../functions/template.php");
 require_once("../../../functions/class.php");
-$MAX_Lv = 60;
+$MAX_Lv = 70;
 
 if($id = isset($_GET['id'])) {
 	$id = $_GET['id'];

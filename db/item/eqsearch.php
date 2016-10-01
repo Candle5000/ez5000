@@ -12,7 +12,7 @@ session_start();
 
 $PAGE_ID = 20030;
 $title = "装備アイテム検索";
-$MAX_LV = "60";
+$MAX_LV = "70";
 $PAGE_SIZE = 50;
 $error = false;
 $mb = (device_info() == "mb" || device_info() == "sp") ? true : false;
@@ -44,7 +44,6 @@ while($array = $data->fetch()) {
 	$eqType["{$array["id"]}"] = $array["name"];
 }
 if(empty($eqType)) die("データ読み込みに失敗しました\n");
-$maxLv = 60;
 $sql = "SELECT * FROM `parameter` ORDER BY `id`";
 $data->query($sql);
 $status[0] = "指定なし";
