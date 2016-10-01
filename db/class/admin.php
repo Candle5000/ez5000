@@ -86,6 +86,7 @@ if(isset($login_err)) echo $login_err;
 ?>
 <body>
 <h3>* * Class Data * *</h3>
+<a href="/admin.php">管理メニューに戻る</a>
 <?=$form->start()?>
 <?=$form->submit("logout", "ログアウト")?>
 <div>

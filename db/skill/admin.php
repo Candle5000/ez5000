@@ -103,10 +103,11 @@ if(isset($login_err)) echo $login_err;
 //ログイン済
 ?>
 <h3>* * Skill List * *</h3>
+<a href="/admin.php">管理メニューに戻る</a>
 <?=$form->start()?>
 <?=$form->submit("logout", "ログアウト")?>
 <div>
-アイテムリストに新規追加<br>
+スキルリストに新規追加<br>
 <?=$form->load_xml_file($form_add_xml)?>
 </div>
 <hr>

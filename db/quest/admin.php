@@ -1,6 +1,6 @@
 <?php
 //=====================================
-// 管理者用 アイテムデータ 追加 更新 削除
+// 管理者用 クエストデータ 追加 更新 削除
 //=====================================
 require_once("/var/www/class/mysql.php");
 require_once("/var/www/class/guestdata.php");
@@ -104,11 +104,12 @@ if(isset($login_err)) echo $login_err;
 } else {
 //ログイン済
 ?>
-<h3>* * Item List * *</h3>
+<h3>* * Quest List * *</h3>
+<a href="/admin.php">管理メニューに戻る</a>
 <?=$form->start()?>
 <?=$form->submit("logout", "ログアウト")?>
 <div>
-アイテムリストに新規追加<br>
+クエストリストに新規追加<br>
 <?=$form->load_xml_file($form_add_xml)?>
 </div>
 <hr>

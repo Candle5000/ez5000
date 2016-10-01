@@ -90,11 +90,12 @@ if(isset($login_err)) echo $login_err;
 //ログイン済
 $count = $data->select_all_l("*", $table, $page, $PAGESIZE, "id desc");
 ?>
-<h3>* * Infomation List * *</h3>
+<h3>* * Application Update List * *</h3>
+<a href="/admin.php">管理メニューに戻る</a>
 <?=$form->start()?>
 <?=$form->submit("logout", "ログアウト")?>
 <div>
-インフォメーションに新規追加<br>
+アプリ更新情報に新規追加<br>
 <?=$form->load_xml_file($form_add_xml)?>
 </div>
 <hr>

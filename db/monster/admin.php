@@ -1,6 +1,6 @@
 <?php
 //=====================================
-// 管理者用 アイテムデータ 追加 更新 削除
+// 管理者用 モンスターデータ 追加 更新 削除
 //=====================================
 require_once("/var/www/class/mysql.php");
 require_once("/var/www/class/guestdata.php");
@@ -117,6 +117,7 @@ if(isset($login_err)) echo $login_err;
 	}
 ?>
 <h3>* * Monster List * *</h3>
+<a href="/admin.php">管理メニューに戻る</a>
 <?=$form->start()?>
 <?=$form->build($part_hidden)?>
 <?=$form->submit("logout", "ログアウト")?>
