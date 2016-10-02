@@ -205,6 +205,14 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 	// 添付ファイル削除 編集モードのみ
 	$delmedia = (($mode == 2) && ($file_id == "") && isset($_POST["delmedia"]) && $_POST["delmedia"]) ? true : false;
 
+	// 入室パスワード取得
+	$readpass = ($mode == 0 && $board->allow_readpass && isset($_POST["readpass"])) ? $_POST["readpass"] : "";
+	if($readpass != "" && !preg_match("/^[!-~]{4,64}$/", $readpass)) $error_list[] = "入室パスワードは半角英数字と記号のみで4～64文字にしてください";
+
+	// 書込パスワード取得
+	$writepass = ($mode == 0 && $board->allow_writepass && isset($_POST["writepass"])) ? $_POST["writepass"] : "";
+	if($writepass != "" && !preg_match("/^[!-~]{4,64}$/", $writepass)) $error_list[] = "書込パスワードは半角英数字と記号のみで4～64文字にしてください";
+
 	// 編集パスワード取得
 	$pass = isset($_POST["pass"]) ? $_POST["pass"] : "";
 	if($pass == "") $error_list[] = "パスワードが空です";
@@ -260,8 +268,8 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 				$next_mid = $array["next_mid"];
 
 				// 新規スレッドを登録
-				$sql = "INSERT INTO `thread` (`tid`, `bid`, `subject`, `tindex`, `update_ts`)";
-				$sql .= " VALUES ('$next_tid', '{$board->bid}', '$sql_title', '$next_mid', NOW())";
+				$sql = "INSERT INTO thread (tid, bid, subject, tindex, readpass, writepass, update_ts)";
+				$sql .= " VALUES ('$next_tid', '{$board->bid}', '$sql_title', '$next_mid', PASSWORD('$readpass'), PASSWORD('$writepass'), NOW())";
 				$mysql->query($sql);
 				if($mysql->error) {
 					$mysql->rollback();
