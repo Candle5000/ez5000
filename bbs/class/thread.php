@@ -10,8 +10,8 @@ class Thread {
 	public $tid;
 	public $subject;
 	public $tindex;
-	public $readpass;
-	public $writepass;
+	public $isset_readpass;
+	public $isset_writepass;
 	public $access_cnt;
 	public $message_cnt;
 	public $update_ts;
@@ -26,6 +26,8 @@ class Thread {
 		$this->tid = $array["tid"];
 		$this->subject = $array["subject"];
 		$this->tindex = $array["tindex"];
+		$this->isset_readpass = (bool)$array["isset_readpass"];
+		$this->isset_writepass = (bool)$array["isset_writepass"];
 		$this->access_cnt = $array["access_cnt"];
 		$this->message_cnt = $array["message_cnt"];
 		$this->update_ts = $array["update_ts"];

@@ -81,10 +81,12 @@ $title = $board->title;
 
 // スレッド情報を取得 返信/編集モードのみ
 if($mode == 1 || $mode == 2) {
-	$sql = "SELECT `T`.`tid`,`subject`,`tindex`,`access_cnt`,COUNT(1) AS `message_cnt`,`update_ts`,`locked`,`top`,`next_tmid`";
-	$sql .= " FROM (SELECT * FROM `thread` WHERE `bid`='{$board->bid}' AND `tid`='$tid') AS `T`";
-	$sql .= " JOIN (SELECT tid FROM `message` WHERE `bid`='{$board->bid}' AND `tid`='$tid') AS `M`";
-	$sql .= " ON `T`.`tid`=`M`.`tid` GROUP BY `tid`";
+	$sql = "SELECT T.tid,subject,tindex,";
+	$sql .= "IF(readpass,TRUE,FALSE) isset_readpass,IF(writepass,TRUE,FALSE) isset_writepass,";
+	$sql .= "access_cnt,COUNT(1) message_cnt,update_ts,locked,top,next_tmid";
+	$sql .= " FROM (SELECT * FROM thread WHERE bid='{$board->bid}' AND tid='$tid') T";
+	$sql .= " JOIN (SELECT tid FROM message WHERE bid='{$board->bid}' AND tid='$tid') M";
+	$sql .= " ON T.tid=M.tid GROUP BY tid";
 	$result = $mysql->query($sql);
 	if($mysql->error) die("ERROR102:存在しないIDです");
 	if(!$result->num_rows) die("ERROR103:存在しないIDです");
@@ -698,6 +700,22 @@ if(!($_SERVER["REQUEST_METHOD"] == "POST") || isset($error_list)) {
 ?>
 編集パス<br />
 <input type="password" name="pass" maxlength="32" value=""><br />
+<?php
+	if($mode == 0 && $board->allow_readpass) {
+?>
+スレ入室パス<br />
+<input type="password" name="readpass" maxlength="32" value=""><br />
+<?php
+	}
+?>
+<?php
+	if($mode == 0 && $board->allow_writepass) {
+?>
+スレ書込パス<br />
+<input type="password" name="writepass" maxlength="32" value=""><br />
+<?php
+	}
+?>
 画像ファイル<?=mbi("(対応機種のみ)")?>※512KBまで<br />
 <input type="hidden" name="MAX_FILE_SIZE" value="<?=$MAX_FSIZE?>" />
 <input name="media" type="file" value="1"><br />
