@@ -49,7 +49,9 @@ $array = $result->fetch_array();
 $rows = $array["count"];
 
 // スレッド一覧を取得
-$sql = "SELECT T.tid,T.subject,T.tindex,T.access_cnt,COUNT(1) message_cnt,T.update_ts,T.locked,T.top,T.next_tmid";
+$sql = "SELECT T.tid,T.subject,T.tindex,";
+$sql .= "IF(LENGTH(T.readpass) > 0,TRUE,FALSE) isset_readpass,IF(LENGTH(T.writepass) > 0,TRUE,FALSE) isset_writepass,";
+$sql .= "T.access_cnt,COUNT(1) message_cnt,T.update_ts,T.locked,T.top,T.next_tmid";
 $sql .= " FROM thread T JOIN message M ON T.bid = M.bid AND T.tid = M.tid WHERE T.bid = '{$board->bid}'";
 $sql .= " GROUP BY T.tid ORDER BY T.top DESC, T.tindex DESC";
 $sql .= " LIMIT ".($page * $LIMIT).",$LIMIT";
@@ -93,9 +95,17 @@ if($result->num_rows) {
 		if($thread->locked) {
 			$marker = "※";
 		} else if($thread->top) {
-			$marker = "▼";
+			if($thread->isset_readpass) {
+				$marker = "◆";
+			} else {
+				$marker = "▼";
+			}
 		} else {
-			$marker = "▽";
+			if($thread->isset_readpass) {
+				$marker = "◇";
+			} else {
+				$marker = "▽";
+			}
 		}
 ?>
 <li><span class="nc5"><?=$marker?></span><a href="./read.php?id=<?=$board->name?>&tid=<?=$thread->tid?>"><?=htmlspecialchars($thread->subject)."(".$thread->message_cnt.")"?></a><?=$new?></li>

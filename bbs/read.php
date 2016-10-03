@@ -7,6 +7,7 @@ require_once("/var/www/bbs/class/board.php");
 require_once("/var/www/bbs/class/thread.php");
 require_once("/var/www/bbs/class/message.php");
 require_once("/var/www/functions/template.php");
+session_start();
 $LIMIT = 10;
 
 // クッキー設定
@@ -54,13 +55,25 @@ if(!isset($_GET["tmid"]) && !isset($_GET["view"]) && !isset($_GET["page"])) {
 	$sql = "UPDATE `thread` SET `access_cnt`=`access_cnt`+1 WHERE `bid`='{$board->bid}' AND `tid`='$tid'";
 	$mysql->query($sql);
 }
-$sql = "SELECT T.tid,T.subject,T.tindex,T.access_cnt,COUNT(1) message_cnt,T.update_ts,T.locked,T.top,T.next_tmid";
+$sql = "SELECT T.tid,T.subject,T.tindex,";
+$sql .= "IF(LENGTH(T.readpass) > 0,TRUE,FALSE) isset_readpass,IF(LENGTH(T.writepass) > 0,TRUE,FALSE) isset_writepass,";
+$sql .= "T.access_cnt,COUNT(1) message_cnt,T.update_ts,T.locked,T.top,T.next_tmid";
 $sql .= " FROM thread T JOIN message M ON T.bid = M.bid AND T.tid = M.tid";
 $sql .= " WHERE T.bid = '{$board->bid}' AND T.tid = '$tid' GROUP BY T.tid";
 $result = $mysql->query($sql);
 if($mysql->error) die("ERROR07:存在しないIDです");
 if(!$result->num_rows) die("ERROR08:存在しないIDです");
 $thread = new Thread($result->fetch_array());
+
+// 閲覧パスの確認
+if($thread->isset_readpass && !isset($_SESSION["read_auth"]["{$board->bid}"]["{$thread->tid}"])) {
+	$http = "http";
+	if(isset($_SERVER["HTTPS"]) && $_SERVER["HTTPS"] == "on") $http .= "s";
+	echo $http;
+	header("HTTP/1.1 301 Moved Permanently");
+	header("Pragma: no-cache");
+	header("Location:$http://{$_SERVER["HTTP_HOST"]}/bbs/readpass.php?id=$id&tid=$tid");
+}
 
 if(!isset($tmid)) {
 	//------------------------------

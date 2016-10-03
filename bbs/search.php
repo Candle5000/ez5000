@@ -39,10 +39,12 @@ $title = $board->name;
 
 // スレッド情報を取得
 if($tid > 0) {
-	$sql = "SELECT `T`.`tid`,`subject`,`tindex`,`access_cnt`,COUNT(1) AS `message_cnt`,`update_ts`,`locked`,`top`,`next_tmid`";
-	$sql .= " FROM (SELECT * FROM `thread` WHERE `bid`='{$board->bid}' AND `tid`='$tid') AS `T`";
-	$sql .= " JOIN (SELECT tid FROM `message` WHERE `bid`='{$board->bid}' AND `tid`='$tid') AS `M`";
-	$sql .= " ON `T`.`tid`=`M`.`tid` GROUP BY `tid`";
+	$sql = "SELECT T.tid,subject,tindex,";
+	$sql .= "IF(LENGTH(T.readpass) > 0,TRUE,FALSE) isset_readpass,IF(LENGTH(T.writepass) > 0,TRUE,FALSE) isset_writepass,";
+	$sql .= "access_cnt,COUNT(1) AS message_cnt,update_ts,locked,top,next_tmid";
+	$sql .= " FROM (SELECT * FROM thread WHERE bid='{$board->bid}' AND tid='$tid') AS T";
+	$sql .= " JOIN (SELECT tid FROM message WHERE bid='{$board->bid}' AND tid='$tid') AS M";
+	$sql .= " ON T.tid=M.tid GROUP BY tid";
 	$result = $mysql->query($sql);
 	if(!$result->num_rows) die("ERROR12:存在しないIDです");
 	$thread = new Thread($result->fetch_array());
@@ -144,10 +146,12 @@ if(isset($words)) {
 		$count = $mysql->query($sql)->fetch_object()->count;
 		while($array = $result->fetch_array()) {
 			if($tid == 0) {
-				$sql = "SELECT `T`.`tid`,`subject`,`tindex`,`access_cnt`,COUNT(1) AS `message_cnt`,`update_ts`,`locked`,`top`,`next_tmid`";
-				$sql .= " FROM (SELECT * FROM `thread` WHERE `bid`='{$board->bid}' AND `tid`='{$array["tid"]}') AS `T`";
-				$sql .= " JOIN (SELECT tid FROM `message` WHERE `bid`='{$board->bid}' AND `tid`='{$array["tid"]}') AS `M`";
-				$sql .= " ON `T`.`tid`=`M`.`tid` GROUP BY `tid`";
+				$sql = "SELECT T.tid,subject,tindex,";
+				$sql .= "IF(LENGTH(T.readpass) > 0,TRUE,FALSE) isset_readpass,IF(LENGTH(T.writepass) > 0,TRUE,FALSE) isset_writepass,";
+				$sql .= "access_cnt,COUNT(1) AS message_cnt,update_ts,locked,top,next_tmid";
+				$sql .= " FROM (SELECT * FROM thread WHERE bid='{$board->bid}' AND tid='{$array["tid"]}') AS T";
+				$sql .= " JOIN (SELECT tid FROM message WHERE bid='{$board->bid}' AND tid='{$array["tid"]}') AS M";
+				$sql .= " ON T.tid=M.tid GROUP BY tid";
 				$thread = new Thread($mysql->query($sql)->fetch_array());
 			}
 			$message_list[] = new Message($array, $mysql, $board, $thread);

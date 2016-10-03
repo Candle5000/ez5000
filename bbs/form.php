@@ -82,7 +82,7 @@ $title = $board->title;
 // スレッド情報を取得 返信/編集モードのみ
 if($mode == 1 || $mode == 2) {
 	$sql = "SELECT T.tid,subject,tindex,";
-	$sql .= "IF(readpass,TRUE,FALSE) isset_readpass,IF(writepass,TRUE,FALSE) isset_writepass,";
+	$sql .= "IF(LENGTH(T.readpass) > 0,TRUE,FALSE) isset_readpass,IF(LENGTH(T.writepass) > 0,TRUE,FALSE) isset_writepass,";
 	$sql .= "access_cnt,COUNT(1) message_cnt,update_ts,locked,top,next_tmid";
 	$sql .= " FROM (SELECT * FROM thread WHERE bid='{$board->bid}' AND tid='$tid') T";
 	$sql .= " JOIN (SELECT tid FROM message WHERE bid='{$board->bid}' AND tid='$tid') M";
@@ -91,6 +91,16 @@ if($mode == 1 || $mode == 2) {
 	if($mysql->error) die("ERROR102:存在しないIDです");
 	if(!$result->num_rows) die("ERROR103:存在しないIDです");
 	$thread = new Thread($result->fetch_array());
+
+	// 閲覧パスの確認
+	if($thread->isset_readpass && !isset($_SESSION["read_auth"]["{$board->bid}"]["{$thread->tid}"])) {
+		$http = "http";
+		if(isset($_SERVER["HTTPS"]) && $_SERVER["HTTPS"] == "on") $http .= "s";
+		header("HTTP/1.1 301 Moved Permanently");
+		header("Pragma: no-cache");
+		header("Location:$http://{$_SERVER["HTTP_HOST"]}/bbs/readpass.php?id=$id&tid=$tid");
+	}
+
 	if($thread->message_cnt > 999 && $mode == 1) die("ERROR104:スレッドの投稿数が上限に達しています");
 	if($thread->locked) die("ERROR105:スレッドがロックされています");
 }
@@ -247,6 +257,8 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 		$sql_title = $mysql->real_escape_string($title);
 		$sql_name = $mysql->real_escape_string($name_t);
 		$sql_comment = $mysql->real_escape_string($comment);
+		$sql_readpass = $mysql->real_escape_string($readpass);
+		$sql_writepass = $mysql->real_escape_string($writepass);
 		$sql_pass = $mysql->real_escape_string($pass);
 
 		switch($mode) {
@@ -269,7 +281,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 
 				// 新規スレッドを登録
 				$sql = "INSERT INTO thread (tid, bid, subject, tindex, readpass, writepass, update_ts)";
-				$sql .= " VALUES ('$next_tid', '{$board->bid}', '$sql_title', '$next_mid', PASSWORD('$readpass'), PASSWORD('$writepass'), NOW())";
+				$sql .= " VALUES ('$next_tid', '{$board->bid}', '$sql_title', '$next_mid', PASSWORD('$sql_readpass'), PASSWORD('$sql_writepass'), NOW())";
 				$mysql->query($sql);
 				if($mysql->error) {
 					$mysql->rollback();
