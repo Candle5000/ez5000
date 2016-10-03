@@ -170,7 +170,6 @@ while($array = $result->fetch_array()) {
 <hr class="normal">
 <?php
 if(!isset($tmid)) {
-	$url = "./read.php?id=$id&tid=$tid$view";
 ?>
 <form action="<?=$_SERVER["PHP_SELF"]?>" method="get" enctype="multipart/form-data">
 <input name="id" type="hidden" value="<?=$id?>">

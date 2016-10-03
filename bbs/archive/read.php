@@ -163,7 +163,6 @@ while($array = $result->fetch_array()) {
 <hr class="normal">
 <?php
 if(!isset($tmid)) {
-	$url = "./read.php?id=$id&tid=$tid$view";
 ?>
 <form action="<?=$_SERVER["PHP_SELF"]?>" method="get" enctype="multipart/form-data">
 <input name="id" type="hidden" value="<?=$id?>">
@@ -180,11 +179,11 @@ if(!isset($tmid)) {
 <?php
 if(isset($tmid)) {
 ?>
-<li><a href="/bbs/read.php?id=<?=$board->name?>&tid=<?=$thread->tid?>"<?=mbi_ack(8)?>><?=mbi("8.")?>スレッドに戻る</a></li>
+<li><a href="/bbs/archive/read.php?id=<?=$board->name?>&tid=<?=$thread->tid?>"<?=mbi_ack(8)?>><?=mbi("8.")?>スレッドに戻る</a></li>
 <?php
 }
 ?>
-<li><a href="/bbs/?id=<?=$board->name?>"<?=mbi_ack(9)?>><?=mbi("9.")?><?=$board->title?></a></li>
+<li><a href="/bbs/archive/?id=<?=$board->name?>"<?=mbi_ack(9)?>><?=mbi("9.")?><?=$board->title?>(過去ログ)</a></li>
 <li><a href="/"<?=mbi_ack(0)?>><?=mbi("0.")?>トップページ</a></li>
 </ul>
 <?php
