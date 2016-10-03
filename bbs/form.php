@@ -81,14 +81,39 @@ $title = $board->title;
 
 // スレッド情報を取得 返信/編集モードのみ
 if($mode == 1 || $mode == 2) {
-	$sql = "SELECT `T`.`tid`,`subject`,`tindex`,`access_cnt`,COUNT(1) AS `message_cnt`,`update_ts`,`locked`,`top`,`next_tmid`";
-	$sql .= " FROM (SELECT * FROM `thread` WHERE `bid`='{$board->bid}' AND `tid`='$tid') AS `T`";
-	$sql .= " JOIN (SELECT tid FROM `message` WHERE `bid`='{$board->bid}' AND `tid`='$tid') AS `M`";
-	$sql .= " ON `T`.`tid`=`M`.`tid` GROUP BY `tid`";
+	$sql = "SELECT T.tid,subject,tindex,";
+	$sql .= "IF(LENGTH(T.readpass) > 0,TRUE,FALSE) isset_readpass,IF(LENGTH(T.writepass) > 0,TRUE,FALSE) isset_writepass,";
+	$sql .= "access_cnt,COUNT(1) message_cnt,update_ts,locked,top,next_tmid";
+	$sql .= " FROM (SELECT * FROM thread WHERE bid='{$board->bid}' AND tid='$tid') T";
+	$sql .= " JOIN (SELECT tid FROM message WHERE bid='{$board->bid}' AND tid='$tid') M";
+	$sql .= " ON T.tid=M.tid GROUP BY tid";
 	$result = $mysql->query($sql);
 	if($mysql->error) die("ERROR102:存在しないIDです");
 	if(!$result->num_rows) die("ERROR103:存在しないIDです");
 	$thread = new Thread($result->fetch_array());
+
+	// 閲覧パスの確認
+	if($thread->isset_readpass && !isset($_SESSION["read_auth"]["{$board->bid}"]["{$thread->tid}"])) {
+		$http = "http";
+		if(isset($_SERVER["HTTPS"]) && $_SERVER["HTTPS"] == "on") $http .= "s";
+		header("HTTP/1.1 301 Moved Permanently");
+		header("Pragma: no-cache");
+		header("Location:$http://{$_SERVER["HTTP_HOST"]}/bbs/readpass.php?id=$id&tid=$tid");
+		exit;
+	}
+
+	// 書込パスの確認
+	if($thread->isset_writepass && !isset($_SESSION["write_auth"]["{$board->bid}"]["{$thread->tid}"])) {
+		$http = "http";
+		if(isset($_SERVER["HTTPS"]) && $_SERVER["HTTPS"] == "on") $http .= "s";
+		$tmid = ($mode == 2) ? "&tmid=$tmid" : "";
+		$re = ($mode == 1 && $re != 0) ? "&re=$re" : "";
+		header("HTTP/1.1 301 Moved Permanently");
+		header("Pragma: no-cache");
+		header("Location:$http://{$_SERVER["HTTP_HOST"]}/bbs/writepass.php?mode={$_GET["mode"]}&id=$id&tid=$tid$tmid$re");
+		exit;
+	}
+
 	if($thread->message_cnt > 999 && $mode == 1) die("ERROR104:スレッドの投稿数が上限に達しています");
 	if($thread->locked) die("ERROR105:スレッドがロックされています");
 }
@@ -203,6 +228,14 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 	// 添付ファイル削除 編集モードのみ
 	$delmedia = (($mode == 2) && ($file_id == "") && isset($_POST["delmedia"]) && $_POST["delmedia"]) ? true : false;
 
+	// 入室パスワード取得
+	$readpass = ($mode == 0 && $board->allow_readpass && isset($_POST["readpass"])) ? $_POST["readpass"] : "";
+	if($readpass != "" && !preg_match("/^[!-~]{4,64}$/", $readpass)) $error_list[] = "入室パスワードは半角英数字と記号のみで4～64文字にしてください";
+
+	// 書込パスワード取得
+	$writepass = ($mode == 0 && $board->allow_writepass && isset($_POST["writepass"])) ? $_POST["writepass"] : "";
+	if($writepass != "" && !preg_match("/^[!-~]{4,64}$/", $writepass)) $error_list[] = "書込パスワードは半角英数字と記号のみで4～64文字にしてください";
+
 	// 編集パスワード取得
 	$pass = isset($_POST["pass"]) ? $_POST["pass"] : "";
 	if($pass == "") $error_list[] = "パスワードが空です";
@@ -237,6 +270,8 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 		$sql_title = $mysql->real_escape_string($title);
 		$sql_name = $mysql->real_escape_string($name_t);
 		$sql_comment = $mysql->real_escape_string($comment);
+		$sql_readpass = $mysql->real_escape_string($readpass);
+		$sql_writepass = $mysql->real_escape_string($writepass);
 		$sql_pass = $mysql->real_escape_string($pass);
 
 		switch($mode) {
@@ -258,8 +293,8 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 				$next_mid = $array["next_mid"];
 
 				// 新規スレッドを登録
-				$sql = "INSERT INTO `thread` (`tid`, `bid`, `subject`, `tindex`, `update_ts`)";
-				$sql .= " VALUES ('$next_tid', '{$board->bid}', '$sql_title', '$next_mid', NOW())";
+				$sql = "INSERT INTO thread (tid, bid, subject, tindex, readpass, writepass, update_ts)";
+				$sql .= " VALUES ('$next_tid', '{$board->bid}', '$sql_title', '$next_mid', PASSWORD('$sql_readpass'), PASSWORD('$sql_writepass'), NOW())";
 				$mysql->query($sql);
 				if($mysql->error) {
 					$mysql->rollback();
@@ -698,6 +733,22 @@ if(!($_SERVER["REQUEST_METHOD"] == "POST") || isset($error_list)) {
 ?>
 編集パス<br />
 <input type="password" name="pass" maxlength="32" value=""><br />
+<?php
+	if($mode == 0 && $board->allow_readpass) {
+?>
+スレ入室パス<br />
+<input type="password" name="readpass" maxlength="32" value=""><br />
+<?php
+	}
+?>
+<?php
+	if($mode == 0 && $board->allow_writepass) {
+?>
+スレ書込パス<br />
+<input type="password" name="writepass" maxlength="32" value=""><br />
+<?php
+	}
+?>
 画像ファイル<?=mbi("(対応機種のみ)")?>※512KBまで<br />
 <input type="hidden" name="MAX_FILE_SIZE" value="<?=$MAX_FSIZE?>" />
 <input name="media" type="file" value="1"><br />

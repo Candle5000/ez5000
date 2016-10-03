@@ -16,10 +16,13 @@ function toppage() {
 // 同一ページにリダイレクト
 //----------------------------------------
 function selfpage() {
-	$url = "http://".$_SERVER["HTTP_HOST"].$_SERVER["PHP_SELF"];
+	$http = "http";
+	if(isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') $http .= "s";
+	$url = "$http://".$_SERVER["HTTP_HOST"].$_SERVER["PHP_SELF"];
 	header("HTTP/1.1 301 Moved Permanently");
 	header("Pragma: no-cache");
 	header("Location: $url");
+	exit;
 }
 
 //----------------------------------------

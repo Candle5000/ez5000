@@ -7,6 +7,7 @@ require_once("/var/www/bbs/class/board.php");
 require_once("/var/www/bbs/class/thread.php");
 require_once("/var/www/bbs/class/message.php");
 require_once("/var/www/functions/template.php");
+session_start();
 $LIMIT = 10;
 
 // クッキー設定
@@ -50,14 +51,27 @@ $board = new Board($result->fetch_array());
 $title = htmlspecialchars($board->title);
 
 // スレッド情報を取得
-$sql = "SELECT `T`.`tid`,`subject`,`tindex`,`access_cnt`,COUNT(1) AS `message_cnt`,`update_ts`,`locked`,`top`,`next_tmid`";
-$sql .= " FROM (SELECT * FROM `thread_archive` WHERE `bid`='{$board->bid}' AND `tid`='$tid') AS `T`";
-$sql .= " JOIN (SELECT tid FROM `message_archive` WHERE `bid`='{$board->bid}' AND `tid`='$tid') AS `M`";
-$sql .= " ON `T`.`tid`=`M`.`tid` GROUP BY `tid`";
+$sql = "SELECT T.tid,T.subject,T.tindex,";
+$sql .= "IF(LENGTH(T.readpass) > 0,TRUE,FALSE) isset_readpass,IF(LENGTH(T.writepass) > 0,TRUE,FALSE) isset_writepass,";
+$sql .= "T.access_cnt,COUNT(1) message_cnt,T.update_ts,T.locked,T.top,T.next_tmid";
+$sql .= " FROM (SELECT * FROM thread_archive WHERE bid='{$board->bid}' AND tid='$tid') AS T";
+$sql .= " JOIN (SELECT tid FROM message_archive WHERE bid='{$board->bid}' AND tid='$tid') AS M";
+$sql .= " ON T.tid=M.tid GROUP BY tid";
 $result = $mysql->query($sql);
 if($mysql->error) die("ERROR07:存在しないIDです");
 if(!$result->num_rows) die("ERROR08:存在しないIDです");
 $thread = new Thread($result->fetch_array());
+
+// 閲覧パスの確認
+if($thread->isset_readpass && !isset($_SESSION["read_auth"]["{$board->bid}"]["{$thread->tid}"])) {
+	$http = "http";
+	if(isset($_SERVER["HTTPS"]) && $_SERVER["HTTPS"] == "on") $http .= "s";
+	echo $http;
+	header("HTTP/1.1 301 Moved Permanently");
+	header("Pragma: no-cache");
+	header("Location:$http://{$_SERVER["HTTP_HOST"]}/bbs/archive/readpass.php?id=$id&tid=$tid");
+	exit;
+}
 
 if(!isset($tmid)) {
 	//------------------------------
@@ -149,7 +163,6 @@ while($array = $result->fetch_array()) {
 <hr class="normal">
 <?php
 if(!isset($tmid)) {
-	$url = "./read.php?id=$id&tid=$tid$view";
 ?>
 <form action="<?=$_SERVER["PHP_SELF"]?>" method="get" enctype="multipart/form-data">
 <input name="id" type="hidden" value="<?=$id?>">
@@ -166,11 +179,11 @@ if(!isset($tmid)) {
 <?php
 if(isset($tmid)) {
 ?>
-<li><a href="/bbs/read.php?id=<?=$board->name?>&tid=<?=$thread->tid?>"<?=mbi_ack(8)?>><?=mbi("8.")?>スレッドに戻る</a></li>
+<li><a href="/bbs/archive/read.php?id=<?=$board->name?>&tid=<?=$thread->tid?>"<?=mbi_ack(8)?>><?=mbi("8.")?>スレッドに戻る</a></li>
 <?php
 }
 ?>
-<li><a href="/bbs/?id=<?=$board->name?>"<?=mbi_ack(9)?>><?=mbi("9.")?><?=$board->title?></a></li>
+<li><a href="/bbs/archive/?id=<?=$board->name?>"<?=mbi_ack(9)?>><?=mbi("9.")?><?=$board->title?>(過去ログ)</a></li>
 <li><a href="/"<?=mbi_ack(0)?>><?=mbi("0.")?>トップページ</a></li>
 </ul>
 <?php
