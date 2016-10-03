@@ -39,13 +39,25 @@ $title = $board->name;
 
 // スレッド情報を取得
 if($tid > 0) {
-	$sql = "SELECT `T`.`tid`,`subject`,`tindex`,`access_cnt`,COUNT(1) AS `message_cnt`,`update_ts`,`locked`,`top`,`next_tmid`";
-	$sql .= " FROM (SELECT * FROM `thread` WHERE `bid`='{$board->bid}' AND `tid`='$tid') AS `T`";
-	$sql .= " JOIN (SELECT tid FROM `message` WHERE `bid`='{$board->bid}' AND `tid`='$tid') AS `M`";
-	$sql .= " ON `T`.`tid`=`M`.`tid` GROUP BY `tid`";
+	$sql = "SELECT T.tid,subject,tindex,";
+	$sql .= "IF(LENGTH(T.readpass) > 0,TRUE,FALSE) isset_readpass,IF(LENGTH(T.writepass) > 0,TRUE,FALSE) isset_writepass,";
+	$sql .= "access_cnt,COUNT(1) AS message_cnt,update_ts,locked,top,next_tmid";
+	$sql .= " FROM (SELECT * FROM thread WHERE bid='{$board->bid}' AND tid='$tid') AS T";
+	$sql .= " JOIN (SELECT tid FROM message WHERE bid='{$board->bid}' AND tid='$tid') AS M";
+	$sql .= " ON T.tid=M.tid GROUP BY tid";
 	$result = $mysql->query($sql);
 	if(!$result->num_rows) die("ERROR12:存在しないIDです");
 	$thread = new Thread($result->fetch_array());
+
+	// 閲覧パスの確認
+	if($thread->isset_readpass && !isset($_SESSION["read_auth"]["{$board->bid}"]["{$thread->tid}"])) {
+		$http = "http";
+		if(isset($_SERVER["HTTPS"]) && $_SERVER["HTTPS"] == "on") $http .= "s";
+		header("HTTP/1.1 301 Moved Permanently");
+		header("Pragma: no-cache");
+		header("Location:$http://{$_SERVER["HTTP_HOST"]}/bbs/readpass.php?id=$id&tid=$tid");
+		exit;
+	}
 }
 
 // 検索ワード
@@ -137,17 +149,19 @@ if(isset($words)) {
 	if(count($like_list) > 0) {
 		$column = "";
 		$where = implode(" $mode ", $like_list);
-		$where_add = ($tid > 0) ? "`bid`='{$board->bid}' AND `tid`='$tid'" : "`thread`.`bid`='{$board->bid}'";
+		$where_add = ($tid > 0) ? "`bid`='{$board->bid}' AND `tid`='$tid'" : "`thread`.`bid`='{$board->bid}' AND IFNULL(LENGTH(`thread`.`readpass`),0)=0";
 		$sql = "SELECT SQL_CALC_FOUND_ROWS * FROM $table WHERE ($where) AND $where_add ORDER BY `mid` DESC LIMIT $start,10";
 		$result = $mysql->query($sql);
 		$sql = "SELECT FOUND_ROWS() AS `count`";
 		$count = $mysql->query($sql)->fetch_object()->count;
 		while($array = $result->fetch_array()) {
 			if($tid == 0) {
-				$sql = "SELECT `T`.`tid`,`subject`,`tindex`,`access_cnt`,COUNT(1) AS `message_cnt`,`update_ts`,`locked`,`top`,`next_tmid`";
-				$sql .= " FROM (SELECT * FROM `thread` WHERE `bid`='{$board->bid}' AND `tid`='{$array["tid"]}') AS `T`";
-				$sql .= " JOIN (SELECT tid FROM `message` WHERE `bid`='{$board->bid}' AND `tid`='{$array["tid"]}') AS `M`";
-				$sql .= " ON `T`.`tid`=`M`.`tid` GROUP BY `tid`";
+				$sql = "SELECT T.tid,subject,tindex,";
+				$sql .= "IF(LENGTH(T.readpass) > 0,TRUE,FALSE) isset_readpass,IF(LENGTH(T.writepass) > 0,TRUE,FALSE) isset_writepass,";
+				$sql .= "access_cnt,COUNT(1) AS message_cnt,update_ts,locked,top,next_tmid";
+				$sql .= " FROM (SELECT * FROM thread WHERE bid='{$board->bid}' AND tid='{$array["tid"]}') AS T";
+				$sql .= " JOIN (SELECT tid FROM message WHERE bid='{$board->bid}' AND tid='{$array["tid"]}') AS M";
+				$sql .= " ON T.tid=M.tid GROUP BY tid";
 				$thread = new Thread($mysql->query($sql)->fetch_array());
 			}
 			$message_list[] = new Message($array, $mysql, $board, $thread);

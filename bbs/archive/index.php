@@ -46,11 +46,13 @@ $array = $result->fetch_array();
 $rows = $array["count"];
 
 // スレッド一覧を取得
-$sql = "SELECT `T`.`tid`,`subject`,`tindex`,`access_cnt`,COUNT(1) AS `message_cnt`,`update_ts`,`locked`,`top`,`next_tmid`";
-$sql .= " FROM (SELECT * FROM `thread_archive` WHERE `bid`='{$board->bid}') AS `T`";
-$sql .= " JOIN (SELECT tid FROM `message_archive` WHERE `bid`='{$board->bid}') AS `M`";
-$sql .= " ON `T`.`tid`=`M`.`tid`";
-$sql .= " GROUP BY `tid` ORDER BY `tindex` DESC";
+$sql = "SELECT T.tid,T.subject,T.tindex,";
+$sql .= "IF(LENGTH(T.readpass) > 0,TRUE,FALSE) isset_readpass,IF(LENGTH(T.writepass) > 0,TRUE,FALSE) isset_writepass,";
+$sql .= "T.access_cnt,COUNT(1) message_cnt,T.update_ts,T.locked,T.top,T.next_tmid";
+$sql .= " FROM (SELECT * FROM thread_archive WHERE bid='{$board->bid}') AS T";
+$sql .= " JOIN (SELECT tid FROM message_archive WHERE bid='{$board->bid}') AS M";
+$sql .= " ON T.tid=M.tid";
+$sql .= " GROUP BY tid ORDER BY tindex DESC";
 $sql .= " LIMIT ".($page * $LIMIT).",$LIMIT";
 $result = $mysql->query($sql);
 if($mysql->error) die("ERROR05:存在しないIDです");
