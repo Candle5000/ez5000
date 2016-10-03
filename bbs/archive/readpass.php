@@ -1,6 +1,6 @@
 <?php
 //=====================================
-// 閲覧パス入力フォーム
+// 過去ログ 閲覧パス入力フォーム
 //=====================================
 require_once("/var/www/bbs/class/mysql.php");
 require_once("/var/www/bbs/class/board.php");
@@ -41,7 +41,7 @@ $title = htmlspecialchars($board->title);
 $sql = "SELECT T.tid,T.subject,T.tindex,";
 $sql .= "IF(LENGTH(T.readpass) > 0,TRUE,FALSE) isset_readpass,IF(LENGTH(T.writepass) > 0,TRUE,FALSE) isset_writepass,";
 $sql .= "T.access_cnt,COUNT(1) message_cnt,T.update_ts,T.locked,T.top,T.next_tmid";
-$sql .= " FROM thread T JOIN message M ON T.bid = M.bid AND T.tid = M.tid";
+$sql .= " FROM thread_archive T JOIN message_archive M ON T.bid = M.bid AND T.tid = M.tid";
 $sql .= " WHERE T.bid = '{$board->bid}' AND T.tid = '$tid' GROUP BY T.tid";
 $result = $mysql->query($sql);
 if($mysql->error || !$result->num_rows) die("ERROR07:存在しないIDです");
@@ -56,7 +56,7 @@ $url = $http."://".$_SERVER["HTTP_HOST"];
 if(!$thread->isset_readpass) {
 	header("HTTP/1.1 301 Moved Permanently");
 	header("Pragma: no-cache");
-	header("Location:$url/bbs/read.php?id=$id&tid=$tid");
+	header("Location:$url/bbs/archive/read.php?id=$id&tid=$tid");
 	exit;
 }
 
@@ -64,7 +64,7 @@ if(!$thread->isset_readpass) {
 if($_SERVER["REQUEST_METHOD"] == "POST") {
 	$readpass = $_POST["readpass"];
 	$sql_readpass = $mysql->real_escape_string($readpass);
-	$sql = "SELECT readpass=PASSWORD('$sql_readpass') is_matched FROM thread";
+	$sql = "SELECT readpass=PASSWORD('$sql_readpass') is_matched FROM thread_archive";
 	$sql .= " WHERE bid='{$board->bid}' AND tid='{$thread->tid}'";
 	$result = $mysql->query($sql);
 	if($mysql->error || !$result->num_rows) die("ERROR08:存在しないIDです");
@@ -79,7 +79,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 if(isset($_SESSION["read_auth"]["{$board->bid}"]["{$thread->tid}"])) {
 	header("HTTP/1.1 301 Moved Permanently");
 	header("Pragma: no-cache");
-	header("Location:$url/bbs/read.php?id=$id&tid=$tid");
+	header("Location:$url/bbs/archive/read.php?id=$id&tid=$tid");
 	exit;
 }
 ?>

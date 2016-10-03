@@ -99,6 +99,19 @@ if($mode == 1 || $mode == 2) {
 		header("HTTP/1.1 301 Moved Permanently");
 		header("Pragma: no-cache");
 		header("Location:$http://{$_SERVER["HTTP_HOST"]}/bbs/readpass.php?id=$id&tid=$tid");
+		exit;
+	}
+
+	// 書込パスの確認
+	if($thread->isset_writepass && !isset($_SESSION["write_auth"]["{$board->bid}"]["{$thread->tid}"])) {
+		$http = "http";
+		if(isset($_SERVER["HTTPS"]) && $_SERVER["HTTPS"] == "on") $http .= "s";
+		$tmid = ($mode == 2) ? "&tmid=$tmid" : "";
+		$re = ($mode == 1 && $re != 0) ? "&re=$re" : "";
+		header("HTTP/1.1 301 Moved Permanently");
+		header("Pragma: no-cache");
+		header("Location:$http://{$_SERVER["HTTP_HOST"]}/bbs/writepass.php?mode={$_GET["mode"]}&id=$id&tid=$tid$tmid$re");
+		exit;
 	}
 
 	if($thread->message_cnt > 999 && $mode == 1) die("ERROR104:スレッドの投稿数が上限に達しています");

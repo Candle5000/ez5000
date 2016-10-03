@@ -48,6 +48,16 @@ if($tid > 0) {
 	$result = $mysql->query($sql);
 	if(!$result->num_rows) die("ERROR12:存在しないIDです");
 	$thread = new Thread($result->fetch_array());
+
+	// 閲覧パスの確認
+	if($thread->isset_readpass && !isset($_SESSION["read_auth"]["{$board->bid}"]["{$thread->tid}"])) {
+		$http = "http";
+		if(isset($_SERVER["HTTPS"]) && $_SERVER["HTTPS"] == "on") $http .= "s";
+		header("HTTP/1.1 301 Moved Permanently");
+		header("Pragma: no-cache");
+		header("Location:$http://{$_SERVER["HTTP_HOST"]}/bbs/readpass.php?id=$id&tid=$tid");
+		exit;
+	}
 }
 
 // 検索ワード
@@ -139,7 +149,7 @@ if(isset($words)) {
 	if(count($like_list) > 0) {
 		$column = "";
 		$where = implode(" $mode ", $like_list);
-		$where_add = ($tid > 0) ? "`bid`='{$board->bid}' AND `tid`='$tid'" : "`thread`.`bid`='{$board->bid}'";
+		$where_add = ($tid > 0) ? "`bid`='{$board->bid}' AND `tid`='$tid'" : "`thread`.`bid`='{$board->bid}' AND IFNULL(LENGTH(`thread`.`readpass`),0)=0";
 		$sql = "SELECT SQL_CALC_FOUND_ROWS * FROM $table WHERE ($where) AND $where_add ORDER BY `mid` DESC LIMIT $start,10";
 		$result = $mysql->query($sql);
 		$sql = "SELECT FOUND_ROWS() AS `count`";

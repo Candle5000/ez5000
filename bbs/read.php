@@ -73,6 +73,7 @@ if($thread->isset_readpass && !isset($_SESSION["read_auth"]["{$board->bid}"]["{$
 	header("HTTP/1.1 301 Moved Permanently");
 	header("Pragma: no-cache");
 	header("Location:$http://{$_SERVER["HTTP_HOST"]}/bbs/readpass.php?id=$id&tid=$tid");
+	exit;
 }
 
 if(!isset($tmid)) {

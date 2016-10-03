@@ -22,6 +22,7 @@ function selfpage() {
 	header("HTTP/1.1 301 Moved Permanently");
 	header("Pragma: no-cache");
 	header("Location: $url");
+	exit;
 }
 
 //----------------------------------------
