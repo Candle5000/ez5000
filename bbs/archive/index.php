@@ -102,6 +102,7 @@ if($result->num_rows) {
 <div id="pagelink"><?=$pagelink?></div>
 <hr class="normal">
 <ul id="footlink">
+<li><a href="/bbs/?id=<?=$board->name?>"<?=mbi_ack(9)?>><?=mbi("9.")?>現行ログに戻る</a></li>
 <li><a href="/"<?=mbi_ack(0)?>><?=mbi("0.")?>トップページ</a></li>
 </ul>
 <?php
