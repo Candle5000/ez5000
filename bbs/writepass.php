@@ -151,6 +151,7 @@ if(isset($error_list)) {
 ?>
 <form action="<?=$_SERVER["PHP_SELF"]."?mode={$_GET["mode"]}&id=$id&tid=$tid$tmid$re"?>" method="post" enctype="multipart/form-data">
 <input name="writepass" type="password" maxlength="32" value="" />
+<input type="submit" value=" 送信 " />
 </form>
 <hr class="normal">
 <ul id="footlink">

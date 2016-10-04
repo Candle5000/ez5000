@@ -105,6 +105,7 @@ if(isset($error_list)) {
 ?>
 <form action="<?=$_SERVER["PHP_SELF"]."?id=$id&tid=$tid"?>" method="post" enctype="multipart/form-data">
 <input name="readpass" type="password" maxlength="32" value="" />
+<input type="submit" value=" 送信 " />
 </form>
 <hr class="normal">
 <ul id="footlink">
@@ -112,7 +113,7 @@ if(isset($error_list)) {
 <li><a href="/"<?=mbi_ack(0)?>><?=mbi("0.")?>トップページ</a></li>
 </ul>
 <?php
-pagefoot($thread->access_cnt);
+pagefoot($board->access_cnt_archive);
 ?>
 </div>
 </body>
