@@ -105,6 +105,7 @@ if(isset($error_list)) {
 ?>
 <form action="<?=$_SERVER["PHP_SELF"]."?id=$id&tid=$tid"?>" method="post" enctype="multipart/form-data">
 <input name="readpass" type="password" maxlength="32" value="" />
+<input type="submit" value=" 送信 " />
 </form>
 <hr class="normal">
 <ul id="footlink">
