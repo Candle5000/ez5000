@@ -169,7 +169,7 @@ if(device_info() == "sp") {
 <?php
 }
 ?>
-<title>管理者用 追加・更新</title>
+<title>管理者用</title>
 <?php
 }
 
