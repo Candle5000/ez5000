@@ -4,6 +4,7 @@
 //=====================================
 require_once("/var/www/class/mysql.php");
 require_once("/var/www/functions/template.php");
+require_once("/var/www/bbs/class/board.php");
 
 session_start();
 
@@ -17,6 +18,22 @@ if(!isset($_SESSION["admin_auth"])) {
 	header("Location:$http://{$_SERVER["HTTP_HOST"]}/bbs/admin/login.php");
 	exit;
 }
+
+// DB接続
+$user_file = "/etc/mysql-user/userBBS.ini";
+if($fp_user = fopen($user_file, "r")) {
+	$userName = rtrim(fgets($fp_user));
+	$password = rtrim(fgets($fp_user));
+	$database = rtrim(fgets($fp_user));
+} else {
+	die("接続設定の読み込みに失敗しました");
+}
+$mysql = new MySQL($userName, $password, $database);
+if($mysql->connect_error) die("データベースの接続に失敗しました");
+
+// 掲示板一覧の読み込み
+$sql = "SELECT * FROM board ORDER BY bid";
+$result = $mysql->query($sql);
 ?>
 <html>
 <head>
@@ -25,7 +42,14 @@ if(!isset($_SESSION["admin_auth"])) {
 <body>
 <h3>* * 掲示板管理メニュー * *</h3>
 <ul>
-<li>テスト</li>
+<?php
+while($array = $result->fetch_array()) {
+	$board = new Board($array);
+?>
+<li><a href="./thread.php?id=<?=$board->name?>"><?=$board->title?>(<?=$board->name?>)</a>[<a href="./board.php?id=<?=$board->name?>">編集</a>]</li>
+<?php
+}
+?>
 </ul>
 <hr>
 <a href="/" target="_blank">トップページを開く</a>
