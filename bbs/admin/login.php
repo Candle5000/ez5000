@@ -42,7 +42,7 @@ if(isset($_SESSION["admin_auth"])) {
 	if(isset($_SERVER["HTTPS"]) && $_SERVER["HTTPS"] == "on") $http .= "s";
 	header("HTTP/1.1 301 Moved Permanently");
 	header("Pragma: no-cache");
-	header("Location:$http://{$_SERVER["HTTP_HOST"]}/bbs/admin.php");
+	header("Location:$http://{$_SERVER["HTTP_HOST"]}/bbs/admin/");
 	exit;
 }
 ?>

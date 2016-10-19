@@ -14,7 +14,7 @@ if(!isset($_SESSION["admin_auth"])) {
 	echo $http;
 	header("HTTP/1.1 301 Moved Permanently");
 	header("Pragma: no-cache");
-	header("Location:$http://{$_SERVER["HTTP_HOST"]}/bbs/admin_login.php");
+	header("Location:$http://{$_SERVER["HTTP_HOST"]}/bbs/admin/login.php");
 	exit;
 }
 ?>
