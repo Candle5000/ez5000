@@ -44,8 +44,6 @@ if(!isset($_GET["id"]) || !preg_match('/^[a-zA-Z0-9]{4,16}$/', $_GET["id"])) die
 // 掲示板の読み込み
 $sql = "SELECT * FROM board WHERE name = '{$_GET["id"]}'";
 $result = $mysql->query($sql);
-//if($mysql->error) die("ERROR102:存在しないIDです");
-//if($mysql->error || $result->num_rows != 1) die(print_error(ERRMSG101));
 if($result->num_rows != 1) die(print_error(ERRMSG101));
 $board = new Board($result->fetch_array());
 

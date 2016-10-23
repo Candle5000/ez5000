@@ -46,14 +46,16 @@ $result = $mysql->query($sql);
 while($array = $result->fetch_array()) {
 	$board = new Board($array);
 ?>
-<li><a href="./thread.php?id=<?=$board->name?>"><?=$board->title?>(<?=$board->name?>)</a>[<a href="./board.php?id=<?=$board->name?>">編集</a>]</li>
+<li><a href="./thlist.php?id=<?=$board->name?>"><?=$board->title?>(<?=$board->name?>)</a>[<a href="./board.php?id=<?=$board->name?>">編集</a>]</li>
 <?php
 }
 ?>
 </ul>
-<hr>
-<a href="/" target="_blank">トップページを開く</a>
-<hr>
-<hr>
+<hr />
+<ul style="list-style-type:none; text-align:right;">
+<li><a href="/" target="_blank">トップページを開く</a></li>
+</ul>
+<hr />
+<hr />
 </body>
 </html>
