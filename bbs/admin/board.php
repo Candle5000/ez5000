@@ -2,7 +2,7 @@
 //=====================================
 // 管理者用 掲示板管理メニュー
 //=====================================
-require_once("/var/www/class/mysql.php");
+require_once("/var/www/bbs/class/mysql.php");
 require_once("/var/www/functions/template.php");
 require_once("/var/www/functions/input_check.php");
 require_once("/var/www/bbs/class/board.php");
@@ -16,7 +16,6 @@ session_start();
 if(!isset($_SESSION["admin_auth"])) {
 	$http = "http";
 	if(isset($_SERVER["HTTPS"]) && $_SERVER["HTTPS"] == "on") $http .= "s";
-	echo $http;
 	header("HTTP/1.1 301 Moved Permanently");
 	header("Pragma: no-cache");
 	header("Location:$http://{$_SERVER["HTTP_HOST"]}/bbs/admin/login.php");
@@ -57,6 +56,14 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 	} else if(!preg_match('/^[a-zA-Z0-9]{4,16}$/', trim($_POST["name"]))) {
 		$error_list[] = "掲示板IDは半角英数字で4～16文字を入力してください。";
 		$board->name = trim($_POST["name"]);
+	} else if($board->name != trim($_POST["name"])) {
+		$name = trim($_POST["name"]);
+		$sql = "SELECT 1 FROM board WHERE name = '$name'";
+		$result = $mysql->query($sql);
+		if($result->num_rows == 1) $error_list[] = "既存の掲示板と同じIDは設定できません。";
+		$board->name = trim($_POST["name"]);
+	} else {
+		$board->name = trim($_POST["name"]);
 	}
 
 	// 掲示板タイトルのチェック
@@ -65,6 +72,8 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 		$board->title = "";
 	} else if(mb_strlen(trim_all($_POST["title"])) < 4 || mb_strlen(trim_all($_POST["title"])) > 32) {
 		$error_list[] = "掲示板タイトルは4～32文字を入力してください。";
+		$board->title = trim($_POST["title"]);
+	} else {
 		$board->title = trim($_POST["title"]);
 	}
 
@@ -75,7 +84,6 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 	$board->allow_writepass = isset($_POST["allow_writepass"]);
 
 	// 投稿者名の文字数制限
-	$name_max = 30; // 名無し設定用
 	if(is_empty($_POST["name_max"])) {
 		$error_list[] = "投稿者名の文字数制限が入力されていません。";
 		$board->name_max = "";
@@ -83,7 +91,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 		$error_list[] = "投稿者名の文字数制限は8～30の数値を入力してください。";
 		$board->name_max = trim($_POST["name_max"]);
 	} else {
-		$name_max = $_POST["name_max"];
+		$board->name_max = trim($_POST["name_max"]);
 	}
 
 	// スレッドタイトルの文字数制限
@@ -92,6 +100,8 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 		$board->subject_max = "";
 	} else if(!is_numeric($_POST["subject_max"]) || $_POST["subject_max"] < 8 || $_POST["subject_max"] > 40) {
 		$error_list[] = "スレッドタイトルの文字数制限は8～40の数値を入力してください。";
+		$board->subject_max = trim($_POST["subject_max"]);
+	} else {
 		$board->subject_max = trim($_POST["subject_max"]);
 	}
 
@@ -102,13 +112,17 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 	} else if(!is_numeric($_POST["comment_max"]) || $_POST["comment_max"] < 128 || $_POST["comment_max"] > 4096) {
 		$error_list[] = "メッセージ本文の文字数制限は128～4096の数値を入力してください。";
 		$board->comment_max = trim($_POST["comment_max"]);
+	} else {
+		$board->comment_max = trim($_POST["comment_max"]);
 	}
 
 	// 名無し設定
 	if(is_empty($_POST["default_name"])) {
 		$board->default_name = "";
-	} else if(mb_strlen(trim_all($_POST["default_name"])) > $name_max) {
-		$error_list[] = "デフォルト投稿者名が文字数制限".$name_max."を満たしていません。";
+	} else if(!is_empty($board->name_max) && mb_strlen(trim_all($_POST["default_name"])) > $board->name_max) {
+		$error_list[] = "デフォルト投稿者名が文字数制限".$board->name_max."以内を満たしていません。";
+		$board->default_name = trim($_POST["default_name"]);
+	} else {
 		$board->default_name = trim($_POST["default_name"]);
 	}
 
@@ -119,6 +133,8 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 	} else if(!is_numeric($_POST["thpost_limit"]) || $_POST["thpost_limit"] < 0 || $_POST["thpost_limit"] > 600) {
 		$error_list[] = "スレッド連続作成の制限は0～600の数値を入力してください。";
 		$board->thpost_limit = trim($_POST["thpost_limit"]);
+	} else {
+		$board->thpost_limit = trim($_POST["thpost_limit"]);
 	}
 
 	// 連続投稿の制限
@@ -128,6 +144,35 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 	} else if(!is_numeric($_POST["repost_limit"]) || $_POST["repost_limit"] < 0 || $_POST["repost_limit"] > 600) {
 		$error_list[] = "連続投稿の制限は0～600の数値を入力してください。";
 		$board->repost_limit = trim($_POST["repost_limit"]);
+	} else {
+		$board->repost_limit = trim($_POST["repost_limit"]);
+	}
+
+	// 登録処理
+	if(count($error_list) == 0) {
+		$bid = $board->bid;
+		$name = $board->name;
+		$title = $mysql->real_escape_string($board->title);
+		$allow_readpass = $board->allow_readpass ? "TRUE" : "FALSE";
+		$allow_writepass = $board->allow_writepass ? "TRUE" : "FALSE";
+		$default_name = $mysql->real_escape_string($board->default_name);
+		$name_max = $board->name_max;
+		$subject_max = $board->subject_max;
+		$comment_max = $board->comment_max;
+		$thpost_limit = $board->thpost_limit;
+		$repost_limit = $board->repost_limit;
+		$sql = "UPDATE board SET name = '$name', title = '$title', allow_readpass = $allow_readpass, allow_writepass = $allow_writepass, default_name = '$default_name', name_max = '$name_max', subject_max = '$subject_max', comment_max = '$comment_max', thpost_limit = '$thpost_limit', repost_limit = '$repost_limit' WHERE bid = '$bid'";
+		$mysql->query($sql);
+		if($mysql->error) {
+			$error_list[] = "データの更新に失敗しました。";
+		} else {
+			$http = "http";
+			if(isset($_SERVER["HTTPS"]) && $_SERVER["HTTPS"] == "on") $http .= "s";
+			header("HTTP/1.1 301 Moved Permanently");
+			header("Pragma: no-cache");
+			header("Location:$http://".$_SERVER["HTTP_HOST"]."/bbs/admin/board.php?id=".htmlspecialchars($board->name));
+			exit;
+		}
 	}
 }
 

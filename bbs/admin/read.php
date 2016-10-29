@@ -2,7 +2,7 @@
 //=====================================
 // 管理者用 掲示板管理メニュー
 //=====================================
-require_once("/var/www/class/mysql.php");
+require_once("/var/www/bbs/class/mysql.php");
 require_once("/var/www/functions/template.php");
 require_once("/var/www/bbs/class/board.php");
 require_once("/var/www/bbs/class/message.php");
