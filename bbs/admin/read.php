@@ -73,6 +73,28 @@ if($result->num_rows == 0) die(print_error(ERRMSG103));
 $sql = "SELECT FOUND_ROWS() count";
 $messageCount = $mysql->query($sql)->fetch_object()->count;
 
+// 操作メッセージの取得
+$actInfo = "";
+if(isset($_POST["msgId"])) {
+	switch($_POST["msgId"]) {
+		case "0":
+			$actInfo = "<div style=\"color:#00F;\">メッセージを削除しました。</div>";
+			break;
+		case "1":
+			$actInfo = "<div style=\"color:#F00;\">メッセージが選択されていません。</div>";
+			break;
+		case "2":
+			$actInfo = "<div style=\"color:#F00;\">選択されたメッセージが存在していません。</div>";
+			break;
+		case "3":
+			$actInfo = "<div style=\"color:#F00;\">削除ログの更新に失敗しました。</div>";
+			break;
+		case "4":
+			$actInfo = "<div style=\"color:#F00;\">メッセージの削除に失敗しました。</div>";
+			break;
+	}
+}
+
 // ページ遷移用リンク
 $pageCount = ceil($messageCount / PAGE_SIZE);
 $pageLinkList = array();
@@ -93,6 +115,7 @@ $pageLink = implode(" | ", $pageLinkList);
 <h3>* * 掲示板管理メニュー * *</h3>
 <div>掲示板 : [<?=$board->name?>]<?=$board->title?></div>
 <div>スレッド : [<?=$thread->tid?>]<?=$thread->subject?></div>
+<?=$actInfo?>
 <hr />
 <div>ページ移動 <?=$pageLink?></div>
 <hr />
@@ -103,8 +126,26 @@ while($array = $result->fetch_array()) {
 	$message->name = htmlspecialchars($message->name);
 	$message->comment = nl2br(htmlspecialchars($message->comment));
 	$message->ua = htmlspecialchars($message->ua);
+	if($message->image != "") {
+		$file_id = "{$board->name}-{$thread->tid}-{$message->tmid}-{$message->image}";
+		if(file_exists("/var/www/img/bbs/$file_id")) {
+			$imageinfo = @getimagesize("/var/www/img/bbs/$file_id");
+			$imagesize = ceil(filesize("/var/www/img/bbs/$file_id") / 1024);
+			if(!$imageinfo || !$imageinfo[0]) {
+				$img = "<br />\n[画像の読み込みに失敗しました]\n";
+			} else if(file_exists("/var/www/img/bbs/$file_id.png")) {
+				$img = "<br />\n<a href=\"/img/bbs/$file_id\"><img src=\"/img/bbs/$file_id.png\" />[$imagesize KB]</a>\n";
+			} else {
+				$img = "<br />\n<a href=\"/img/bbs/$file_id\">[サムネイルがありません]<br />\n[$imagesize KB]</a>\n";
+			}
+		} else {
+			$img = "<br />\n[画像が存在しません]\n";
+		}
+	} else {
+		$img = "";
+	}
 ?>
-<div>
+<div style="word-wrap:break-word; white-space:pre-wrap;">
 [<?=$message->tmid?>] By <?=$message->name?><br />
 <?=$message->comment?><br />
 <?=$message->post_ts?><br />
@@ -113,11 +154,12 @@ HOSTNAME:<?=$message->hostname?><br />
 UA:<?=$message->ua?><br />
 UID:<?=$message->uid?><br />
 USER ID:<?=$message->user_id?>
+<?=$img?>
 <?php
 	if($message->tmid != 1) {
 ?>
 <br />
-<label><input type="checkbox" name="delmsg[<?=$message->tmid?>]" value="true" />削除する</label>
+<label><input type="checkbox" name="delmsg[]" value="<?=$message->tmid?>" />削除する</label>
 <?php
 	}
 ?>
