@@ -26,6 +26,13 @@ function selfpage() {
 }
 
 //----------------------------------------
+// エラーメッセージ出力
+//----------------------------------------
+function print_error($errorMessage) {
+	return('<div style="color:#F00;">'.$errorMessage.'</div>');
+}
+
+//----------------------------------------
 // 端末種類取得
 //----------------------------------------
 function device_info() {
@@ -169,7 +176,7 @@ if(device_info() == "sp") {
 <?php
 }
 ?>
-<title>管理者用 追加・更新</title>
+<title>管理者用</title>
 <?php
 }
 
