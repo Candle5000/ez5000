@@ -96,6 +96,7 @@ $pageLink = implode(" | ", $pageLinkList);
 <hr />
 <div>ページ移動 <?=$pageLink?></div>
 <hr />
+<form action="./delmsg.php" method="POST">
 <?php
 while($array = $result->fetch_array()) {
 	$message = new Message($array, $mysql, $board, $thread);
@@ -112,12 +113,29 @@ HOSTNAME:<?=$message->hostname?><br />
 UA:<?=$message->ua?><br />
 UID:<?=$message->uid?><br />
 USER ID:<?=$message->user_id?>
+<?php
+	if($message->tmid != 1) {
+?>
+<br />
+<label><input type="checkbox" name="delmsg[<?=$message->tmid?>]" value="true" />削除する</label>
+<?php
+	}
+?>
 </div>
 <hr />
 <?php
 }
+if($result->num_rows > 1) {
 ?>
+<input type="hidden" name="id" value="<?=$board->name?>" />
+<input type="hidden" name="tid" value="<?=$thread->tid?>" />
+<input type="submit" value=" 削除 " />
+<?php
+}
+?>
+</form>
 <ul style="list-style-type:none; text-align:right;">
+<li><a href="./thlist.php?id=<?=$board->name?>"><?=$board->title?></a></li>
 <li><a href="./">掲示板管理トップに戻る</a></li>
 <li><a href="/" target="_blank">トップページを開く</a></li>
 </ul>
