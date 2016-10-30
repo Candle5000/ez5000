@@ -26,7 +26,6 @@ if(isset($_SERVER["REQUEST_METHOD"]) == "POST") {
 		$userid = $mysql->real_escape_string(rtrim($_POST["user"]));
 		$passwd = "70a9a9e8c1ba195424a1aac50c7afd03df860f01".rtrim($mysql->real_escape_string($_POST["pass"]));
 		$sql = "SELECT 1 FROM bbs_admin WHERE user_id = '$userid' AND password = PASSWORD('$passwd')";
-		echo $sql;
 		$result = $mysql->query($sql);
 		if($result->num_rows > 0) {
 			$_SESSION["admin_auth"] = $userid;
