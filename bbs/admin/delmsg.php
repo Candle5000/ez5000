@@ -191,6 +191,7 @@ while($array = $result->fetch_array()) {
 	$message->name = htmlspecialchars($message->name);
 	$message->comment = nl2br(htmlspecialchars($message->comment));
 	$message->ua = htmlspecialchars($message->ua);
+	$img = ($message->image == "") ? "" : "<br />\n画像添付あり";
 ?>
 <div>
 [<?=$message->tmid?>] By <?=$message->name?><br />
@@ -201,6 +202,7 @@ HOSTNAME:<?=$message->hostname?><br />
 UA:<?=$message->ua?><br />
 UID:<?=$message->uid?><br />
 USER ID:<?=$message->user_id?>
+<?=$img?>
 <input type="hidden" name="delmsg[]" value="<?=$message->tmid?>" />
 </div>
 <hr />
