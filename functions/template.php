@@ -217,3 +217,36 @@ Web Design By Candle
 </div>
 <?php
 }
+
+//----------------------------------------
+// 管理用 JSでPOST送信して遷移
+//----------------------------------------
+function jsPostSend($target, $postArray) {
+?>
+<html>
+<head>
+<?=admin_pagehead()?>
+</head>
+<body>
+<script type="text/javascript">
+var form = document.createElement('form');
+document.body.appendChild(form);
+<?php
+	foreach($postArray as $key => $post) {
+?>
+var input<?=$key?> = document.createElement('input');
+input<?=$key?>.setAttribute('type', 'hidden');
+input<?=$key?>.setAttribute('name', '<?=$post["name"]?>');
+input<?=$key?>.setAttribute('value', '<?=$post["value"]?>');
+form.appendChild(input<?=$key?>);
+<?php
+	}
+?>
+form.setAttribute('action', '<?=$target?>');
+form.setAttribute('method', 'post');
+form.submit();
+</script>
+</body>
+</html>
+<?php
+}
