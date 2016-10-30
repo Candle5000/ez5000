@@ -97,7 +97,7 @@ if($pageCount = 0) {
 		$tid = $array["tid"];
 		$subject = $array["subject"];
 ?>
-<li><a href="./read.php?id=<?=$board->name?>&tid=<?=$tid?>"><?=$subject?>(<?=$tid?>)</a>[<a href="./thread.php?id=<?=$board->name?>&tid=<?$tid?>">編集</a>]</li>
+<li><a href="./read.php?id=<?=$board->name?>&tid=<?=$tid?>"><?=$subject?>(<?=$tid?>)</a>[<a href="./thread.php?id=<?=$board->name?>&tid=<?=$tid?>">編集</a>]</li>
 <?php
 	}
 }

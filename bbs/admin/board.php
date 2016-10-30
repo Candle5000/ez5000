@@ -170,7 +170,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 			if(isset($_SERVER["HTTPS"]) && $_SERVER["HTTPS"] == "on") $http .= "s";
 			header("HTTP/1.1 301 Moved Permanently");
 			header("Pragma: no-cache");
-			header("Location:$http://".$_SERVER["HTTP_HOST"]."/bbs/admin/board.php?id=".htmlspecialchars($board->name));
+			header("Location:$http://".$_SERVER["HTTP_HOST"]."/bbs/admin/board.php?id=".$board->name);
 			exit;
 		}
 	}
