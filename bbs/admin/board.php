@@ -49,23 +49,6 @@ $board = new Board($result->fetch_array());
 // POST送信時
 if($_SERVER["REQUEST_METHOD"] == "POST") {
 
-	// 掲示板IDのチェック
-	if(is_empty($_POST["name"])) {
-		$error_list[] = "掲示板IDが入力されていません。";
-		$board->name = "";
-	} else if(!preg_match('/^[a-zA-Z0-9]{4,16}$/', trim($_POST["name"]))) {
-		$error_list[] = "掲示板IDは半角英数字で4～16文字を入力してください。";
-		$board->name = trim($_POST["name"]);
-	} else if($board->name != trim($_POST["name"])) {
-		$name = trim($_POST["name"]);
-		$sql = "SELECT 1 FROM board WHERE name = '$name'";
-		$result = $mysql->query($sql);
-		if($result->num_rows == 1) $error_list[] = "既存の掲示板と同じIDは設定できません。";
-		$board->name = trim($_POST["name"]);
-	} else {
-		$board->name = trim($_POST["name"]);
-	}
-
 	// 掲示板タイトルのチェック
 	if(is_empty($_POST["title"])) {
 		$error_list[] = "掲示板タイトルが入力されていません。";
@@ -151,7 +134,6 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 	// 登録処理
 	if(count($error_list) == 0) {
 		$bid = $board->bid;
-		$name = $board->name;
 		$title = $mysql->real_escape_string($board->title);
 		$allow_readpass = $board->allow_readpass ? "TRUE" : "FALSE";
 		$allow_writepass = $board->allow_writepass ? "TRUE" : "FALSE";
@@ -161,7 +143,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 		$comment_max = $board->comment_max;
 		$thpost_limit = $board->thpost_limit;
 		$repost_limit = $board->repost_limit;
-		$sql = "UPDATE board SET name = '$name', title = '$title', allow_readpass = $allow_readpass, allow_writepass = $allow_writepass, default_name = '$default_name', name_max = '$name_max', subject_max = '$subject_max', comment_max = '$comment_max', thpost_limit = '$thpost_limit', repost_limit = '$repost_limit' WHERE bid = '$bid'";
+		$sql = "UPDATE board SET title = '$title', allow_readpass = $allow_readpass, allow_writepass = $allow_writepass, default_name = '$default_name', name_max = '$name_max', subject_max = '$subject_max', comment_max = '$comment_max', thpost_limit = '$thpost_limit', repost_limit = '$repost_limit' WHERE bid = '$bid'";
 		$mysql->query($sql);
 		if($mysql->error) {
 			$error_list[] = "データの更新に失敗しました。";
@@ -187,6 +169,7 @@ $wp_checked = $board->allow_writepass ? "checked " : "";
 <body>
 <h3>* * 掲示板管理メニュー * *</h3>
 <h4>掲示板設定の編集</h4>
+<div>掲示板ID : <?=$board->name?></div>
 <?php
 foreach($error_list as $error) {
 ?>
@@ -196,9 +179,6 @@ foreach($error_list as $error) {
 ?>
 <hr />
 <form action="<?=$_SERVER["PHP_SELF"]."?id=".$_GET["id"]?>" method="POST">
-掲示板ID [半角英数字4-16文字]<br />
-<input type="text" name="name" value="<?=$board->name?>" maxlength="16" size="20" /><br />
-<br />
 掲示板タイトル [4-32文字]<br />
 <input type="text" name="title" value="<?=$board->title?>" maxlength="32" size="72" /><br />
 <br />
