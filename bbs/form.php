@@ -257,6 +257,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 	// ユーザー情報取得
 	$ip = $_SERVER["REMOTE_ADDR"];
 	$ua = $_SERVER["HTTP_USER_AGENT"];
+	$hostname = gethostbyaddr($_SERVER['REMOTE_ADDR']);
 	if(isset($_SERVER['HTTP_X_DCMGUID'])) $uid = $_SERVER['HTTP_X_DCMGUID']; // docomo
 	if(isset($_SERVER['HTTP_X_UP_SUBNO'])) $uid = $_SERVER['HTTP_X_UP_SUBNO']; // au
 	if(isset($_SERVER['HTTP_X_JPHONE_UID'])) $uid = $_SERVER['HTTP_X_JPHONE_UID']; // sb
@@ -303,10 +304,10 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 
 				// 新規メッセージを登録
 				$sql = "INSERT INTO `message` (`mid`, `bid`, `tid`, `tmid`, `name`,";
-				$sql .= " `comment`, `image`, `password`, `post_ts`, `ip`, `ua`, `uid`)";
+				$sql .= " `comment`, `image`, `password`, `post_ts`, `ip`, `hostname`, `ua`, `uid`)";
 				$sql .= " VALUES ('$next_mid', '{$board->bid}', '$next_tid', '1', '$sql_name',";
 				$sql .= " '$sql_comment', '$file_id', PASSWORD('$sql_pass'), NOW(),";
-				$sql .= " '$ip', '$ua', '$uid')";
+				$sql .= " '$ip', '$hostname', '$ua', '$uid')";
 				$mysql->query($sql);
 				if($mysql->error) {
 					$mysql->rollback();
@@ -398,10 +399,10 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 
 				// 新規メッセージを登録
 				$sql = "INSERT INTO `message` (`mid`, `bid`, `tid`, `tmid`, `name`,";
-				$sql .= " `comment`, `image`, `password`, `post_ts`, `ip`, `ua`, `uid`)";
+				$sql .= " `comment`, `image`, `password`, `post_ts`, `ip`, `hostname`, `ua`, `uid`)";
 				$sql .= " VALUES ('$next_mid', '{$board->bid}', '{$thread->tid}', '$next_tmid',";
 				$sql .= " '$sql_name', '$sql_comment', '$file_id', PASSWORD('$sql_pass'),";
-				$sql .= " NOW(), '$ip', '$ua', '$uid')";
+				$sql .= " NOW(), '$ip', '$hostname', '$ua', '$uid')";
 				$mysql->query($sql);
 				if($mysql->error) {
 					$mysql->rollback();
@@ -589,7 +590,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 						$sql = "UPDATE `message` SET `name`='$sql_name', `comment`='$sql_comment',";
 						if($delmedia || $file_id != "") $sql .= " `image`='$file_id',";
 						$sql .= " `update_ts`=NOW(), `update_cnt`=`update_cnt`+1,";
-						$sql .= " `ip`='$ip', `ua`='$ua', `uid`='$uid'";
+						$sql .= " `ip`='$ip', `hostname`='$hostname', `ua`='$ua', `uid`='$uid'";
 						$sql .= " WHERE `bid`='{$board->bid}' AND `tid`='$tid' AND `tmid`='$tmid'";
 						$mysql->query($sql);
 						if($mysql->error) {
