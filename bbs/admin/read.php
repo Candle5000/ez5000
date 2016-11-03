@@ -145,7 +145,7 @@ while($array = $result->fetch_array()) {
 		$img = "";
 	}
 ?>
-<div style="word-wrap:break-word; white-space:pre-wrap;">
+<div style="word-wrap:break-word;">
 [<?=$message->tmid?>] By <?=$message->name?><br />
 <?=$message->comment?><br />
 <?=$message->post_ts?><br />
