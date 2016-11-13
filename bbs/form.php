@@ -381,7 +381,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 				$mysql->commit();
 
 				if($name_a[0] != $board->default_name) setcookie("bbs_name", $name_a[0], time() + 604800);
-				$_SESSION["thposttime"] = time() + 300;
+				$_SESSION["thposttime"] = time() + $board->thpost_limit;
 				$tid = $next_tid;
 				$tmid = 1;
 				break;
@@ -488,7 +488,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 				$mysql->commit();
 				$tmid = $next_tmid;
 				if($name_a[0] != $board->default_name) setcookie("bbs_name", $name_a[0], time() + 604800);
-				$_SESSION["reposttime"] = time() + 60;
+				$_SESSION["reposttime"] = time() + $board->repost_limit;
 				break;
 
 			case 2: // メッセージ編集
@@ -654,6 +654,9 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 				}
 			}
 		}
+
+		// 投稿後に画像認証情報をリセット
+		if(isset($_SESSION['ImageAuthentication'])) unset($_SESSION['ImageAuthentication']);
 	}
 }
 
