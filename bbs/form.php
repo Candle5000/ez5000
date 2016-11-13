@@ -654,6 +654,9 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 				}
 			}
 		}
+
+		// 投稿後に画像認証情報をリセット
+		if(isset($_SESSION['ImageAuthentication'])) unset($_SESSION['ImageAuthentication']);
 	}
 }
 
