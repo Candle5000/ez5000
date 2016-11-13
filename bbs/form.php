@@ -256,16 +256,22 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 
 	// ユーザー情報取得
 	$ip = $_SERVER["REMOTE_ADDR"];
-	$ua = $_SERVER["HTTP_USER_AGENT"];
-	$hostname = gethostbyaddr($_SERVER['REMOTE_ADDR']);
-	if(isset($_SERVER['HTTP_X_DCMGUID'])) $uid = $_SERVER['HTTP_X_DCMGUID']; // docomo
-	if(isset($_SERVER['HTTP_X_UP_SUBNO'])) $uid = $_SERVER['HTTP_X_UP_SUBNO']; // au
-	if(isset($_SERVER['HTTP_X_JPHONE_UID'])) $uid = $_SERVER['HTTP_X_JPHONE_UID']; // sb
+	$ua = $mysql->real_escape_string($_SERVER["HTTP_USER_AGENT"]);
+	$hostname = $mysql->real_escape_string(gethostbyaddr($_SERVER['REMOTE_ADDR']));
+	if(isset($_SERVER['HTTP_X_DCMGUID'])) $uid = $mysql->real_escape_string($_SERVER['HTTP_X_DCMGUID']); // docomo
+	if(isset($_SERVER['HTTP_X_UP_SUBNO'])) $uid = $mysql->real_escape_string($_SERVER['HTTP_X_UP_SUBNO']); // au
+	if(isset($_SERVER['HTTP_X_JPHONE_UID'])) $uid = $mysql->real_escape_string($_SERVER['HTTP_X_JPHONE_UID']); // sb
 	if(!isset($uid)) $uid = "";
 
 	// 画像認証
 	$is_mb = (device_info() == 'mb' && $uid != "");
 	if(!$is_mb && (!isset($_SESSION['ImageAuthentication']) || !isset($_POST["authcap"]) || ($_SESSION["ImageAuthentication"] != $_POST["authcap"]))) $error_list[] = "画像認証コードが一致しません";
+
+	// 書き込み規制チェック
+	$ip_a = explode('.', $ip);
+	$pattern_sql = "'^".$ip_a[0].'\.('.$ip_a[1].'\.('.$ip_a[2].'\.('.$ip_a[3].")?)?)?\$'";
+	$sql = "SELECT 1 FROM bbs_ban WHERE (ip REGEXP $pattern_sql AND (IFNULL(ua, '') = '' OR ua = '$ua')) OR (IFNULL(ip, '') = '' AND ua = '$ua')";
+	if($mysql->query($sql)->num_rows > 0) $error_list = array("投稿規制されています");
 
 	if(!isset($error_list)) {
 		$sql_title = $mysql->real_escape_string($title);
@@ -375,7 +381,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 				$mysql->commit();
 
 				if($name_a[0] != $board->default_name) setcookie("bbs_name", $name_a[0], time() + 604800);
-				$_SESSION["thposttime"] = time() + 300;
+				$_SESSION["thposttime"] = time() + $board->thpost_limit;
 				$tid = $next_tid;
 				$tmid = 1;
 				break;
@@ -482,7 +488,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 				$mysql->commit();
 				$tmid = $next_tmid;
 				if($name_a[0] != $board->default_name) setcookie("bbs_name", $name_a[0], time() + 604800);
-				$_SESSION["reposttime"] = time() + 60;
+				$_SESSION["reposttime"] = time() + $board->repost_limit;
 				break;
 
 			case 2: // メッセージ編集
@@ -648,6 +654,9 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 				}
 			}
 		}
+
+		// 投稿後に画像認証情報をリセット
+		if(isset($_SESSION['ImageAuthentication'])) unset($_SESSION['ImageAuthentication']);
 	}
 }
 
