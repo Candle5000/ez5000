@@ -52,6 +52,11 @@ while($array = $result->fetch_array()) {
 ?>
 </ul>
 <hr />
+<h3>* * 共通設定 * *</h3>
+<ul>
+<li><a href="./ban.php">書込規制設定(IP/UA指定)</a></li>
+</ul>
+<hr />
 <ul style="list-style-type:none; text-align:right;">
 <li><a href="/" target="_blank">トップページを開く</a></li>
 </ul>
