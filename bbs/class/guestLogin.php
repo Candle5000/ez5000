@@ -18,6 +18,9 @@ class GuestLogin {
 	function GuestLogin($p_mysql) {
 		$this->mysql = $p_mysql;
 
+		// フィーチャーフォンの場合処理しない
+		if(device_info() == "mb") return;
+
 		if(isset($_SESSION["guest_id"])) {
 			// ログイン済みのとき
 			$this->id = $_SESSION["guest_id"];
