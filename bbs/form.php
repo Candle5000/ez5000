@@ -6,7 +6,7 @@ require_once("/var/www/bbs/class/mysql.php");
 require_once("/var/www/bbs/class/board.php");
 require_once("/var/www/bbs/class/thread.php");
 require_once("/var/www/bbs/class/message.php");
-require_once("/var/www/bbs/class/guestLogin.php");
+require_once("/var/www/bbs/class/guestUser.php");
 require_once("/var/www/functions/template.php");
 session_start();
 $MAX_FSIZE = 512000;
@@ -74,7 +74,7 @@ $mysql = new MySQL($userName, $password, $database);
 if($mysql->connect_error) die("データベースの接続に失敗しました");
 
 // ゲストログイン情報
-$guest = new GuestLogin($mysql);
+$guest = new GuestUser($mysql);
 if(device_info() != "mb" && $guest->id != null && (strtotime($guest->allow_post) > time())) $error_list[] = "ご利用のゲストIDは{$guest->allow_post}まで書き込みできません";
 
 // クッキー有効確認

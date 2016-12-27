@@ -6,7 +6,7 @@ require_once("/var/www/bbs/class/mysql.php");
 require_once("/var/www/bbs/class/board.php");
 require_once("/var/www/bbs/class/thread.php");
 require_once("/var/www/bbs/class/message.php");
-require_once("/var/www/bbs/class/guestLogin.php");
+require_once("/var/www/bbs/class/guestUser.php");
 require_once("/var/www/functions/template.php");
 require_once("/var/www/functions/form.php");
 session_start();
@@ -23,7 +23,7 @@ $mysql = new MySQL($userName, $password, $database);
 if($mysql->connect_error) die("データベースの接続に失敗しました");
 
 // ゲストログイン情報
-$guest = new GuestLogin($mysql);
+$guest = new GuestUser($mysql);
 
 // 掲示板ID取得
 if(!isset($_GET["id"]) && !is_array($_GET["id"])) die("ERROR01:IDがありません");

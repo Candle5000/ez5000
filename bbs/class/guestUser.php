@@ -2,7 +2,7 @@
 //==============================
 // BBS用 MySQLクラス
 //==============================
-class GuestLogin {
+class GuestUser {
 
 	//--------------------------
 	// 変数の宣言
@@ -15,7 +15,7 @@ class GuestLogin {
 	//--------------------------
 	// コンストラクタ
 	//--------------------------
-	function GuestLogin($p_mysql) {
+	function GuestUser($p_mysql) {
 		$this->mysql = $p_mysql;
 
 		// フィーチャーフォンの場合処理しない
@@ -25,7 +25,7 @@ class GuestLogin {
 			// ログイン済みのとき
 			$this->id = $_SESSION["guest_id"];
 			$sql = <<<EOT
-SELECT * FROM guest_login WHERE id = '$this->id'
+SELECT * FROM guest_user WHERE id = '$this->id'
 EOT;
 			$this->set_value($this->mysql->query($sql)->fetch_array());
 			$this->update_id("");
@@ -33,7 +33,7 @@ EOT;
 			// 未ログイン トークンあり
 			$token = $_COOKIE["ez5000bbsguest"];
 			$sql = <<<EOT
-SELECT * FROM guest_login WHERE token = PASSWORD('$token')
+SELECT * FROM guest_user WHERE token = PASSWORD('$token')
 EOT;
 			$result = $this->mysql->query($sql);
 			if($result->num_rows == 1) {
@@ -64,7 +64,7 @@ EOT;
 
 		// 登録
 		$sql = <<<EOT
-INSERT INTO guest_login
+INSERT INTO guest_user
 (token, last_login_at, allow_post, ip, hostname, ua, created_at, updated_at)
 VALUES
 (PASSWORD('$token'), NOW(), NOW() + INTERVAL 2 DAY, '$ip', '$hostname', '$ua', NOW(), NOW())
@@ -72,7 +72,7 @@ EOT;
 		$this->mysql->query($sql);
 
 		// 取得
-		$sql = "SELECT * FROM guest_login WHERE id = LAST_INSERT_ID()";
+		$sql = "SELECT * FROM guest_user WHERE id = LAST_INSERT_ID()";
 		$array = $this->mysql->query($sql)->fetch_array();
 		$this->set_value($array);
 
@@ -91,7 +91,7 @@ EOT;
 		$hostname = $this->mysql->real_escape_string(gethostbyaddr($_SERVER['REMOTE_ADDR']));
 		$ua = $this->mysql->real_escape_string($_SERVER["HTTP_USER_AGENT"]);
 		$sql = <<<EOT
-UPDATE guest_login
+UPDATE guest_user
 SET token = $token, last_login_at = NOW(), allow_post = $allow_post, ip = '$ip', hostname = '$hostname', ua = '$ua', updated_at = NOW()
 WHERE id = '{$this->id}'
 EOT;

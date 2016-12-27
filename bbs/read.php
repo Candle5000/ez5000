@@ -6,7 +6,7 @@ require_once("/var/www/bbs/class/mysql.php");
 require_once("/var/www/bbs/class/board.php");
 require_once("/var/www/bbs/class/thread.php");
 require_once("/var/www/bbs/class/message.php");
-require_once("/var/www/bbs/class/guestLogin.php");
+require_once("/var/www/bbs/class/guestUser.php");
 require_once("/var/www/functions/template.php");
 session_start();
 $LIMIT = 10;
@@ -45,7 +45,7 @@ $mysql = new MySQL($userName, $password, $database);
 if($mysql->connect_error) die("データベースの接続に失敗しました");
 
 // ゲストログイン情報
-$guest = new GuestLogin($mysql);
+$guest = new GuestUser($mysql);
 
 // 掲示板情報を取得
 $sql = "SELECT * FROM `board` WHERE `name`='$id'";
