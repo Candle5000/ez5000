@@ -43,6 +43,9 @@ if($fp_user = fopen($user_file, "r")) {
 $mysql = new MySQL($userName, $password, $database);
 if($mysql->connect_error) die("データベースの接続に失敗しました");
 
+// ゲストログイン情報
+$guest = new GuestLogin($mysql);
+
 // 掲示板情報を取得
 $sql = "SELECT * FROM `board` WHERE `name`='$id'";
 $result = $mysql->query($sql);
