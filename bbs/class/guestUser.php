@@ -95,6 +95,7 @@ UPDATE guest_user
 SET token = $token, last_login_at = NOW(), allow_post = $allow_post, ip = '$ip', hostname = '$hostname', ua = '$ua', updated_at = NOW()
 WHERE id = '{$this->id}'
 EOT;
+		$this->mysql->query($sql);
 	}
 
 	//--------------------------
