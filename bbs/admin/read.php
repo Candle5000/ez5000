@@ -153,7 +153,8 @@ IP:<?=$message->ip?><br />
 HOSTNAME:<?=$message->hostname?><br />
 UA:<?=$message->ua?><br />
 UID:<?=$message->uid?><br />
-USER ID:<?=$message->user_id?>
+USER ID:<?=$message->user_id?><br />
+GUEST ID:<?=$message->guest_id?>
 <?=$img?>
 <?php
 	if($message->tmid != 1) {

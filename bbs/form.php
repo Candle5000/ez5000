@@ -77,6 +77,12 @@ if($mysql->connect_error) die("データベースの接続に失敗しました"
 $guest = new GuestUser($mysql);
 if(device_info() != "mb" && $guest->id != null && (strtotime($guest->allow_post) > time())) $error_list[] = "ご利用のゲストIDは{$guest->allow_post}まで書き込みできません";
 
+// 書き込み規制チェック
+$ip_a = explode('.', $ip);
+$pattern_sql = "'^".$ip_a[0].'\.('.$ip_a[1].'\.('.$ip_a[2].'\.('.$ip_a[3].")?)?)?\$'";
+$sql = "SELECT 1 FROM bbs_ban WHERE (ip REGEXP $pattern_sql AND (IFNULL(ua, '') = '' OR ua = '$ua')) OR (IFNULL(ip, '') = '' AND ua = '$ua')";
+if($guest->banned || $mysql->query($sql)->num_rows > 0) $error_list = array("投稿規制されています");
+
 // クッキー有効確認
 setcookie("cookiecheck", true, time() + 864000);
 if(!isset($_COOKIE["cookiecheck"])) {
@@ -271,12 +277,6 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 	// 画像認証
 	$is_mb = (device_info() == 'mb' && $uid != "");
 	if(!$is_mb && (!isset($_SESSION['ImageAuthentication']) || !isset($_POST["authcap"]) || ($_SESSION["ImageAuthentication"] != $_POST["authcap"]))) $error_list[] = "画像認証コードが一致しません";
-
-	// 書き込み規制チェック
-	$ip_a = explode('.', $ip);
-	$pattern_sql = "'^".$ip_a[0].'\.('.$ip_a[1].'\.('.$ip_a[2].'\.('.$ip_a[3].")?)?)?\$'";
-	$sql = "SELECT 1 FROM bbs_ban WHERE (ip REGEXP $pattern_sql AND (IFNULL(ua, '') = '' OR ua = '$ua')) OR (IFNULL(ip, '') = '' AND ua = '$ua')";
-	if($mysql->query($sql)->num_rows > 0) $error_list = array("投稿規制されています");
 
 	if(!isset($error_list)) {
 		$sql_title = $mysql->real_escape_string($title);

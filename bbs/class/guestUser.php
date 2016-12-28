@@ -10,6 +10,7 @@ class GuestUser {
 	public $id;
 	public $last_login_at;
 	public $allow_post;
+	public $banned;
 	public $mysql;
 
 	//--------------------------
@@ -133,6 +134,7 @@ EOT;
 		$this->id = $array["id"];
 		$this->last_login_at = $array["last_login_at"];
 		$this->allow_post = $array["allow_post"];
+		$this->banned = $array["banned"];
 	}
 }
 ?>
