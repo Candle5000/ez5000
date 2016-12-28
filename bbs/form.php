@@ -73,21 +73,30 @@ if($fp_user = fopen($user_file, "r")) {
 $mysql = new MySQL($userName, $password, $database);
 if($mysql->connect_error) die("データベースの接続に失敗しました");
 
+// クッキー有効確認
+setcookie("cookiecheck", true, time() + 864000);
+if(!isset($_COOKIE["cookiecheck"])) {
+	$error_list[] = "クッキーを有効にしてください";
+}
+
 // ゲストログイン情報
 $guest = new GuestUser($mysql);
 if(device_info() != "mb" && $guest->id != null && (strtotime($guest->allow_post) > time())) $error_list[] = "ご利用のゲストIDは{$guest->allow_post}まで書き込みできません";
+
+// ユーザー情報取得
+$ip = $_SERVER["REMOTE_ADDR"];
+$ua = $mysql->real_escape_string($_SERVER["HTTP_USER_AGENT"]);
+$hostname = $mysql->real_escape_string(gethostbyaddr($_SERVER['REMOTE_ADDR']));
+if(isset($_SERVER['HTTP_X_DCMGUID'])) $uid = $mysql->real_escape_string($_SERVER['HTTP_X_DCMGUID']); // docomo
+if(isset($_SERVER['HTTP_X_UP_SUBNO'])) $uid = $mysql->real_escape_string($_SERVER['HTTP_X_UP_SUBNO']); // au
+if(isset($_SERVER['HTTP_X_JPHONE_UID'])) $uid = $mysql->real_escape_string($_SERVER['HTTP_X_JPHONE_UID']); // sb
+if(!isset($uid)) $uid = "";
 
 // 書き込み規制チェック
 $ip_a = explode('.', $ip);
 $pattern_sql = "'^".$ip_a[0].'\.('.$ip_a[1].'\.('.$ip_a[2].'\.('.$ip_a[3].")?)?)?\$'";
 $sql = "SELECT 1 FROM bbs_ban WHERE (ip REGEXP $pattern_sql AND (IFNULL(ua, '') = '' OR ua = '$ua')) OR (IFNULL(ip, '') = '' AND ua = '$ua')";
 if($guest->banned || $mysql->query($sql)->num_rows > 0) $error_list = array("投稿規制されています");
-
-// クッキー有効確認
-setcookie("cookiecheck", true, time() + 864000);
-if(!isset($_COOKIE["cookiecheck"])) {
-	$error_list[] = "クッキーを有効にしてください";
-}
 
 // 掲示板情報を取得
 $sql = "SELECT * FROM `board` WHERE `name`='$id'";
@@ -264,15 +273,6 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 	// 連投チェック
 	if($mode == 0 && isset($_SESSION["thposttime"]) && ($_SESSION["thposttime"] > time())) $error_list[] = "{$board->thpost_limit}秒間は連続でスレッドを作成できません";
 	if($mode == 1 && isset($_SESSION["reposttime"]) && ($_SESSION["reposttime"] > time())) $error_list[] = "{$board->repost_limit}秒間は連続で返信を投稿できません";
-
-	// ユーザー情報取得
-	$ip = $_SERVER["REMOTE_ADDR"];
-	$ua = $mysql->real_escape_string($_SERVER["HTTP_USER_AGENT"]);
-	$hostname = $mysql->real_escape_string(gethostbyaddr($_SERVER['REMOTE_ADDR']));
-	if(isset($_SERVER['HTTP_X_DCMGUID'])) $uid = $mysql->real_escape_string($_SERVER['HTTP_X_DCMGUID']); // docomo
-	if(isset($_SERVER['HTTP_X_UP_SUBNO'])) $uid = $mysql->real_escape_string($_SERVER['HTTP_X_UP_SUBNO']); // au
-	if(isset($_SERVER['HTTP_X_JPHONE_UID'])) $uid = $mysql->real_escape_string($_SERVER['HTTP_X_JPHONE_UID']); // sb
-	if(!isset($uid)) $uid = "";
 
 	// 画像認証
 	$is_mb = (device_info() == 'mb' && $uid != "");
