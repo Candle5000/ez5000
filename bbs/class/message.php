@@ -20,6 +20,7 @@ class Message {
 	public $ua;
 	public $uid;
 	public $user_id;
+	public $guest_id;
 	public $mysql;
 	public $board;
 	public $thread;
@@ -42,6 +43,7 @@ class Message {
 		$this->ua = isset($array["ua"]) ? $array["ua"] : "";
 		$this->uid = isset($array["uid"]) ? $array["uid"] : "";
 		$this->user_id = isset($array["user_id"]) ? $array["user_id"] : "";
+		$this->guest_id = isset($array["guest_id"]) ? $array["guest_id"] : "";
 		$this->mode = 0;
 		$this->mysql = $mysql_temp;
 		$this->board = $board_temp;

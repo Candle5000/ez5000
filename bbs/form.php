@@ -6,7 +6,7 @@ require_once("/var/www/bbs/class/mysql.php");
 require_once("/var/www/bbs/class/board.php");
 require_once("/var/www/bbs/class/thread.php");
 require_once("/var/www/bbs/class/message.php");
-require_once("/var/www/bbs/class/guestLogin.php");
+require_once("/var/www/bbs/class/guestUser.php");
 require_once("/var/www/functions/template.php");
 session_start();
 $MAX_FSIZE = 512000;
@@ -73,15 +73,30 @@ if($fp_user = fopen($user_file, "r")) {
 $mysql = new MySQL($userName, $password, $database);
 if($mysql->connect_error) die("データベースの接続に失敗しました");
 
-// ゲストログイン情報
-$guest = new GuestLogin($mysql);
-if(device_info() != "mb" && $guest->id != null && (strtotime($guest->allow_post) > time())) $error_list[] = "ご利用のゲストIDは{$guest->allow_post}まで書き込みできません";
-
 // クッキー有効確認
 setcookie("cookiecheck", true, time() + 864000);
 if(!isset($_COOKIE["cookiecheck"])) {
 	$error_list[] = "クッキーを有効にしてください";
 }
+
+// ゲストログイン情報
+$guest = new GuestUser($mysql);
+if(device_info() != "mb" && $guest->id != null && (strtotime($guest->allow_post) > time())) $error_list[] = "ご利用のゲストIDは{$guest->allow_post}まで書き込みできません";
+
+// ユーザー情報取得
+$ip = $_SERVER["REMOTE_ADDR"];
+$ua = $mysql->real_escape_string($_SERVER["HTTP_USER_AGENT"]);
+$hostname = $mysql->real_escape_string(gethostbyaddr($_SERVER['REMOTE_ADDR']));
+if(isset($_SERVER['HTTP_X_DCMGUID'])) $uid = $mysql->real_escape_string($_SERVER['HTTP_X_DCMGUID']); // docomo
+if(isset($_SERVER['HTTP_X_UP_SUBNO'])) $uid = $mysql->real_escape_string($_SERVER['HTTP_X_UP_SUBNO']); // au
+if(isset($_SERVER['HTTP_X_JPHONE_UID'])) $uid = $mysql->real_escape_string($_SERVER['HTTP_X_JPHONE_UID']); // sb
+if(!isset($uid)) $uid = "";
+
+// 書き込み規制チェック
+$ip_a = explode('.', $ip);
+$pattern_sql = "'^".$ip_a[0].'\.('.$ip_a[1].'\.('.$ip_a[2].'\.('.$ip_a[3].")?)?)?\$'";
+$sql = "SELECT 1 FROM bbs_ban WHERE (ip REGEXP $pattern_sql AND (IFNULL(ua, '') = '' OR ua = '$ua')) OR (IFNULL(ip, '') = '' AND ua = '$ua')";
+if($guest->banned || $mysql->query($sql)->num_rows > 0) $error_list = array("投稿規制されています");
 
 // 掲示板情報を取得
 $sql = "SELECT * FROM `board` WHERE `name`='$id'";
@@ -259,24 +274,9 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 	if($mode == 0 && isset($_SESSION["thposttime"]) && ($_SESSION["thposttime"] > time())) $error_list[] = "{$board->thpost_limit}秒間は連続でスレッドを作成できません";
 	if($mode == 1 && isset($_SESSION["reposttime"]) && ($_SESSION["reposttime"] > time())) $error_list[] = "{$board->repost_limit}秒間は連続で返信を投稿できません";
 
-	// ユーザー情報取得
-	$ip = $_SERVER["REMOTE_ADDR"];
-	$ua = $mysql->real_escape_string($_SERVER["HTTP_USER_AGENT"]);
-	$hostname = $mysql->real_escape_string(gethostbyaddr($_SERVER['REMOTE_ADDR']));
-	if(isset($_SERVER['HTTP_X_DCMGUID'])) $uid = $mysql->real_escape_string($_SERVER['HTTP_X_DCMGUID']); // docomo
-	if(isset($_SERVER['HTTP_X_UP_SUBNO'])) $uid = $mysql->real_escape_string($_SERVER['HTTP_X_UP_SUBNO']); // au
-	if(isset($_SERVER['HTTP_X_JPHONE_UID'])) $uid = $mysql->real_escape_string($_SERVER['HTTP_X_JPHONE_UID']); // sb
-	if(!isset($uid)) $uid = "";
-
 	// 画像認証
 	$is_mb = (device_info() == 'mb' && $uid != "");
 	if(!$is_mb && (!isset($_SESSION['ImageAuthentication']) || !isset($_POST["authcap"]) || ($_SESSION["ImageAuthentication"] != $_POST["authcap"]))) $error_list[] = "画像認証コードが一致しません";
-
-	// 書き込み規制チェック
-	$ip_a = explode('.', $ip);
-	$pattern_sql = "'^".$ip_a[0].'\.('.$ip_a[1].'\.('.$ip_a[2].'\.('.$ip_a[3].")?)?)?\$'";
-	$sql = "SELECT 1 FROM bbs_ban WHERE (ip REGEXP $pattern_sql AND (IFNULL(ua, '') = '' OR ua = '$ua')) OR (IFNULL(ip, '') = '' AND ua = '$ua')";
-	if($mysql->query($sql)->num_rows > 0) $error_list = array("投稿規制されています");
 
 	if(!isset($error_list)) {
 		$sql_title = $mysql->real_escape_string($title);
