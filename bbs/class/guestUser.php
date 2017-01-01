@@ -36,7 +36,7 @@ class GuestUser {
 		if(!isset($_COOKIE["cookiecheck"])) return;
 
 		$this->mysql = $p_mysql;
-		$this->hostname_sql = $this->mysql->real_escape_string(gethostbyaddr($this->hostname));
+		$this->hostname_sql = $this->mysql->real_escape_string($this->hostname);
 		$this->ua_sql = $this->mysql->real_escape_string($this->ua);
 
 		if(isset($_SESSION["guest_id"])) {
