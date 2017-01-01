@@ -6,6 +6,7 @@ require_once("/var/www/bbs/class/mysql.php");
 require_once("/var/www/bbs/class/board.php");
 require_once("/var/www/bbs/class/thread.php");
 require_once("/var/www/bbs/class/message.php");
+require_once("/var/www/bbs/class/guestUser.php");
 require_once("/var/www/functions/template.php");
 require_once("/var/www/functions/form.php");
 session_start();
@@ -20,6 +21,9 @@ if($fp_user = fopen($user_file, "r")) {
 }
 $mysql = new MySQL($userName, $password, $database);
 if($mysql->connect_error) die("データベースの接続に失敗しました");
+
+// ゲストログイン情報
+$guest = new GuestUser($mysql);
 
 // 掲示板ID取得
 if(!isset($_GET["id"]) && !is_array($_GET["id"])) die("ERROR01:IDがありません");
@@ -255,8 +259,17 @@ if(isset($words)) {
 <?=$count?> 件中 <?=(($page * 10) + 1)?> - <?=(($page + 1) * 10)?> 件
 <hr class="normal">
 <div class="cnt"><?=$pagelink?></div>
+<hr class="normal">
 <?php
+	$hrFlag = false;
 	foreach($message_list as $message) {
+		if($hrFlag) {
+?>
+<hr class="message">
+<?php
+		} else {
+			$hrFlag = true;
+		}
 		if($tid > 0) {
 			$message->printMessage();
 		} else {

@@ -6,6 +6,7 @@ require_once("/var/www/bbs/class/mysql.php");
 require_once("/var/www/bbs/class/board.php");
 require_once("/var/www/bbs/class/thread.php");
 require_once("/var/www/bbs/class/message.php");
+require_once("/var/www/bbs/class/guestUser.php");
 require_once("/var/www/functions/template.php");
 session_start();
 $LIMIT = 10;
@@ -42,6 +43,9 @@ if($fp_user = fopen($user_file, "r")) {
 }
 $mysql = new MySQL($userName, $password, $database);
 if($mysql->connect_error) die("データベースの接続に失敗しました");
+
+// ゲストログイン情報
+$guest = new GuestUser($mysql);
 
 // 掲示板情報を取得
 $sql = "SELECT * FROM `board` WHERE `name`='$id'";
@@ -147,12 +151,24 @@ $new = "[<a href=\"./read.php?id={$board->name}&tid=$tid&view=desc&page=0\"".mbi
 </p>
 <hr class="normal">
 <div class="cnt"><?=$pagelink?></div>
+<hr class="normal">
 <?php
 if($page == 0 && !isset($_GET["view"]) && !isset($tmid)) {
 	$fmessage->printArchiveMessage();
+?>
+<hr class="message">
+<?php
 }
 
+$hrFlag = false;
 while($array = $result->fetch_array()) {
+	if($hrFlag) {
+?>
+<hr class="message">
+<?php
+	} else {
+		$hrFlag = true;
+	}
 	$message = new Message($array, $mysql, $board, $thread);
 	$message->printArchiveMessage();
 }

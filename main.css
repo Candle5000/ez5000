@@ -213,6 +213,14 @@ hr.normal {
 	margin:0px 0px;
 	width:auto;
 }
+hr.message {
+	background:#ECA;
+	border:0;
+	color:#420;
+	height:1px;
+	margin:0px 0px;
+	width:auto;
+}
 hr.table {
 	background:#420;
 	border:0;
