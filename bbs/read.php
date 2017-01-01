@@ -159,12 +159,24 @@ $new = "[<a href=\"./read.php?id={$board->name}&tid=$tid&view=desc&page=0\"".mbi
 </p>
 <hr class="normal">
 <div class="cnt"><?=$pagelink?></div>
+<hr class="normal">
 <?php
 if($page == 0 && !isset($_GET["view"]) && !isset($tmid)) {
 	$fmessage->printMessage();
+?>
+<hr class="message">
+<?php
 }
 
+$hrFlag = false;
 while($array = $result->fetch_array()) {
+	if($hrFlag) {
+?>
+<hr class="message">
+<?php
+	} else {
+		$hrFlag = true;
+	}
 	$message = new Message($array, $mysql, $board, $thread);
 	$message->printMessage();
 }

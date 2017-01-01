@@ -77,7 +77,6 @@ class Message {
 			$img = "";
 		}
 ?>
-<hr class="normal">
 <p>
 <?=$thread_link?>
 [<?=$this->tmid?>] By <?=htmlspecialchars($this->name)?><br />

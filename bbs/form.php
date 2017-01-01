@@ -233,7 +233,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 
 	// ファイルアップロード
 	$file_id = "";
-	if(is_uploaded_file($_FILES["media"]["tmp_name"])) {
+	if(isset($_FILES["media"]) && is_uploaded_file($_FILES["media"]["tmp_name"])) {
 		$extension = pathinfo($_FILES["media"]["name"], PATHINFO_EXTENSION);
 		if(preg_match("/(png|jpe?g|gif)/i", $extension)) {
 			try {
@@ -644,7 +644,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 			if($mode == 0 || $mode == 1) $_SESSION["comment"] = $comment;
 
 			// ファイルアップロード
-			if(is_uploaded_file($_FILES["media"]["tmp_name"])) {
+			if(isset($_FILES["media"]) && is_uploaded_file($_FILES["media"]["tmp_name"])) {
 				$file_path = "/var/www/img/bbs/{$board->name}-$tid-$tmid-$file_id";
 				if(move_uploaded_file($_FILES["media"]["tmp_name"], $file_path)) {
 					chmod($file_path, 0644);

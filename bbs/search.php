@@ -259,8 +259,17 @@ if(isset($words)) {
 <?=$count?> 件中 <?=(($page * 10) + 1)?> - <?=(($page + 1) * 10)?> 件
 <hr class="normal">
 <div class="cnt"><?=$pagelink?></div>
+<hr class="normal">
 <?php
+	$hrFlag = false;
 	foreach($message_list as $message) {
+		if($hrFlag) {
+?>
+<hr class="message">
+<?php
+		} else {
+			$hrFlag = true;
+		}
 		if($tid > 0) {
 			$message->printMessage();
 		} else {
