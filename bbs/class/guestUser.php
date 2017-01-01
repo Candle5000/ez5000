@@ -121,6 +121,9 @@ EOT;
 		// DB更新
 		$this->update_id($token);
 
+		// ログイン履歴を登録
+		$this->insert_history();
+
 		// セッション・クッキーを設定
 		$_SESSION["guest_id"] = $this->id;
 		setcookie("ez5000bbsguest", $token, time() + 2592000);
