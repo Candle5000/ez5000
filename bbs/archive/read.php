@@ -6,6 +6,7 @@ require_once("/var/www/bbs/class/mysql.php");
 require_once("/var/www/bbs/class/board.php");
 require_once("/var/www/bbs/class/thread.php");
 require_once("/var/www/bbs/class/message.php");
+require_once("/var/www/bbs/class/guestUser.php");
 require_once("/var/www/functions/template.php");
 session_start();
 $LIMIT = 10;
