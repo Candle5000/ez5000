@@ -60,8 +60,17 @@ if(item_group($id) != -1) {
 <h2><?=item_category(item_category_id($id))?> <?=item_group($id)?></h2>
 <ul id="linklist">
 <?php
-	$data->select_column("id,name", "items", array("id", "hidden"), array("BETWEEN ".($id + 1)." AND ".item_group_end($id), "0"));
+	$event_item_flag = false;
+	$data->select_column_p("id,name,event", "items", "id BETWEEN ".($id + 1)." AND ".item_group_end($id)." AND hidden = '0'", 0, 0, "event, id");
 	while($row = $data->fetch()){
+		if(!$event_item_flag && $row["event"]) {
+?>
+</ul>
+<h2>イベント・ガチャ</h2>
+<ul id="linklist">
+<?php
+			$event_item_flag = true;
+		}
 		$i_id = $row["id"];
 		$i_name = $row["name"];
 		$id_f = isset($data->is_admin) ? sprintf("%d:", $i_id) : "";
