@@ -61,6 +61,7 @@ if($mode == 1) {
 $url = $_SERVER["PHP_SELF"]."?mode={$_GET["mode"]}&id=$id";
 if($mode == 1 || $mode == 2) $url .= "&tid=$tid";
 if($mode == 2) $url .= "&tmid=$tmid";
+if(device_info() == 'mb' && !is_au()) $url .= "&guid=ON";
 
 $user_file = "/etc/mysql-user/user5000.ini";
 if($fp_user = fopen($user_file, "r")) {
