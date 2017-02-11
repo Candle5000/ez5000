@@ -53,7 +53,7 @@ class AnonymousId {
 	//--------------------------
 	// 匿名ID文字列を作成
 	//--------------------------
-	private function create_id {
+	private function create_id() {
 		$source = array_merge(range('a', 'z'), range('0', '9'), range('A', 'Z'), array('!', '#', '$', '%', '&', '-', '=', '+', '*', '/'));
 		$date = $this->get_next_tuesday();
 		do {
