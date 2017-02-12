@@ -37,14 +37,13 @@ class AnonymousId {
 			$this->update_id();
 		} else {
 			// 有効期限を確認する
-			$expiration_date = new DateTime($array);
+			$expiration_date = new DateTime($array['expiration_date']);
 			$now = new DateTime();
-			if($expiration_date > $now) {
+			if($expiration_date < $now) {
 				// 期限切れの場合、再発行する
 				$this->update_id();
 			} else {
 				// 有効な場合、変数にセットする
-				$this->set_value($array);
 				$this->display_id = $array['display_id'];
 			}
 		}
@@ -91,6 +90,7 @@ class AnonymousId {
 		$sql_guest = $this->guest ? 'TRUE' : 'FALSE';
 		$sql = "UPDATE anonymous_id SET display_id = '{$this->display_id}', expiration_date = '$date'";
 		$sql .= " WHERE guest = $sql_guest AND user_id = {$this->user_id}";
+		$this->mysql->query($sql);
 	}
 
 	//--------------------------
@@ -102,6 +102,7 @@ class AnonymousId {
 		$sql_guest = $this->guest ? 'TRUE' : 'FALSE';
 		$sql = "INSERT anonymous_id (guest, user_id, display_id, expiration_date)";
 		$sql .= " VALUES ($sql_guest, {$this->user_id}, '{$this->display_id}', '$date')";
+		$this->mysql->query($sql);
 	}
 }
 ?>
