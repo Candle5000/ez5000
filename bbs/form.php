@@ -7,6 +7,7 @@ require_once("/var/www/bbs/class/board.php");
 require_once("/var/www/bbs/class/thread.php");
 require_once("/var/www/bbs/class/message.php");
 require_once("/var/www/bbs/class/guestUser.php");
+require_once("/var/www/bbs/class/memberUser.php");
 require_once("/var/www/bbs/class/anonymousId.php");
 require_once("/var/www/functions/template.php");
 session_start();
@@ -94,6 +95,12 @@ if(isset($_SERVER['HTTP_X_UP_SUBNO'])) $uid = $mysql->real_escape_string($_SERVE
 if(isset($_SERVER['HTTP_X_JPHONE_UID'])) $uid = $mysql->real_escape_string($_SERVER['HTTP_X_JPHONE_UID']); // sb
 if(!isset($uid)) $uid = "";
 
+// ガラケーのみ ユーザー情報
+$member = null;
+if(device_info() == "mb") {
+	$member = new MemberUser($mysql, "", "", $uid);
+}
+
 // 書き込み規制チェック
 $ip_a = explode('.', $ip);
 $pattern_sql = "'^".$ip_a[0].'\.('.$ip_a[1].'\.('.$ip_a[2].'\.('.$ip_a[3].")?)?)?\$'";
@@ -176,8 +183,8 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 			$error_list[] = "文字コードの検出に失敗しました";
 		}
 
-		// 匿名ID仮対応
-		$display_id = "";
+		$anonymous_id = new AnonymousId(false, $member->id, $mysql);
+		$display_id = $anonymous_id->display_id;
 	} else {
 		$anonymous_id = new AnonymousId(true, $guest->id, $mysql);
 		$display_id = $anonymous_id->display_id;
