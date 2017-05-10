@@ -7,6 +7,8 @@ require_once("/var/www/bbs/class/board.php");
 require_once("/var/www/bbs/class/thread.php");
 require_once("/var/www/bbs/class/message.php");
 require_once("/var/www/bbs/class/guestUser.php");
+require_once("/var/www/bbs/class/memberUser.php");
+require_once("/var/www/bbs/class/anonymousId.php");
 require_once("/var/www/functions/template.php");
 session_start();
 $MAX_FSIZE = 512000;
@@ -93,6 +95,12 @@ if(isset($_SERVER['HTTP_X_UP_SUBNO'])) $uid = $mysql->real_escape_string($_SERVE
 if(isset($_SERVER['HTTP_X_JPHONE_UID'])) $uid = $mysql->real_escape_string($_SERVER['HTTP_X_JPHONE_UID']); // sb
 if(!isset($uid)) $uid = "";
 
+// ガラケーのみ ユーザー情報
+$member = null;
+if(device_info() == "mb") {
+	$member = new MemberUser($mysql, "", "", $uid);
+}
+
 // 書き込み規制チェック
 $ip_a = explode('.', $ip);
 $pattern_sql = "'^".$ip_a[0].'\.('.$ip_a[1].'\.('.$ip_a[2].'\.('.$ip_a[3].")?)?)?\$'";
@@ -157,8 +165,8 @@ if($mode == 2) {
 
 if($_SERVER["REQUEST_METHOD"] == "POST") {
 
-	// 文字コード確認 フィーチャーフォンのみ
 	if(device_info() == "mb") {
+		// 文字コード確認 フィーチャーフォンのみ
 		if(isset($_POST["enc"])) {
 			if($_POST["enc"] == "あ") {
 				$enc_mode = 0;
@@ -174,6 +182,12 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 		} else {
 			$error_list[] = "文字コードの検出に失敗しました";
 		}
+
+		$anonymous_id = new AnonymousId(false, $member->id, $mysql);
+		$display_id = $anonymous_id->display_id;
+	} else {
+		$anonymous_id = new AnonymousId(true, $guest->id, $mysql);
+		$display_id = $anonymous_id->display_id;
 	}
 
 	// 名前取得
@@ -316,10 +330,10 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 
 				// 新規メッセージを登録
 				$sql = "INSERT INTO `message` (`mid`, `bid`, `tid`, `tmid`, `name`,";
-				$sql .= " `comment`, `image`, `password`, `post_ts`, `ip`, `hostname`, `ua`, `uid`, `guest_id`)";
+				$sql .= " `comment`, `image`, `password`, `post_ts`, `ip`, `hostname`, `ua`, `uid`, `guest_id`, `display_id`)";
 				$sql .= " VALUES ('$next_mid', '{$board->bid}', '$next_tid', '1', '$sql_name',";
 				$sql .= " '$sql_comment', '$file_id', PASSWORD('$sql_pass'), NOW(),";
-				$sql .= " '$ip', '$hostname', '$ua', '$uid', '{$guest->id}')";
+				$sql .= " '$ip', '$hostname', '$ua', '$uid', '{$guest->id}', '$display_id')";
 				$mysql->query($sql);
 				if($mysql->error) {
 					$mysql->rollback();
@@ -362,7 +376,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 						die("ERROR206:クエリ処理に失敗しました");
 					}
 					$sql = "INSERT INTO `message_archive`";
-					$sql .= " SELECT `bid` ,`mid`, `tid`, `tmid`, `name`, `comment`, `image`, `post_ts`, `update_ts`, `update_cnt`, `ip`, `hostname`, `ua`, `uid`, `user_id`, `guest_id`";
+					$sql .= " SELECT `bid` ,`mid`, `tid`, `tmid`, `name`, `comment`, `image`, `post_ts`, `update_ts`, `update_cnt`, `ip`, `hostname`, `ua`, `uid`, `user_id`, `guest_id`, `display_id`";
 					$sql .= " FROM message WHERE `bid`='{$board->bid}' AND `tid`='$archive_tid'";
 					$mysql->query($sql);
 					if($mysql->error) {
@@ -399,7 +413,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 
 				// 次のメッセージIDを取得
 				$sql = "SELECT `next_mid`, `next_tmid` FROM `thread` AS `T` JOIN `board` AS `B`";
-				$sql .= " ON `T`.`bid`=`B`.`bid` WHERE `tid`='{$thread->tid}'";
+				$sql .= " ON `T`.`bid`=`B`.`bid` WHERE `B`.`bid`='{$board->bid}' AND `T`.`tid`='{$thread->tid}'";
 				$result_obj = $mysql->query($sql);
 				if($mysql->error || !$result_obj->num_rows) {
 					$mysql->rollback();
@@ -411,10 +425,10 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 
 				// 新規メッセージを登録
 				$sql = "INSERT INTO `message` (`mid`, `bid`, `tid`, `tmid`, `name`,";
-				$sql .= " `comment`, `image`, `password`, `post_ts`, `ip`, `hostname`, `ua`, `uid`, `guest_id`)";
+				$sql .= " `comment`, `image`, `password`, `post_ts`, `ip`, `hostname`, `ua`, `uid`, `guest_id`, `display_id`)";
 				$sql .= " VALUES ('$next_mid', '{$board->bid}', '{$thread->tid}', '$next_tmid',";
 				$sql .= " '$sql_name', '$sql_comment', '$file_id', PASSWORD('$sql_pass'),";
-				$sql .= " NOW(), '$ip', '$hostname', '$ua', '$uid', '{$guest->id}')";
+				$sql .= " NOW(), '$ip', '$hostname', '$ua', '$uid', '{$guest->id}', '$display_id')";
 				$mysql->query($sql);
 				if($mysql->error) {
 					$mysql->rollback();
@@ -469,7 +483,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 						die("ERROR216:クエリ処理に失敗しました");
 					}
 					$sql = "INSERT INTO `message_archive`";
-					$sql .= " SELECT `bid` ,`mid`, `tid`, `tmid`, `name`, `comment`, `image`, `post_ts`, `update_ts`, `update_cnt`, `ip`, `hostname`, `ua`, `uid`, `user_id`, `guest_id`";
+					$sql .= " SELECT `bid` ,`mid`, `tid`, `tmid`, `name`, `comment`, `image`, `post_ts`, `update_ts`, `update_cnt`, `ip`, `hostname`, `ua`, `uid`, `user_id`, `guest_id`, `display_id`";
 					$sql .= " FROM message WHERE `bid`='{$board->bid}' AND `tid`='$archive_tid'";
 					$mysql->query($sql);
 					if($mysql->error) {
@@ -525,7 +539,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 							}
 							$sql = "INSERT INTO `message_deleted`";
 							$sql .= " SELECT `bid` ,`mid`, `tid`, `tmid`, `name`, `comment`, `image`, `post_ts`, `update_ts`, ";
-							$sql .= "`update_cnt`, `ip`, `hostname`, `ua`, `uid`, `user_id`, `guest_id`";
+							$sql .= "`update_cnt`, `ip`, `hostname`, `ua`, `uid`, `user_id`, `guest_id`, `display_id`";
 							$sql .= " FROM message WHERE `bid`='{$board->bid}' AND `tid`='$tid'";
 							$mysql->query($sql);
 							if($mysql->error) {
@@ -548,7 +562,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 							// メッセージ削除
 							$sql = "INSERT INTO `message_deleted`";
 							$sql .= " SELECT `bid`, `mid`, `tid`, `tmid`, `name`, `comment`, `image`, `post_ts`, `update_ts`, ";
-							$sql .= "`update_cnt`, `ip`, `hostname`, `ua`, `uid`, `user_id`, `guest_id`";
+							$sql .= "`update_cnt`, `ip`, `hostname`, `ua`, `uid`, `user_id`, `guest_id`, `display_id`";
 							$sql .= " FROM message WHERE `bid`='{$board->bid}' AND `tid`='$tid' AND `tmid`='$tmid'";
 							$mysql->query($sql);
 							if($mysql->error) {
@@ -595,7 +609,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 						// メッセージ編集
 						$sql = "INSERT INTO `message_history`";
 						$sql .= " SELECT `bid`, `mid`, `update_cnt`, `tid`, `tmid`, `name`, `comment`, `image`, `ip`, `hostname`, `ua`, ";
-						$sql .= "`uid`, `user_id`, `guest_id`, IFNULL(`update_ts`, `post_ts`)";
+						$sql .= "`uid`, `user_id`, `guest_id`, `display_id`, IFNULL(`update_ts`, `post_ts`)";
 						$sql .= " FROM `message` WHERE `bid`='{$board->bid}' AND `tid`='$tid' AND `tmid`='$tmid'";
 						$mysql->query($sql);
 						if($mysql->error) {
@@ -605,7 +619,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 						$sql = "UPDATE `message` SET `name`='$sql_name', `comment`='$sql_comment',";
 						if($delmedia || $file_id != "") $sql .= " `image`='$file_id',";
 						$sql .= " `update_ts`=NOW(), `update_cnt`=`update_cnt`+1,";
-						$sql .= " `ip`='$ip', `hostname`='$hostname', `ua`='$ua', `uid`='$uid', `guest_id`='{$guest->id}'";
+						$sql .= " `ip`='$ip', `hostname`='$hostname', `ua`='$ua', `uid`='$uid', `guest_id`='{$guest->id}', `display_id`='$display_id'";
 						$sql .= " WHERE `bid`='{$board->bid}' AND `tid`='$tid' AND `tmid`='$tmid'";
 						$mysql->query($sql);
 						if($mysql->error) {

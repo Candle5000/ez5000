@@ -21,6 +21,7 @@ class Message {
 	public $uid;
 	public $user_id;
 	public $guest_id;
+	public $display_id;
 	public $mysql;
 	public $board;
 	public $thread;
@@ -44,6 +45,7 @@ class Message {
 		$this->uid = isset($array["uid"]) ? $array["uid"] : "";
 		$this->user_id = isset($array["user_id"]) ? $array["user_id"] : "";
 		$this->guest_id = isset($array["guest_id"]) ? $array["guest_id"] : "";
+		$this->display_id = isset($array["display_id"]) ? $array["display_id"] : "";
 		$this->mode = 0;
 		$this->mysql = $mysql_temp;
 		$this->board = $board_temp;
@@ -79,7 +81,7 @@ class Message {
 ?>
 <p>
 <?=$thread_link?>
-[<?=$this->tmid?>] By <?=htmlspecialchars($this->name)?><br />
+[<?=$this->tmid?>] By <?=htmlspecialchars($this->name)?> ID:<?=$this->display_id?><br />
 <?=$img?>
 <?=$this->textConvert($this->comment)?><br />
 <?=$this->post_ts?><br />

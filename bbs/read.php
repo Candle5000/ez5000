@@ -7,6 +7,7 @@ require_once("/var/www/bbs/class/board.php");
 require_once("/var/www/bbs/class/thread.php");
 require_once("/var/www/bbs/class/message.php");
 require_once("/var/www/bbs/class/guestUser.php");
+require_once("/var/www/bbs/class/memberUser.php");
 require_once("/var/www/functions/template.php");
 session_start();
 $LIMIT = 10;
@@ -46,6 +47,18 @@ if($mysql->connect_error) die("データベースの接続に失敗しました"
 
 // ゲストログイン情報
 $guest = new GuestUser($mysql);
+
+// ユーザー情報取得
+if(isset($_SERVER['HTTP_X_DCMGUID'])) $uid = $mysql->real_escape_string($_SERVER['HTTP_X_DCMGUID']); // docomo
+if(isset($_SERVER['HTTP_X_UP_SUBNO'])) $uid = $mysql->real_escape_string($_SERVER['HTTP_X_UP_SUBNO']); // au
+if(isset($_SERVER['HTTP_X_JPHONE_UID'])) $uid = $mysql->real_escape_string($_SERVER['HTTP_X_JPHONE_UID']); // sb
+if(!isset($uid)) $uid = "";
+
+// ガラケーのみ ユーザー情報
+$member = null;
+if(device_info() == "mb") {
+	$member = new MemberUser($mysql, "", "", $uid);
+}
 
 // 掲示板情報を取得
 $sql = "SELECT * FROM `board` WHERE `name`='$id'";
@@ -87,7 +100,7 @@ if(!isset($tmid)) {
 
 	// メッセージ情報(1)を取得 ページ0のときのみ
 	if($page == 0 && !isset($_GET["view"])) {
-		$sql = "SELECT `mid`,`tmid`,`name`,`comment`,`image`,`post_ts`,`update_ts`,`update_cnt`";
+		$sql = "SELECT `mid`,`tmid`,`name`,`comment`,`image`,`post_ts`,`update_ts`,`update_cnt`, `display_id`";
 		$sql .= " FROM `message` WHERE `bid`='{$board->bid}' AND `tid`='$tid' AND `tmid`='1'";
 		$result = $mysql->query($sql);
 		if($mysql->error) die("ERROR11:存在しないIDです");
@@ -97,12 +110,12 @@ if(!isset($tmid)) {
 
 	// メッセージ情報を取得
 	if($page == 0 && !isset($_GET["view"])) {
-		$sql = "SELECT `mid`,`tmid`,`name`,`comment`,`image`,`post_ts`,`update_ts`,`update_cnt`";
+		$sql = "SELECT `mid`,`tmid`,`name`,`comment`,`image`,`post_ts`,`update_ts`,`update_cnt`, `display_id`";
 		$sql .= " FROM `message` WHERE `bid`='{$board->bid}' AND `tid`='$tid' AND `tmid`>'1'";
 		$sql .= " ORDER BY `tmid` DESC LIMIT 0,$LIMIT";
 	} else {
 		$order = (isset($_GET["view"]) && $_GET["view"] == "asc") ? "ASC" : "DESC";
-		$sql = "SELECT `mid`,`tmid`,`name`,`comment`,`image`,`post_ts`,`update_ts`,`update_cnt`";
+		$sql = "SELECT `mid`,`tmid`,`name`,`comment`,`image`,`post_ts`,`update_ts`,`update_cnt`, `display_id`";
 		$sql .= " FROM `message` WHERE `bid`='{$board->bid}' AND `tid`='$tid'";
 		$sql .= " ORDER BY `tmid` $order LIMIT ".($page * $LIMIT).",$LIMIT";
 	}
@@ -127,7 +140,7 @@ if(!isset($tmid)) {
 	//------------------------------
 
 	// メッセージ情報を取得
-	$sql = "SELECT `mid`,`tmid`,`name`,`comment`,`image`,`post_ts`,`update_ts`,`update_cnt`";
+	$sql = "SELECT `mid`,`tmid`,`name`,`comment`,`image`,`post_ts`,`update_ts`,`update_cnt`, `display_id`";
 	$sql .= " FROM `message` WHERE `bid`='{$board->bid}' AND `tid`='$tid' AND `tmid`='$tmid'";
 	$result = $mysql->query($sql);
 	if($mysql->error) die("ERROR21:存在しないIDです");
