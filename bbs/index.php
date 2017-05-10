@@ -6,6 +6,7 @@ require_once("/var/www/bbs/class/mysql.php");
 require_once("/var/www/bbs/class/board.php");
 require_once("/var/www/bbs/class/thread.php");
 require_once("/var/www/bbs/class/guestUser.php");
+require_once("/var/www/bbs/class/memberUser.php");
 require_once("/var/www/functions/template.php");
 session_start();
 $LIMIT = 20;
@@ -32,6 +33,18 @@ if($mysql->connect_error) die("データベースの接続に失敗しました"
 
 // ゲストログイン情報
 $guest = new GuestUser($mysql);
+
+// ユーザー情報取得
+if(isset($_SERVER['HTTP_X_DCMGUID'])) $uid = $mysql->real_escape_string($_SERVER['HTTP_X_DCMGUID']); // docomo
+if(isset($_SERVER['HTTP_X_UP_SUBNO'])) $uid = $mysql->real_escape_string($_SERVER['HTTP_X_UP_SUBNO']); // au
+if(isset($_SERVER['HTTP_X_JPHONE_UID'])) $uid = $mysql->real_escape_string($_SERVER['HTTP_X_JPHONE_UID']); // sb
+if(!isset($uid)) $uid = "";
+
+// ガラケーのみ ユーザー情報
+$member = null;
+if(device_info() == "mb") {
+	$member = new MemberUser($mysql, "", "", $uid);
+}
 
 // 掲示板情報を取得
 $sql = "UPDATE `board` SET `access_cnt`=`access_cnt`+1 WHERE `name`='$id'";

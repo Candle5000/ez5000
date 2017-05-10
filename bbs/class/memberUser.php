@@ -42,7 +42,7 @@ class MemberUser {
 			$sql = <<<EOT
 SELECT * FROM member_user WHERE uid = '$uid'
 EOT;
-			$result = $mysql->query($sql);
+			$result = $this->mysql->query($sql);
 
 			if($result->num_rows) {
 				// ユーザー登録済みのとき
