@@ -413,7 +413,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 
 				// 次のメッセージIDを取得
 				$sql = "SELECT `next_mid`, `next_tmid` FROM `thread` AS `T` JOIN `board` AS `B`";
-				$sql .= " ON `T`.`bid`=`B`.`bid` WHERE `tid`='{$thread->tid}'";
+				$sql .= " ON `T`.`bid`=`B`.`bid` WHERE `B`.`bid`='{$board->bid}' AND `T`.`tid`='{$thread->tid}'";
 				$result_obj = $mysql->query($sql);
 				if($mysql->error || !$result_obj->num_rows) {
 					$mysql->rollback();
