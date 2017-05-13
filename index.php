@@ -28,6 +28,9 @@ $sql = "SELECT * FROM `board`";
 $result = $data->query($sql);
 $count = $data->top_count();
 $rows = $data->select_all_l("*", "info", 0, $PAGESIZE, "id desc");
+
+// docomo用
+$guid_on = (device_info() == 'mb' && !is_au()) ? "&guid=ON" : "";
 ?>
 <html>
 <head>
@@ -52,7 +55,7 @@ while($array = $result->fetch_array()) {
 	$accesskey = ($ak < 10) ? mbi_ack($ak) : "";
 	$aklabel = ($ak < 10) ? mbi($ak.'.') : "";
 ?>
-<li><a href="./bbs/?id=<?=$board->name?>"<?=$accesskey?>><?=$aklabel.$board->title?></a></li>
+<li><a href="./bbs/?id=<?=$board->name.$guid_on?>"<?=$accesskey?>><?=$aklabel.$board->title?></a></li>
 <?php
 }
 ?>

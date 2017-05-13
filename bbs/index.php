@@ -31,6 +31,9 @@ if($fp_user = fopen($user_file, "r")) {
 $mysql = new MySQL($userName, $password, $database);
 if($mysql->connect_error) die("データベースの接続に失敗しました");
 
+// docomo用
+$guid_on = (device_info() == 'mb' && !is_au()) ? "&guid=ON" : "";
+
 // ゲストログイン情報
 $guest = new GuestUser($mysql);
 
@@ -78,13 +81,13 @@ if($mysql->error) die("ERROR05:存在しないIDです");
 
 // ページ切り替えリンク生成
 if(($page > 0) && ($rows > 0)) {
-	$pagelink = "[<a href=\"./?id=$id&page=".($page - 1)."\"".mbi_ack("*").">".mbi("*.")."前へ</a>] ";
+	$pagelink = "[<a href=\"./?id=$id&page=".($page - 1).$guid_on."\"".mbi_ack("*").">".mbi("*.")."前へ</a>] ";
 } else {
 	$pagelink = "[".mbi("*.")."前へ] ";
 }
 $pagelink .= "[P ".($page + 1)."/".ceil($rows / $LIMIT)." ]";
 if((($page + 1) * $LIMIT) < $rows) {
-	$pagelink .= " [<a href=\"./?id=$id&page=".($page + 1)."\"".mbi_ack("#").">".mbi("#.")."次へ</a>]";
+	$pagelink .= " [<a href=\"./?id=$id&page=".($page + 1).$guid_on."\"".mbi_ack("#").">".mbi("#.")."次へ</a>]";
 } else {
 	$pagelink .= " [".mbi("#.")."次へ]";
 }
@@ -98,7 +101,7 @@ if((($page + 1) * $LIMIT) < $rows) {
 <h1><?=$board->title?></h1>
 <hr class="normal">
 <p>
-[<a href="./form.php?mode=thform&id=<?=$board->name?>"<?=mbi_ack(8)?>><?=mbi("8.")?>新規スレ</a>] [<a href="./search.php?id=<?=$board->name?>"<?=mbi_ack(4)?>><?=mbi("4.")?>検索</a>]
+[<a href="./form.php?mode=thform&id=<?=$board->name.$guid_on?>"<?=mbi_ack(8)?>><?=mbi("8.")?>新規スレ</a>] [<a href="./search.php?id=<?=$board->name.$guid_on?>"<?=mbi_ack(4)?>><?=mbi("4.")?>検索</a>]
 </p>
 <hr class="normal">
 <div id="pagelink"><?=$pagelink?></div>
@@ -126,7 +129,7 @@ if($result->num_rows) {
 			}
 		}
 ?>
-<li><span class="nc5"><?=$marker?></span><a href="./read.php?id=<?=$board->name?>&tid=<?=$thread->tid?>"><?=htmlspecialchars($thread->subject)."(".$thread->message_cnt.")"?></a><?=$new?></li>
+<li><span class="nc5"><?=$marker?></span><a href="./read.php?id=<?=$board->name?>&tid=<?=$thread->tid.$guid_on?>"><?=htmlspecialchars($thread->subject)."(".$thread->message_cnt.")"?></a><?=$new?></li>
 <?php
 	}
 } else {
@@ -143,7 +146,7 @@ if($result->num_rows) {
 <?php
 if($archive_cnt > 0) {
 ?>
-<li><a href="/bbs/archive/?id=<?=$board->name?>"<?=mbi_ack(6)?>><?=mbi("6.")?>過去ログ</a></li>
+<li><a href="/bbs/archive/?id=<?=$board->name.$guid_on?>"<?=mbi_ack(6)?>><?=mbi("6.")?>過去ログ</a></li>
 <?php
 }
 ?>

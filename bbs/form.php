@@ -82,6 +82,9 @@ if(!isset($_COOKIE["cookiecheck"])) {
 	$error_list[] = "クッキーを有効にしてください";
 }
 
+// docomo用
+$guid_on = (device_info() == 'mb' && !is_au()) ? "&guid=ON" : "";
+
 // ゲストログイン情報
 $guest = new GuestUser($mysql);
 if(device_info() != "mb" && $guest->id != null && (strtotime($guest->allow_post) > time())) $error_list[] = "ご利用のゲストIDは{$guest->allow_post}まで書き込みできません";
@@ -860,11 +863,11 @@ if(!($_SERVER["REQUEST_METHOD"] == "POST") || isset($error_list)) {
 <?php
 if(($mode == 1 || $mode == 2) && !(isset($delmessage) && $delmessage && $tmid == 1)) {
 ?>
-<li><a href="/bbs/read.php?id=<?=$board->name?>&tid=<?=$thread->tid?>"<?=mbi_ack(8)?>><?=mbi("8.")?>スレッドに戻る</a></li>
+<li><a href="/bbs/read.php?id=<?=$board->name?>&tid=<?=$thread->tid.$guid_on?>"<?=mbi_ack(8)?>><?=mbi("8.")?>スレッドに戻る</a></li>
 <?php
 }
 ?>
-<li><a href="/bbs/?id=<?=$board->name?>"<?=mbi_ack(9)?>><?=mbi("9.").$board->title?></a></li>
+<li><a href="/bbs/?id=<?=$board->name.$guid_on?>"<?=mbi_ack(9)?>><?=mbi("9.").$board->title?></a></li>
 <li><a href="/"<?=mbi_ack(0)?>><?=mbi("0.")?>トップページ</a></li>
 </ul>
 <?php
