@@ -45,6 +45,9 @@ if($fp_user = fopen($user_file, "r")) {
 $mysql = new MySQL($userName, $password, $database);
 if($mysql->connect_error) die("データベースの接続に失敗しました");
 
+// docomo用
+$guid_on = (device_info() == 'mb' && !is_au()) ? "&guid=ON" : "";
+
 // ゲストログイン情報
 $guest = new GuestUser($mysql);
 
@@ -125,12 +128,12 @@ if(!isset($tmid)) {
 	// ページ切り替えリンク生成
 	$view = isset($_GET["view"]) ? ($_GET["view"] == "asc") ? "&view=asc" : "&view=desc" : "";
 	if(($page > 0) && ($thread->message_cnt > 0)) {
-		$pagelink = "<a href=\"./read.php?id=$id&tid=$tid$view&page=".($page - 1)."\"".mbi_ack("*").">".mbi("*.")."前のページ</a> | ";
+		$pagelink = "<a href=\"./read.php?id=$id&tid=$tid$view&page=".($page - 1).$guid_on."\"".mbi_ack("*").">".mbi("*.")."前のページ</a> | ";
 	} else {
 		$pagelink = mbi("*.")."前のページ | ";
 	}
 	if((($page + 1) * $LIMIT) < $thread->message_cnt) {
-		$pagelink .= "<a href=\"./read.php?id=$id&tid=$tid$view&page=".($page + 1)."\"".mbi_ack("#").">".mbi("#.")."次のページ</a>";
+		$pagelink .= "<a href=\"./read.php?id=$id&tid=$tid$view&page=".($page + 1).$guid_on."\"".mbi_ack("#").">".mbi("#.")."次のページ</a>";
 	} else {
 		$pagelink .= mbi("#.")."次のページ";
 	}
@@ -162,11 +165,11 @@ if(!isset($tmid)) {
 <p>
 <?php
 $reply = mbi("2.")."返信";
-$reply = ($thread->message_cnt > 999 || $thread->locked) ? "[$reply]" : "[<a href=\"./form.php?mode=reform&id=".$board->name."&tid=$tid\"".mbi_ack(2).">$reply</a>]";
-$search = "[<a href=\"./search.php?id={$board->name}&tid=$tid\">検索</a>]";
+$reply = ($thread->message_cnt > 999 || $thread->locked) ? "[$reply]" : "[<a href=\"./form.php?mode=reform&id=".$board->name."&tid=$tid$guid_on\"".mbi_ack(2).">$reply</a>]";
+$search = "[<a href=\"./search.php?id={$board->name}&tid=$tid$guid_on\">検索</a>]";
 if(device_info() == 'mb') $search .= "<br />";
-$old = "[<a href=\"./read.php?id={$board->name}&tid=$tid&view=asc&page=0\"".mbi_ack(4).">".mbi("4.")."最古</a>]";
-$new = "[<a href=\"./read.php?id={$board->name}&tid=$tid&view=desc&page=0\"".mbi_ack(6).">".mbi("6.")."最新</a>]";
+$old = "[<a href=\"./read.php?id={$board->name}&tid=$tid&view=asc&page=0$guid_on\"".mbi_ack(4).">".mbi("4.")."最古</a>]";
+$new = "[<a href=\"./read.php?id={$board->name}&tid=$tid&view=desc&page=0$guid_on\"".mbi_ack(6).">".mbi("6.")."最新</a>]";
 ?>
 <?=$reply?> <?=$search?> <?=$old?> <?=$new?>
 </p>
@@ -215,11 +218,11 @@ if(!isset($tmid)) {
 <?php
 if(isset($tmid)) {
 ?>
-<li><a href="/bbs/read.php?id=<?=$board->name?>&tid=<?=$thread->tid?>"<?=mbi_ack(8)?>><?=mbi("8.")?>スレッドに戻る</a></li>
+<li><a href="/bbs/read.php?id=<?=$board->name?>&tid=<?=$thread->tid.$guid_on?>"<?=mbi_ack(8)?>><?=mbi("8.")?>スレッドに戻る</a></li>
 <?php
 }
 ?>
-<li><a href="/bbs/?id=<?=$board->name?>"<?=mbi_ack(9)?>><?=mbi("9.")?><?=$board->title?></a></li>
+<li><a href="/bbs/?id=<?=$board->name.$guid_on?>"<?=mbi_ack(9)?>><?=mbi("9.")?><?=$board->title?></a></li>
 <li><a href="/"<?=mbi_ack(0)?>><?=mbi("0.")?>トップページ</a></li>
 </ul>
 <?php

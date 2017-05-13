@@ -31,6 +31,9 @@ if($fp_user = fopen($user_file, "r")) {
 $mysql = new MySQL($userName, $password, $database);
 if($mysql->connect_error) die("データベースの接続に失敗しました");
 
+// docomo用
+$guid_on = (device_info() == 'mb' && !is_au()) ? "&guid=ON" : "";
+
 // ゲストログイン情報
 $guest = new GuestUser($mysql);
 
@@ -76,13 +79,13 @@ if($mysql->error) die("ERROR05:存在しないIDです");
 
 // ページ切り替えリンク生成
 if(($page > 0) && ($rows > 0)) {
-	$pagelink = "[<a href=\"./?id=$id&page=".($page - 1)."\"".mbi_ack("*").">".mbi("*.")."前へ</a>] ";
+	$pagelink = "[<a href=\"./?id=$id&page=".($page - 1).$guid_on."\"".mbi_ack("*").">".mbi("*.")."前へ</a>] ";
 } else {
 	$pagelink = "[".mbi("*.")."前へ] ";
 }
 $pagelink .= "[P ".($page + 1)."/".ceil($rows / $LIMIT)." ]";
 if((($page + 1) * $LIMIT) < $rows) {
-	$pagelink .= " [<a href=\"./?id=$id&page=".($page + 1)."\"".mbi_ack("#").">".mbi("#.")."次へ</a>]";
+	$pagelink .= " [<a href=\"./?id=$id&page=".($page + 1).$guid_on."\"".mbi_ack("#").">".mbi("#.")."次へ</a>]";
 } else {
 	$pagelink .= " [".mbi("#.")."次へ]";
 }
@@ -105,7 +108,7 @@ if($result->num_rows) {
 	while($array = $result->fetch_array()) {
 		$thread = new Thread($array);
 ?>
-<li><span class="nc5">▽</span><a href="./read.php?id=<?=$board->name?>&tid=<?=$thread->tid?>"><?=htmlspecialchars($thread->subject)."(".$thread->message_cnt.")"?></a></li>
+<li><span class="nc5">▽</span><a href="./read.php?id=<?=$board->name?>&tid=<?=$thread->tid.$guid_on?>"><?=htmlspecialchars($thread->subject)."(".$thread->message_cnt.")"?></a></li>
 <?php
 	}
 } else {
@@ -119,7 +122,7 @@ if($result->num_rows) {
 <div id="pagelink"><?=$pagelink?></div>
 <hr class="normal">
 <ul id="footlink">
-<li><a href="/bbs/?id=<?=$board->name?>"<?=mbi_ack(9)?>><?=mbi("9.")?>現行ログに戻る</a></li>
+<li><a href="/bbs/?id=<?=$board->name.$guid_on?>"<?=mbi_ack(9)?>><?=mbi("9.")?>現行ログに戻る</a></li>
 <li><a href="/"<?=mbi_ack(0)?>><?=mbi("0.")?>トップページ</a></li>
 </ul>
 <?php

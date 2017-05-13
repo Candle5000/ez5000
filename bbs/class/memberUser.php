@@ -38,6 +38,9 @@ class MemberUser {
 
 		// フィーチャーフォンの場合
 		if(device_info() == "mb") {
+			// uid未設定の場合処理しない
+			if($uid == "") return;
+
 			// ユーザー情報取得
 			$sql = <<<EOT
 SELECT * FROM member_user WHERE uid = '$uid'
