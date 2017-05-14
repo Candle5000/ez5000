@@ -59,7 +59,7 @@ class Message {
 		$thread_link = ($this->mode == 1) ? "[<a href=\"./read.php?id={$this->board->name}&tid={$this->thread->tid}\">{$this->thread->subject}</a>]<br />" : "";
 		$reply = ($this->thread->message_cnt > 999 || $this->thread->locked || $this->mode == 2) ? "返信" : "<a href=\"./form.php?mode=reform&id={$this->board->name}&tid={$this->thread->tid}&re={$this->tmid}\">返信</a>";
 		$modify = ($this->thread->message_cnt > 999 || $this->thread->locked || $this->mode == 2) ? "編集" : "<a href=\"./form.php?mode=modify&id={$this->board->name}&tid={$this->thread->tid}&tmid={$this->tmid}\">編集</a>";
-		$updinfo = ($this->update_cnt > 0) ? "最終更新:{$this->update_ts}({$this->update_cnt}回更新)<br />" : "";
+		$updinfo = ($this->update_cnt > 0) ? "最終更新:{$this->update_ts}<br />" : "";
 		if($this->image != "") {
 			$file_id = "{$this->board->name}-{$this->thread->tid}-{$this->tmid}-{$this->image}";
 			if(file_exists("/var/www/img/bbs/$file_id")) {
