@@ -5,12 +5,10 @@
 require_once("/var/www/bbs/class/mysql.php");
 require_once("/var/www/functions/template.php");
 require_once("/var/www/bbs/class/board.php");
-require_once("/var/www/bbs/class/message.php");
 
 const ERRMSG001 = 'ERROR001: 不正なパラメータを検出しました。';
 const ERRMSG002 = 'ERROR002: 不正なパラメータを検出しました。';
 const ERRMSG003 = 'ERROR003: 不正なパラメータを検出しました。';
-const ERRMSG004 = 'ERROR004: 不正なパラメータを検出しました。';
 const ERRMSG101 = 'ERROR101: 掲示板データの取得に失敗しました。';
 const ERRMSG102 = 'ERROR102: スレッドの取得に失敗しました。';
 const ERRMSG901 = 'ERROR901: ファイル削除時にエラーが発生しました。';
@@ -53,42 +51,38 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 	if($result->num_rows != 1) die(print_error(ERRMSG101));
 	$board = new Board($result->fetch_array());
 
-	// スレッドIDのチェック
-	if(!isset($_POST["tid"]) || !is_numeric($_POST["tid"]) || $_POST["tid"] < 1) die(print_error(ERRMSG002));
-
-	// スレッド情報の読み込み
-	$sql = "SELECT tid, subject FROM thread WHERE bid = {$board->bid} AND tid = {$_POST["tid"]}";
-	$result = $mysql->query($sql);
-	if($result->num_rows != 1) die(print_error(ERRMSG102));
-	$thread = $result->fetch_object();
+	// 選択スレッドIDのチェック
+	if(!is_array($_POST["delth"]) || count($_POST["delth"]) > PAGE_SIZE) die(print_error(ERRMSG002));
 
 	// 選択無しの場合 一覧画面に戻りエラーメッセージを出力
-	if(!isset($_POST["delmsg"])) {
-		$target = "./read.php?id={$board->name}&tid={$thread->tid}";
+	if(!isset($_POST["delth"])) {
+		$target = "./thlist.php?id={$board->name}";
 		$postArray[] = array("name" => "msgId", "value" => "1");
 		jsPostSend($target, $postArray);
 		exit;
 	}
 
-	// 選択メッセージIDのチェック
-	if(!is_array($_POST["delmsg"]) || count($_POST["delmsg"]) > PAGE_SIZE) die(print_error(ERRMSG003));
-
 	// 選択IDリストを読み込み
-	$tmidList = array();
-	foreach($_POST["delmsg"] as $tmid) {
-		if(!is_numeric($tmid)) die(print_error(ERRMSG004));
-		$tmidList[] = $tmid;
+	$tidList = array();
+	foreach($_POST["delth"] as $tid) {
+		if(!is_numeric($tid)) die(print_error(ERRMSG003));
+		$tidList[] = $tid;
 	}
+
+	// スレッド情報の読み込み
 	$bid = $board->bid;
-	$tmidListStr = implode($tmidList, ", ");
-	$tid = $thread->tid;
-	$sql = "SELECT * FROM message WHERE bid = $bid AND tid = $tid AND tmid IN($tmidListStr) ORDER BY tmid";
+	$tidListStr = implode($tidList, ", ");
+	$sql = "SELECT T.tid, T.subject, M.name, M.comment, M.image, M.post_ts, M.update_ts, M.update_cnt, M.ip, M.hostname, M.ua, M.uid, M.user_id"
+			." FROM thread T JOIN message M"
+			." ON T.bid = M.bid AND T.tid = M.tid AND M.tmid = 1"
+			." WHERE T.bid = $bid AND T.tid IN($tidListStr) ORDER BY T.tid";
 	$result = $mysql->query($sql);
 
-	// 取得したメッセージ数が選択数に合わない場合 一覧画面に戻る
-	if(count($_POST["delmsg"]) != $result->num_rows) {
-		$target = "./read.php?id={$board->name}&tid={$thread->tid}";
+	// 取得したスレッド数が選択数に合わない場合 一覧画面に戻る
+	if(count($_POST["delth"]) != $result->num_rows) {
+		$target = "./thlist.php?id={$board->name}";
 		$postArray[] = array("name" => "msgId", "value" => "2");
+		//die("<pre>".var_dump($mysql->error)."</pre>");
 		jsPostSend($target, $postArray);
 		exit;
 	}
@@ -99,7 +93,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 		// トランザクションの開始
 		$mysql->begin_transaction(MYSQLI_TRANS_START_READ_WRITE);
 
-		// 削除ログへINSERT
+		// メッセージ削除ログへINSERT
 		$sql = <<<EOT
 INSERT INTO message_deleted (
 	bid,
@@ -140,36 +134,96 @@ INSERT INTO message_deleted (
 	FROM message
 	WHERE
 		bid = $bid
-		AND tid = $tid
-		AND tmid IN($tmidListStr)
+		AND tid IN($tidListStr)
 EOT;
 		$mysql->query($sql);
 		if($mysql->error) {
+			$error = $mysql->error;
 			$mysql->rollback();
-			$target = "./read.php?id={$board->name}&tid={$thread->tid}";
+			$target = "./thlist.php?id={$board->name}";
 			$postArray[] = array("name" => "msgId", "value" => "3");
+			die("<pre>".var_dump($error)."</pre>");
 			jsPostSend($target, $postArray);
 			exit;
 		}
 
-		// メッセージを削除
-		$sql = "DELETE FROM message WHERE bid = $bid AND tid = $tid AND tmid IN($tmidListStr)";
+		// スレッド削除ログへINSERT
+		$sql = <<<EOT
+INSERT INTO thread_deleted (
+	bid,
+	tid,
+	subject,
+	tindex,
+	readpass,
+	writepass,
+	access_cnt,
+	update_ts,
+	locked,
+	top,
+	next_tmid)
+	SELECT
+		bid,
+		tid,
+		subject,
+		tindex,
+		readpass,
+		writepass,
+		access_cnt,
+		update_ts,
+		locked,
+		top,
+		next_tmid
+	FROM thread
+	WHERE
+		bid = $bid
+		AND tid IN($tidListStr)
+EOT;
 		$mysql->query($sql);
 		if($mysql->error) {
 			$mysql->rollback();
-			$target = "./read.php?id={$board->name}&tid={$thread->tid}";
+			$target = "./thlist.php?id={$board->name}";
 			$postArray[] = array("name" => "msgId", "value" => "4");
+			jsPostSend($target, $postArray);
+			exit;
+		}
+
+		// 添付ファイル削除用にメッセージを取得
+		$sql = "SELECT * FROM message WHERE bid = $bid AND tid IN($tidListStr) AND image != ''";
+		$msgResult = $mysql->query($sql);
+
+		// メッセージを削除
+		$sql = "DELETE FROM message WHERE bid = $bid AND tid IN($tidListStr)";
+		$mysql->query($sql);
+		if($mysql->error) {
+			$mysql->rollback();
+			$target = "./thlist.php?id={$board->name}";
+			$postArray[] = array("name" => "msgId", "value" => "5");
+			jsPostSend($target, $postArray);
+			exit;
+		}
+
+		// スレッドを削除
+		$sql = "DELETE FROM thread WHERE bid = $bid AND tid IN($tidListStr)";
+		$mysql->query($sql);
+		if($mysql->error) {
+			$mysql->rollback();
+			$target = "./thlist.php?id={$board->name}";
+			$postArray[] = array("name" => "msgId", "value" => "6");
 			jsPostSend($target, $postArray);
 			exit;
 		}
 
 		// 添付ファイルを削除
 		try {
-			while($message = $result->fetch_object()) {
+			while($message = $msgResult->fetch_object()) {
 				if($message->image != "") {
-					$filename = "{$board->name}-$tid-$tmid-{$message->image}";
-					if(file_exists("/var/www/img/bbs/$filename")) rename("/var/www/img/bbs/$filename", "/var/www/img/bbs/trash/$filename");
-					if(file_exists("/var/www/img/bbs/$filename.png")) rename("/var/www/img/bbs/$filename.png", "/var/www/img/bbs/trash/$filename.png");
+					$filename = "{$board->name}-{$message->tid}-{$message->tmid}-{$message->image}";
+					if(file_exists("/var/www/img/bbs/$filename") && file_exists("/var/www/img/bbs/$filename.png")) {
+						rename("/var/www/img/bbs/$filename", "/var/www/img/bbs/trash/$filename");
+						rename("/var/www/img/bbs/$filename.png", "/var/www/img/bbs/trash/$filename.png");
+					} else {
+						throw new Exception("File Not Found : $filename");
+					}
 				}
 			}
 		} catch(Exception $e) {
@@ -178,7 +232,7 @@ EOT;
 		}
 
 		$mysql->commit();
-		$target = "./read.php?id={$board->name}&tid={$thread->tid}";
+		$target = "./thlist.php?id={$board->name}";
 		$postArray[] = array("name" => "msgId", "value" => "0");
 		jsPostSend($target, $postArray);
 		exit;
@@ -200,41 +254,39 @@ EOT;
 <body>
 <h3>* * 掲示板管理メニュー * *</h3>
 <div>掲示板 : [<?=$board->name?>]<?=$board->title?></div>
-<div>スレッド : [<?=$thread->tid?>]<?=$thread->subject?></div>
-<div style="color:F00;">以下のメッセージを削除します。</div>
+<div style="color:F00;">以下のスレッドを削除します。</div>
 <hr />
 <form action="<?=$_SERVER["PHP_SELF"]?>" method="POST">
 <?php
-while($array = $result->fetch_array()) {
-	$message = new Message($array, $mysql, $board, $thread);
-	$message->name = htmlspecialchars($message->name);
-	$message->comment = nl2br(htmlspecialchars($message->comment));
-	$message->ua = htmlspecialchars($message->ua);
-	$img = ($message->image == "") ? "" : "<br />\n画像添付あり";
+while($thread = $result->fetch_object()) {
+	$thread->subject = htmlspecialchars($thread->subject);
+	$thread->name = htmlspecialchars($thread->name);
+	$thread->comment = nl2br(htmlspecialchars($thread->comment));
+	$thread->ua = htmlspecialchars($thread->ua);
+	$img = ($thread->image == "") ? "" : "<br />\n画像添付あり";
 ?>
 <div>
-[<?=$message->tmid?>] By <?=$message->name?><br />
-<?=$message->comment?><br />
-<?=$message->post_ts?><br />
-IP:<?=$message->ip?><br />
-HOSTNAME:<?=$message->hostname?><br />
-UA:<?=$message->ua?><br />
-UID:<?=$message->uid?><br />
-USER ID:<?=$message->user_id?>
+[<?=$thread->subject?>]<br />
+By <?=$thread->name?><br />
+<?=$thread->comment?><br />
+<?=$thread->post_ts?><br />
+IP:<?=$thread->ip?><br />
+HOSTNAME:<?=$thread->hostname?><br />
+UA:<?=$thread->ua?><br />
+UID:<?=$thread->uid?><br />
+USER ID:<?=$thread->user_id?>
 <?=$img?>
-<input type="hidden" name="delmsg[]" value="<?=$message->tmid?>" />
+<input type="hidden" name="delth[]" value="<?=$thread->tid?>" />
 </div>
 <hr />
 <?php
 }
 ?>
 <input type="hidden" name="id" value="<?=$board->name?>" />
-<input type="hidden" name="tid" value="<?=$thread->tid?>" />
 <input type="submit" name="delete" value=" 削除 " />
 </form>
 <hr />
 <ul style="list-style-type:none; text-align:right;">
-<li><a href="./read.php?id=<?=$board->name?>&tid=<?=$thread->tid?>"><?=$thread->subject?></a></li>
 <li><a href="./thlist.php?id=<?=$board->name?>"><?=$board->title?></a></li>
 <li><a href="./">掲示板管理トップに戻る</a></li>
 <li><a href="/" target="_blank">トップページを開く</a></li>
