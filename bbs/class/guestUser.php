@@ -72,6 +72,9 @@ EOT;
 	// ゲストID発行
 	//--------------------------
 	private function create_id() {
+		// 定数を読み込み
+		$allow_post_interval = Constants::NEW_GUEST_POST_ALLOW;
+
 		// トークン文字列を作成
 		$token = $this->create_token();
 
@@ -80,7 +83,7 @@ EOT;
 INSERT INTO guest_user
 (token, last_login_at, allow_post, ip, hostname, ua, created_at, updated_at)
 VALUES
-(PASSWORD('$token'), NOW(), NOW() + INTERVAL 2 DAY, '{$this->ip}', '{$this->hostname_sql}', '{$this->ua_sql}', NOW(), NOW())
+(PASSWORD('$token'), NOW(), NOW() + INTERVAL $allow_post_interval, '{$this->ip}', '{$this->hostname_sql}', '{$this->ua_sql}', NOW(), NOW())
 EOT;
 		$this->mysql->query($sql);
 
@@ -101,8 +104,11 @@ EOT;
 	// ゲストID更新
 	//--------------------------
 	private function update_id($token) {
+		// 定数を読み込み
+		$allow_post_interval = Constants::OLD_GUEST_POST_ALLOW;
+
 		$token = (strlen($token) == 0) ? "token" : "PASSWORD('$token')";
-		$allow_post = (strtotime($this->last_login_at." +7 day") < time()) ? "NOW() + INTERVAL 1 DAY" : "allow_post";
+		$allow_post = (strtotime($this->last_login_at." +7 day") < time()) ? "NOW() + INTERVAL $allow_post_interval" : "allow_post";
 		$sql = <<<EOT
 UPDATE guest_user
 SET token = $token, last_login_at = NOW(), allow_post = $allow_post, ip = '{$this->ip}', hostname = '{$this->hostname_sql}', ua = '{$this->ua_sql}', updated_at = NOW()

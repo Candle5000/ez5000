@@ -64,6 +64,34 @@ $threadCount = $mysql->query($sql)->fetch_object()->count;
 $sql = "SELECT COUNT(*) count FROM message WHERE bid = {$board->bid}";
 $messageCount = $mysql->query($sql)->fetch_object()->count;
 
+// 操作メッセージの取得
+$actInfo = "";
+if(isset($_POST["msgId"])) {
+	switch($_POST["msgId"]) {
+		case "0":
+			$actInfo = "<div style=\"color:#00F;\">スレッドを削除しました。</div>";
+			break;
+		case "1":
+			$actInfo = "<div style=\"color:#F00;\">スレッドが選択されていません。</div>";
+			break;
+		case "2":
+			$actInfo = "<div style=\"color:#F00;\">選択されたスレッドが存在していません。</div>";
+			break;
+		case "3":
+			$actInfo = "<div style=\"color:#F00;\">メッセージ削除ログの更新に失敗しました。</div>";
+			break;
+		case "4":
+			$actInfo = "<div style=\"color:#F00;\">スレッド削除ログの更新に失敗しました。</div>";
+			break;
+		case "5":
+			$actInfo = "<div style=\"color:#F00;\">メッセージの削除に失敗しました。</div>";
+			break;
+		case "6":
+			$actInfo = "<div style=\"color:#F00;\"スレッドの削除に失敗しました。</div>";
+			break;
+	}
+}
+
 // ページ遷移用リンク
 $pageCount = ceil($threadCount / PAGE_SIZE);
 $pageLinkList = array();
@@ -83,12 +111,14 @@ $pageLink = implode(" | ", $pageLinkList);
 <body>
 <h3>* * 掲示板管理メニュー * *</h3>
 <div>メッセージ数 : <?=$messageCount?> / 50000</div>
+<?=$actInfo?>
 <hr />
 <div>ページ移動 <?=$pageLink?></div>
 <hr />
+<form action="./delth.php" method="POST">
 <ul>
 <?php
-if($pageCount = 0) {
+if($pageCount == 0) {
 ?>
 <li>スレッドがありません</li>
 <?php
@@ -97,12 +127,22 @@ if($pageCount = 0) {
 		$tid = $array["tid"];
 		$subject = $array["subject"];
 ?>
-<li><a href="./read.php?id=<?=$board->name?>&tid=<?=$tid?>"><?=$subject?>(<?=$tid?>)</a>[<a href="./thread.php?id=<?=$board->name?>&tid=<?=$tid?>">編集</a>]</li>
+<li><a href="./read.php?id=<?=$board->name?>&tid=<?=$tid?>"><?=$subject?>(<?=$tid?>)</a>[<a href="./thread.php?id=<?=$board->name?>&tid=<?=$tid?>">編集</a>][<label><input type="checkbox" name="delth[]" value="<?=$tid?>" />削除</label>]</li>
 <?php
 	}
 }
 ?>
 </ul>
+<?php
+if($pageCount > 0) {
+?>
+<hr />
+<input type="hidden" name="id" value="<?=$board->name?>" />
+<input type="submit" value=" 削除 " />
+<?php
+}
+?>
+</form>
 <hr />
 <ul style="list-style-type:none; text-align:right;">
 <li><a href="./">掲示板管理トップに戻る</a></li>
