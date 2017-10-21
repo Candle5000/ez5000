@@ -82,7 +82,6 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 	if(count($_POST["delth"]) != $result->num_rows) {
 		$target = "./thlist.php?id={$board->name}";
 		$postArray[] = array("name" => "msgId", "value" => "2");
-		//die("<pre>".var_dump($mysql->error)."</pre>");
 		jsPostSend($target, $postArray);
 		exit;
 	}
@@ -142,7 +141,6 @@ EOT;
 			$mysql->rollback();
 			$target = "./thlist.php?id={$board->name}";
 			$postArray[] = array("name" => "msgId", "value" => "3");
-			die("<pre>".var_dump($error)."</pre>");
 			jsPostSend($target, $postArray);
 			exit;
 		}
