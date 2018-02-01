@@ -90,7 +90,11 @@ $start = ($page - 1) * PAGE_SIZE;
 $size = PAGE_SIZE;
 
 // 通報リストの読み込み
-$sql = "SELECT SQL_CALC_FOUND_ROWS * FROM report ORDER BY id DESC LIMIT $start, $size";
+$sql = "SELECT SQL_CALC_FOUND_ROWS R.*, B.name bname, M.bid mbid, M.tid mtid, M.tmid mtmid, D.mid dmid FROM report AS R "
+		. " LEFT JOIN board AS B ON R.bid = B.bid "
+		. " LEFT JOIN message AS M ON R.bid = M.bid AND R.mid = M.mid "
+		. " LEFT JOIN message_deleted AS D ON R.bid = D.bid AND R.mid = D.mid "
+		. " ORDER BY id DESC LIMIT $start, $size";
 $result = $mysql->query($sql);
 $sql = "SELECT FOUND_ROWS() count";
 $listCount = $mysql->query($sql)->fetch_object()->count;
@@ -146,6 +150,23 @@ UA:<?=htmlspecialchars($array["ua"])?><br />
 ユーザーID:<?=$array["user_id"]?><br />
 ゲストID:<?=$array["guest_id"]?><br />
 登録日時:<?=$array["ts"]?><br />
+<?php
+	if(!is_empty($array["mbid"])) {
+?>
+<a href="/bbs/read.php?id=<?=$array["bname"]?>&tid=<?=$array["mtid"]?>&tmid=<?=$array["mtmid"]?>" target="_blank">
+	BID:<?=$array["mbid"]?> TID:<?=$array["mtid"]?> TMID:<?=$array["mtmid"]?>
+</a><br />
+<?php
+	} else if(!is_empty($array["dmid"])) {
+?>
+メッセージ削除済み(BID:<?=$array["bid"]?> MID:<?=$array["mid"]?>)<br />
+<?php
+	} else {
+?>
+<span style="color:#F00; font-weight:bold;">メッセージが見つかりません。</span><br />
+<?php
+	}
+?>
 <input type="submit" name="submit_del[<?=$array["id"]?>]" value=" 処理済 " />
 <hr />
 <?php
