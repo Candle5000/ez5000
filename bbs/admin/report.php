@@ -6,7 +6,7 @@ require_once("/var/www/bbs/class/mysql.php");
 require_once("/var/www/functions/template.php");
 require_once("/var/www/functions/input_check.php");
 
-const PAGE_SIZE = 50;
+const PAGE_SIZE = 20;
 
 session_start();
 
