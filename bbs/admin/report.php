@@ -90,10 +90,12 @@ $start = ($page - 1) * PAGE_SIZE;
 $size = PAGE_SIZE;
 
 // 通報リストの読み込み
-$sql = "SELECT SQL_CALC_FOUND_ROWS R.*, B.name bname, M.bid mbid, M.tid mtid, M.tmid mtmid, D.mid dmid FROM report AS R "
+$sql = "SELECT SQL_CALC_FOUND_ROWS R.*, B.name bname, M.bid mbid, M.tid mtid, M.tmid mtmid, D.mid dmid, A.mid amid "
+		. " FROM report AS R "
 		. " LEFT JOIN board AS B ON R.bid = B.bid "
 		. " LEFT JOIN message AS M ON R.bid = M.bid AND R.mid = M.mid "
 		. " LEFT JOIN message_deleted AS D ON R.bid = D.bid AND R.mid = D.mid "
+		. " LEFT JOIN message_archive AS A ON R.bid = A.bid AND R.mid = A.mid "
 		. " ORDER BY id DESC LIMIT $start, $size";
 $result = $mysql->query($sql);
 $sql = "SELECT FOUND_ROWS() count";
@@ -160,6 +162,10 @@ UA:<?=htmlspecialchars($array["ua"])?><br />
 	} else if(!is_empty($array["dmid"])) {
 ?>
 メッセージ削除済み(BID:<?=$array["bid"]?> MID:<?=$array["mid"]?>)<br />
+<?php
+	} else if(!is_empty($array["amid"])) {
+?>
+メッセージ過去ログ移動済み(BID:<?=$array["bid"]?> MID:<?=$array["mid"]?>)<br />
 <?php
 	} else {
 ?>
