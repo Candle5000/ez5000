@@ -100,7 +100,7 @@ if((($page + 1) * $LIMIT) < $rows) {
 <hr class="normal">
 <p>過去ログ</p>
 <hr class="normal">
-<div id="pagelink"><?=$pagelink?></div>
+<div class="pagelink"><?=$pagelink?></div>
 <hr class="normal">
 <ul id="threadlist">
 <?php
@@ -119,7 +119,7 @@ if($result->num_rows) {
 ?>
 </ul>
 <hr class="normal">
-<div id="pagelink"><?=$pagelink?></div>
+<div class="pagelink"><?=$pagelink?></div>
 <hr class="normal">
 <ul id="footlink">
 <li><a href="/bbs/?id=<?=$board->name.$guid_on?>"<?=mbi_ack(9)?>><?=mbi("9.")?>現行ログに戻る</a></li>

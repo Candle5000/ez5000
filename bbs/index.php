@@ -104,7 +104,7 @@ if((($page + 1) * $LIMIT) < $rows) {
 [<a href="./form.php?mode=thform&id=<?=$board->name.$guid_on?>"<?=mbi_ack(8)?>><?=mbi("8.")?>新規スレ</a>] [<a href="./search.php?id=<?=$board->name.$guid_on?>"<?=mbi_ack(4)?>><?=mbi("4.")?>検索</a>]
 </p>
 <hr class="normal">
-<div id="pagelink"><?=$pagelink?></div>
+<div class="pagelink"><?=$pagelink?></div>
 <hr class="normal">
 <ul id="threadlist">
 <?php
@@ -140,7 +140,7 @@ if($result->num_rows) {
 ?>
 </ul>
 <hr class="normal">
-<div id="pagelink"><?=$pagelink?></div>
+<div class="pagelink"><?=$pagelink?></div>
 <hr class="normal">
 <ul id="footlink">
 <?php

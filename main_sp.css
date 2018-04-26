@@ -83,7 +83,7 @@ ul#dblink li {
 	margin:5px;
 	padding:3px 12px;
 }
-ul#linklist {
+ul.linklist {
 	list-style-type:square;
 }
 ul#footlink li {

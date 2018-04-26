@@ -8,14 +8,14 @@ div#all {
 div#footer {
 	padding:2px 6px;
 }
-div#infobox {
+div.infobox {
 	margin:10px;
 }
-div#infobox div#date {
+div.infobox div.date {
 	padding:2px;
 	width:180px;
 }
-div#infobox p {
+div.infobox p {
 	margin:6px;
 	padding:0px;
 }
