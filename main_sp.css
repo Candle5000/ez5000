@@ -8,15 +8,15 @@ div#all {
 div#footer {
 	padding:0px 3px;
 }
-div#infobox {
+div.infobox {
 	margin:8px;
 }
-div#infobox div#date {
+div.infobox div.date {
 	background: -webkit-gradient(linear, left top, right bottom, from(#F0CD96),color-stop(0.7, #F0CD96),to(#FFFACD));
 	padding:2px 4px;
 	width:70%;
 }
-div#infobox p {
+div.infobox p {
 	margin:0px 4px;
 	padding:0px;
 }

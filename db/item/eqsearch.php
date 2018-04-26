@@ -473,7 +473,7 @@ if(!$error) {
 <hr class="normal">
 <div class="cnt"><?=$pagelink?></div>
 <hr class="normal">
-<ul id="linklist">
+<ul class="linklist">
 <?php
 	if($rows > 0) {
 		while($row = $data->fetch()) {

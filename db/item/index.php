@@ -58,7 +58,7 @@ if(item_group($id) != -1) {
 <h1>アイテムデータ</h1>
 <hr class="normal">
 <h2><?=item_category(item_category_id($id))?> <?=item_group($id)?></h2>
-<ul id="linklist">
+<ul class="linklist">
 <?php
 	$event_item_flag = false;
 	$data->select_column_p("id,name,event", "items", "id BETWEEN ".($id + 1)." AND ".item_group_end($id)." AND hidden = '0'", 0, 0, "event, id");
@@ -67,7 +67,7 @@ if(item_group($id) != -1) {
 ?>
 </ul>
 <h2>イベント・ガチャ</h2>
-<ul id="linklist">
+<ul class="linklist">
 <?php
 			$event_item_flag = true;
 		}
@@ -84,7 +84,7 @@ if(item_group($id) != -1) {
 	if(isset($data->is_admin)) {
 ?>
 <h2>未実装</h2>
-<ul id="linklist">
+<ul class="linklist">
 <?php
 		$data->select_column("id,name", "items", array("id", "hidden"), array("BETWEEN ".($id + 1)." AND ".item_group_end($id), "1"));
 		while($row = $data->fetch()){
@@ -127,7 +127,7 @@ if(device_info() == 'mb') {
 ?>
 <input type="submit" value="検索">
 </form>
-<ul id="linklist">
+<ul class="linklist">
 <li><a href="/db/item/updinfo.php">更新履歴</a></li>
 <li><a href="/db/item/eqsearch.php">装備アイテム検索</a></li>
 </ul>
@@ -146,7 +146,7 @@ foreach($categories->category as $category) {
 	$i++;
 ?>
 <?=mbi("<a name=\"i".$i."\">")?><h2><?=$category["name"]?></h2><?=mbi("</a>")?>
-<ul id="linklist">
+<ul class="linklist">
 <?php
 	foreach($category->group as $group) {
 ?>

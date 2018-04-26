@@ -65,7 +65,7 @@ if($id == 0) {
 		$flag = true;
 		if($i == 1) echo "<h2>イベント</h2>\n";
 ?>
-<ul id="linklist">
+<ul class="linklist">
 <?php
 		$data->select_column("id,name,enabled", "zone", array("event", "enabled"), array($i, 1));
 		while($row = $data->fetch()){
@@ -96,7 +96,7 @@ if($id == 0) {
 <h2><?=$name?><br /><?=$nameE?></h2>
 <div class="img"><img src="/img/zone/<?=$image?>.gif" class="map" /></div>
 <h2>表示切替</h2>
-<ul id="linklist">
+<ul class="linklist">
 <?php
 if($mode != 0) echo "<li><a href=\"./?id=$id\">総合情報</a></li>";
 if($mode != 1) echo "<li><a href=\"./?id=$id&mode=1\">クエスト情報</a></li>";
@@ -107,7 +107,7 @@ if($mode != 2) echo "<li><a href=\"./?id=$id&mode=2\">モンスター情報</a><
 	if($mode == 0) {
 ?>
 <h2>ショップ</h2>
-<ul id="linklist">
+<ul class="linklist">
 <?php
 		if($data->select_column_a("id,name", "quest", "id BETWEEN 10000 AND 20000 AND note LIKE '%##z$id##%'")) {
 			while($row = $data->fetch()) {
@@ -128,7 +128,7 @@ if($mode != 2) echo "<li><a href=\"./?id=$id&mode=2\">モンスター情報</a><
 		if($data->select_column_a("id,name", "quest", "id BETWEEN 30000 AND 50000 AND note LIKE '%##z$id##%'")) {
 ?>
 <h2>製作</h2>
-<ul id="linklist">
+<ul class="linklist">
 <?php
 			while($row = $data->fetch()) {
 				$shop_id = $row["id"];
@@ -144,7 +144,7 @@ if($mode != 2) echo "<li><a href=\"./?id=$id&mode=2\">モンスター情報</a><
 		if($data->select_column_a("id,name", "quest", "id BETWEEN 20000 AND 30000 AND note LIKE '%##z$id##%'")) {
 ?>
 <h2>宝箱</h2>
-<ul id="linklist">
+<ul class="linklist">
 <?php
 			while($row = $data->fetch()) {
 				$chest_id = $row["id"];
@@ -160,7 +160,7 @@ if($mode != 2) echo "<li><a href=\"./?id=$id&mode=2\">モンスター情報</a><
 	} else if($mode == 1) {
 ?>
 <h2>クエスト</h2>
-<ul id="linklist">
+<ul class="linklist">
 <?php
 		if($data->select_column_a("id,name", "quest", "id BETWEEN 50000 AND 90000 AND note LIKE '%##z$id##%'")) {
 			while($row = $data->fetch()) {
@@ -189,7 +189,7 @@ if($mode != 2) echo "<li><a href=\"./?id=$id&mode=2\">モンスター情報</a><
 	} else if($mode == 2) {
 ?>
 <h2>モンスター</h2>
-<ul id="linklist">
+<ul class="linklist">
 <?php
 		if($data->select_column_a("id,name,nm", "monster", "zone=$id AND event=0")) {
 			while($row = $data->fetch()) {

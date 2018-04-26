@@ -62,12 +62,12 @@ ul#dblink li {
 	margin:5px;
 	padding:10px 15px;
 }
-ul#linklist {
+ul.linklist {
 	list-style-type:disc;
 	margin-top:12px;
 	margin-bottom:12px;
 }
-ul#linklist li {
+ul.linklist li {
 	margin-top:5px;
 	margin-bottom:5px;
 }

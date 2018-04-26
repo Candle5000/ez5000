@@ -7,15 +7,15 @@ div#all {
 div#footer {
 	padding:1px;
 }
-div#infobox {
+div.infobox {
 	font-size:xx-small;
 	margin:4px;
 }
-div#infobox div#date {
+div.infobox div.date {
 	padding:1px 2px;
 	width:60%;
 }
-div#infobox p {
+div.infobox p {
 	margin:2px;
 	padding:0px;
 }
@@ -58,12 +58,12 @@ ul#dblink li {
 	margin:3px;
 	padding:2px 4px;
 }
-ul#linklist {
+ul.linklist {
 	list-style-type:none;
 	margin:2px 0px;
 	padding:0px;
 }
-ul#linklist li {
+ul.linklist li {
 	padding:1px 2px;
 }
 ul#threadlist {

@@ -83,7 +83,7 @@ if($id != -1) {
 <?php
 		}
 ?>
-<ul id="linklist">
+<ul class="linklist">
 <?php
 		$flag = 0;
 
@@ -123,11 +123,11 @@ if($id != -1) {
 //一覧表示
 ?>
 <h1>モンスターデータ</h1>
-<ul id="linklist">
+<ul class="linklist">
 <li><a href="./updinfo.php">更新履歴</a></li>
 </ul>
 <hr class="normal">
-<ul id="linklist">
+<ul class="linklist">
 <?php
 	$data->select_group_by("category", "monster", "", "category", "HAVING COUNT(id) >= 5");
 	while($rows = $data->fetch()) {

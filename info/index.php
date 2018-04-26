@@ -65,10 +65,10 @@ if((($page + 1) * $PAGESIZE) < $rows) {
 if($rows > 0) {
 	while($row = $data->fetch()) {
 ?>
-<div id="infobox">
-<div id="date"><?=preg_replace("/-/", "/", $row["id"])?></div>
+<div class="infobox">
+<div class="date"><?=preg_replace("/-/", "/", $row["id"])?></div>
 <p>
-<span id="boxtitle">■<?=$row["subject"]?></span><br />
+<span class="boxtitle">■<?=$row["subject"]?></span><br />
 <?=nl2br($row["info"])?>
 </p>
 </div>
