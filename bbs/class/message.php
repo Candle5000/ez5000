@@ -59,6 +59,7 @@ class Message {
 		$thread_link = ($this->mode == 1) ? "[<a href=\"./read.php?id={$this->board->name}&tid={$this->thread->tid}\">{$this->thread->subject}</a>]<br />" : "";
 		$reply = ($this->thread->message_cnt > 999 || $this->thread->locked || $this->mode == 2) ? "返信" : "<a href=\"./form.php?mode=reform&id={$this->board->name}&tid={$this->thread->tid}&re={$this->tmid}\">返信</a>";
 		$modify = ($this->thread->message_cnt > 999 || $this->thread->locked || $this->mode == 2) ? "編集" : "<a href=\"./form.php?mode=modify&id={$this->board->name}&tid={$this->thread->tid}&tmid={$this->tmid}\">編集</a>";
+		$report = ($this->mode == 1 || $this->mode == 2) ? "" : "[<a href=\"./report.php?id={$this->board->name}&tid={$this->thread->tid}&tmid={$this->tmid}\">報告</a>]";
 		$updinfo = ($this->update_cnt > 0) ? "最終更新:{$this->update_ts}<br />" : "";
 		if($this->image != "") {
 			$file_id = "{$this->board->name}-{$this->thread->tid}-{$this->tmid}-{$this->image}";
@@ -86,7 +87,7 @@ class Message {
 <?=$this->textConvert($this->comment)?><br />
 <?=$this->post_ts?><br />
 <?=$updinfo?>
-[<?=$reply?>] [<?=$modify?>]
+[<?=$reply?>] [<?=$modify?>] <?=$report?>
 </p>
 <?php
 	}

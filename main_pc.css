@@ -8,14 +8,14 @@ div#all {
 div#footer {
 	padding:2px 6px;
 }
-div#infobox {
+div.infobox {
 	margin:10px;
 }
-div#infobox div#date {
+div.infobox div.date {
 	padding:2px;
 	width:180px;
 }
-div#infobox p {
+div.infobox p {
 	margin:6px;
 	padding:0px;
 }
@@ -50,7 +50,7 @@ table#bmskill {
 	width:640px;
 }
 table#topcount {
-	width:720;
+	width:720px;
 }
 textarea#comment {
 	width:90%;
@@ -62,12 +62,12 @@ ul#dblink li {
 	margin:5px;
 	padding:10px 15px;
 }
-ul#linklist {
+ul.linklist {
 	list-style-type:disc;
 	margin-top:12px;
 	margin-bottom:12px;
 }
-ul#linklist li {
+ul.linklist li {
 	margin-top:5px;
 	margin-bottom:5px;
 }

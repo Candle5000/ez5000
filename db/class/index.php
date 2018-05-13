@@ -30,11 +30,11 @@ if(mysqli_connect_error()) {
 <div id="all">
 <h1>クラスデータ</h1>
 <hr class="normal">
-<ul id="linklist">
+<ul class="linklist">
 <li><a href="./skill/">戦闘スキル/属性スキル</a></li>
 </ul>
 <hr class="normal">
-<ul id="linklist">
+<ul class="linklist">
 <?php
 $data->select_all("class");
 while($row = $data->fetch()) {
@@ -44,7 +44,7 @@ while($row = $data->fetch()) {
 ?>
 </ul>
 <h2>上級クラス</h2>
-<ul id="linklist">
+<ul class="linklist">
 <?php
 	}
 ?>

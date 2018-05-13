@@ -67,7 +67,7 @@ if(isset($name)) {
 <h1>スキルデータ</h1>
 <hr class="normal">
 <h2><?=$name["category"]?> <?=$name["group"]?></h2>
-<ul id="linklist">
+<ul class="linklist">
 <?php
 	$data->select_column("id,name", "skill", "category", $id);
 	while($row = $data->fetch()){
@@ -103,7 +103,7 @@ foreach($categories->category as $category) {
 	$i++;
 ?>
 <?=mbi("<a name=\"s".$i."\">")?><h2><?=$category["name"]?></h2><?=mbi("</a>")?>
-<ul id="linklist">
+<ul class="linklist">
 <?php
 	foreach($category->group as $group) {
 ?>

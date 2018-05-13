@@ -55,7 +55,7 @@ if($id == 0) {
 ?>
 <h1>クエストデータ</h1>
 <hr class="normal">
-<ul id="linklist">
+<ul class="linklist">
 <?php
 foreach($category as $c_id => $c_name) {
 ?>
@@ -73,7 +73,7 @@ foreach($category as $c_id => $c_name) {
 <h1>クエストデータ</h1>
 <hr class="normal">
 <h2><?=$category[$id]?></h2>
-<ul id="linklist">
+<ul class="linklist">
 <?php
 	$end = quest_category_end($category, $id);
 	$data->select_column("id,name", $table, "id", "BETWEEN $id AND $end");

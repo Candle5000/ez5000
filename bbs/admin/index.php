@@ -55,6 +55,7 @@ while($array = $result->fetch_array()) {
 <h3>* * 共通設定 * *</h3>
 <ul>
 <li><a href="./ban.php">書込規制設定(IP/UA指定)</a></li>
+<li><a href="./report.php">通報一覧</a></li>
 </ul>
 <hr />
 <ul style="list-style-type:none; text-align:right;">
