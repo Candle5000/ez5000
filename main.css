@@ -171,24 +171,24 @@ div#footer {
 	margin:0px;
 	text-align:right;
 }
-div#infobox {
+div.infobox {
 	border:solid 1px #F0CD96;
 	padding:0px;
 }
-div#infobox div#date {
+div.infobox div.date {
 	background-color:#F0CD96;
 	font-weight:bold;
 }
-div#infobox p {
+div.infobox p {
 	margin:0px;
 	padding:0px;
 }
-div#infobox #boxtitle {
+div.infobox .boxtitle {
 	color:#F80;
 	font-weight:bold;
 	list-style-type:circle;
 }
-div#pagelink {
+div.pagelink {
 	text-align:center;
 	margin:2px 0px;
 }

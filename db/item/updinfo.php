@@ -90,7 +90,7 @@ if($rows > 0) {
 			$upd = $row["updated"];
 ?>
 <h2><?=$upd?></h2>
-<ul id="linklist">
+<ul class="linklist">
 <?php
 		}
 ?>

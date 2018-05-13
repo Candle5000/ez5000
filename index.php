@@ -44,7 +44,7 @@ $guid_on = (device_info() == 'mb' && !is_au()) ? "&guid=ON" : "";
 <div id="all">
 <h1>EZ5000テストサイト</h1>
 <hr class="normal">
-<ul id="linklist">
+<ul class="linklist">
 <li><a href="./about/"<?=mbi_ack(1)?>><?=mbi("1.")?>このサイトについて</a></li>
 <li><a href="./db/"<?=mbi_ack(2)?>><?=mbi("2.")?>データベース</a></li>
 <?php
@@ -69,17 +69,17 @@ while($array = $result->fetch_array()) {
 </table>
 </div>
 <hr class="normal">
-<ul id="linklist">
+<ul class="linklist">
 <li><a href="./info/">インフォメーション</a></li>
 </ul>
 <?php
 if($rows > 0) {
 	while($row = $data->fetch()) {
 ?>
-<div id="infobox">
-<div id="date"><?=preg_replace("/-/", "/", $row["id"])?></div>
+<div class="infobox">
+<div class="date"><?=preg_replace("/-/", "/", $row["id"])?></div>
 <p>
-<span id="boxtitle">■<?=$row["subject"]?></span><br />
+<span class="boxtitle">■<?=$row["subject"]?></span><br />
 <?=nl2br($row["info"])?>
 </p>
 </div>
