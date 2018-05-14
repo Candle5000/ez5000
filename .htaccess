@@ -1,3 +1,4 @@
 <Files ~ "^(README|\.gitignore)$">
 	deny from all
 </Files>
+Options -Indexes
