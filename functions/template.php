@@ -163,6 +163,15 @@ if(device_info() == "sp") {
 ?>
 <link rel="stylesheet" href="/main.css" type="text/css">
 <link rel="stylesheet" href="/main_<?=device_info()?>.css" type="text/css">
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-144743342-2"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'UA-144743342-2');
+</script>
+<script data-ad-client="ca-pub-5908052326802473" async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
 <title><?=$title?></title>
 <?php
 }
