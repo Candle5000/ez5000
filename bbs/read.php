@@ -198,6 +198,18 @@ while($array = $result->fetch_array()) {
 }
 ?>
 <hr class="normal">
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+<!-- Unit01 -->
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-5908052326802473"
+     data-ad-slot="5845995840"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>
+     (adsbygoogle = window.adsbygoogle || []).push({});
+</script>
+<hr class="normal">
 <div class="cnt"><?=$pagelink?></div>
 <hr class="normal">
 <?php

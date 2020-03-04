@@ -104,6 +104,18 @@ if((($page + 1) * $LIMIT) < $rows) {
 [<a href="./form.php?mode=thform&id=<?=$board->name.$guid_on?>"<?=mbi_ack(8)?>><?=mbi("8.")?>新規スレ</a>] [<a href="./search.php?id=<?=$board->name.$guid_on?>"<?=mbi_ack(4)?>><?=mbi("4.")?>検索</a>]
 </p>
 <hr class="normal">
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+<!-- Unit01 -->
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-5908052326802473"
+     data-ad-slot="5845995840"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>
+     (adsbygoogle = window.adsbygoogle || []).push({});
+</script>
+<hr class="normal">
 <div class="pagelink"><?=$pagelink?></div>
 <hr class="normal">
 <ul id="threadlist">
