@@ -172,6 +172,23 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 
 		// 投稿後に画像認証情報をリセット
 		if(isset($_SESSION['ImageAuthentication'])) unset($_SESSION['ImageAuthentication']);
+
+		// Discord連携送信
+		$webhookUrl = Settings::WEBHOOK_URL;
+		if ($webhookUrl) {
+			$message = [
+				'content' => Settings::DISCORD_USER_ID
+					. " 通報を受信しました。\n"
+					. $comment
+			];
+			$ch = curl_init($webhookUrl);
+			curl_setopt($ch, CURLOPT_POST, true);
+			curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json; charset=utf-8'));
+			curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+			curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+			curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($message));
+			$response = curl_exec($ch);
+		}
 	}
 } else {
 	// 初期表示時の設定

@@ -38,8 +38,6 @@ if(mysqli_connect_error()) {
 <li><a href="./quest/"<?=mbi_ack(5)?>><?=mbi("5.")?>クエストデータ</a></li>
 <li><a href="./class/"<?=mbi_ack(6)?>><?=mbi("6.")?>クラスデータ</a></li>
 <li><a href="./skill/"<?=mbi_ack(7)?>><?=mbi("7.")?>スキルデータ</a></li>
-<li>　</li>
-<li>　</li>
 </ul>
 <hr class="normal">
 <ul id="footlink">

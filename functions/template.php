@@ -6,7 +6,7 @@
 //----------------------------------------
 // 定数定義クラスを読み込み
 //----------------------------------------
-require_once("/var/www/class/constants.php");
+require_once("/var/www/class/settings.php");
 
 //----------------------------------------
 // トップページにリダイレクト
@@ -163,15 +163,21 @@ if(device_info() == "sp") {
 ?>
 <link rel="stylesheet" href="/main.css" type="text/css">
 <link rel="stylesheet" href="/main_<?=device_info()?>.css" type="text/css">
+<?php
+$ga_id = Settings::GOOGLE_ANALYTICS_ID;
+if ($ga_id) {
+?>
 <!-- Global site tag (gtag.js) - Google Analytics -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=UA-144743342-2"></script>
+<script async src="https://www.googletagmanager.com/gtag/js?id=<?=$ga_id?>"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
-  gtag('config', 'UA-144743342-2');
+  gtag('config', '<?=$ga_id?>');
 </script>
-<script data-ad-client="ca-pub-5908052326802473" async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+<?php
+}
+?>
 <title><?=$title?></title>
 <?php
 }
