@@ -3,7 +3,9 @@ phpinfo.php
 *.swp
 *.ico
 *.png
+ads.txt
 functions/mobile_ip_list.php
+class/settings.php
 img/
 lefko/
 html/

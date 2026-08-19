@@ -73,7 +73,7 @@ EOT;
 	//--------------------------
 	private function create_id() {
 		// 定数を読み込み
-		$allow_post_interval = Constants::NEW_GUEST_POST_ALLOW;
+		$allow_post_interval = Settings::NEW_GUEST_POST_ALLOW;
 
 		// トークン文字列を作成
 		$token = $this->create_token();
@@ -105,7 +105,7 @@ EOT;
 	//--------------------------
 	private function update_id($token) {
 		// 定数を読み込み
-		$allow_post_interval = Constants::OLD_GUEST_POST_ALLOW;
+		$allow_post_interval = Settings::OLD_GUEST_POST_ALLOW;
 
 		$token = (strlen($token) == 0) ? "token" : "PASSWORD('$token')";
 		$allow_post = (strtotime($this->last_login_at." +7 day") < time()) ? "NOW() + INTERVAL $allow_post_interval" : "allow_post";
