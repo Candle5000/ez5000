@@ -14,7 +14,7 @@ class Form {
 	//--------------------------
 	//コンストラクタ
 	//--------------------------
-	function Form($act, $mth, $enc) {
+	function __construct($act, $mth, $enc) {
 		$this->action = $act;
 		$this->method = $mth;
 		$this->enctype = $enc;

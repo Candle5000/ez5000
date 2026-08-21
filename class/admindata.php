@@ -12,8 +12,8 @@ class AdminData extends GuestData {
 	//--------------------------
 	//コンストラクタ
 	//--------------------------
-	function AdminData($userName, $password, $database) {
-		parent::GuestData($userName, $password, $database);
+	function __construct($userName, $password, $database) {
+		parent::__construct($userName, $password, $database);
 		$this->is_admin = ($userName == "admin" || $userName == "subb" || $userName == "subn");
 	}
 

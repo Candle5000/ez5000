@@ -21,7 +21,7 @@ class GuestUser {
 	//--------------------------
 	// コンストラクタ
 	//--------------------------
-	function GuestUser($p_mysql) {
+	function __construct($p_mysql) {
 
 		// アクセス情報を取得
 		$this->ip = $_SERVER["REMOTE_ADDR"];
