@@ -22,7 +22,7 @@ class Thread {
 	//--------------------------
 	// コンストラクタ
 	//--------------------------
-	function Thread($array) {
+	function __construct($array) {
 		$this->tid = $array["tid"];
 		$this->subject = $array["subject"];
 		$this->tindex = $array["tindex"];

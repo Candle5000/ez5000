@@ -21,7 +21,7 @@ class MemberUser {
 	//--------------------------
 	// コンストラクタ
 	//--------------------------
-	function MemberUser($p_mysql, $user_name, $password, $uid = "") {
+	function __construct($p_mysql, $user_name, $password, $uid = "") {
 
 		$this->mysql = $p_mysql;
 		$this->hostname_sql = $this->mysql->real_escape_string($this->hostname);

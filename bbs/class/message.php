@@ -30,7 +30,7 @@ class Message {
 	//--------------------------
 	// コンストラクタ
 	//--------------------------
-	function Message($array, $mysql_temp, $board_temp, $thread_temp) {
+	function __construct($array, $mysql_temp, $board_temp, $thread_temp) {
 		$this->mid = $array["mid"];
 		$this->tmid = $array["tmid"];
 		$this->name = $array["name"];

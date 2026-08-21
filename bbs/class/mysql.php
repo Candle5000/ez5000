@@ -11,7 +11,7 @@ class MySQL extends mysqli {
 	//--------------------------
 	// コンストラクタ
 	//--------------------------
-	function MySQL($userName, $password, $database) {
+	function __construct($userName, $password, $database) {
 		parent::__construct("localhost", $userName, $password, $database);
 	}
 

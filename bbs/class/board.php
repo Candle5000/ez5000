@@ -26,7 +26,7 @@ class Board {
 	//--------------------------
 	// コンストラクタ
 	//--------------------------
-	function Board($array) {
+	function __construct($array) {
 		$this->bid = $array["bid"];
 		$this->name = $array["name"];
 		$this->title = $array["title"];

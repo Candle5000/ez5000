@@ -7,12 +7,13 @@ class GuestData extends MySQL {
 	//--------------------------
 	//変数の宣言
 	//--------------------------
+	private $sql;
 	
 	//--------------------------
 	//コンストラクタ
 	//--------------------------
-	function GuestData($userName, $password, $database) {
-		parent::MySQL($userName, $password, $database);
+	function __construct($userName, $password, $database) {
+		parent::__construct($userName, $password, $database);
 	}
 	
 	//--------------------------
@@ -249,11 +250,11 @@ class GuestData extends MySQL {
 		$mnth = date("Y-m-");
 
 		if($this->is_added("topcount", $date)) {
-			$this->sql = "SELECT count FROM topcount WHERE id='$date'";
+			$this->sql = "SELECT `count` FROM topcount WHERE id='$date'";
 			$this->query($this->sql);
 			$c = $this->fetch();
 			$count['t'] = $c['count'] + 1;
-			$this->sql = "UPDATE topcount SET count={$count['t']} WHERE id='$date'";
+			$this->sql = "UPDATE topcount SET `count`={$count['t']} WHERE id='$date'";
 			$this->query($this->sql);
 		} else {
 			$this->sql = "INSERT INTO topcount (id) VALUE ('$date')";
@@ -262,7 +263,7 @@ class GuestData extends MySQL {
 		}
 
 		if($this->is_added("topcount", $yest)) {
-			$this->sql = "SELECT count FROM topcount WHERE id='$yest'";
+			$this->sql = "SELECT `count` FROM topcount WHERE id='$yest'";
 			$this->query($this->sql);
 			$c = $this->fetch();
 			$count['y'] = $c['count'];
@@ -270,10 +271,10 @@ class GuestData extends MySQL {
 			$count['y'] = 0;
 		}
 
-		$this->sql = "SELECT sum(count) FROM topcount WHERE id LIKE '$mnth%'";
+		$this->sql = "SELECT sum(`count`) AS total FROM topcount WHERE id LIKE '$mnth%'";
 		$this->query($this->sql);
 		$c = $this->fetch();
-		$count['m'] = $c['sum(count)'];
+		$count['m'] = $c['total'];
 
 		return($count);
 	}

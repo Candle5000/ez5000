@@ -15,7 +15,7 @@ class AnonymousId {
 	//--------------------------
 	// コンストラクタ
 	//--------------------------
-	function AnonymousId($is_guest, $user_id, $p_mysql) {
+	function __construct($is_guest, $user_id, $p_mysql) {
 
 		$this->guest = $is_guest;
 		$this->user_id = $user_id;

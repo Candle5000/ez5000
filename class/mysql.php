@@ -2,7 +2,7 @@
 //==============================
 // MySQLクラス
 //==============================
-class MySQL extends mysqli {
+class MySQL {
 
 	//--------------------------
 	// 変数の宣言
@@ -17,7 +17,7 @@ class MySQL extends mysqli {
 	//--------------------------
 	// コンストラクタ
 	//--------------------------
-	function MySQL($userName, $password, $database) {
+	function __construct($userName, $password, $database) {
 
 		//接続設定の読み込み
 		$this->m_HostName = "localhost";
@@ -27,6 +27,9 @@ class MySQL extends mysqli {
 
 		//データベースへ接続
 		$this->m_Con = mysqli_connect($this->m_HostName, $this->m_UserName, $this->m_Password, $this->m_Database);
+		if (!$this->m_Con || $this->m_Con == null) {
+			die("データベースへの接続に失敗しました<br />".$this->errors());
+		}
 	}
 
 	//--------------------------
@@ -51,7 +54,7 @@ class MySQL extends mysqli {
 	//変更された行の数を取得
 	//--------------------------
 	function affected_rows() {
-		return(mysqli_affected_rows());
+		return(mysqli_affected_rows($this->m_Con));
 	}
 
 	//--------------------------
