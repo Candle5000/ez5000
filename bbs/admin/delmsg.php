@@ -80,7 +80,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 		$tmidList[] = $tmid;
 	}
 	$bid = $board->bid;
-	$tmidListStr = implode($tmidList, ", ");
+	$tmidListStr = implode(", ", $tmidList);
 	$tid = $thread->tid;
 	$sql = "SELECT * FROM message WHERE bid = $bid AND tid = $tid AND tmid IN($tmidListStr) ORDER BY tmid";
 	$result = $mysql->query($sql);

@@ -71,7 +71,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 
 	// スレッド情報の読み込み
 	$bid = $board->bid;
-	$tidListStr = implode($tidList, ", ");
+	$tidListStr = implode(", ", $tidList);
 	$sql = "SELECT T.tid, T.subject, M.name, M.comment, M.image, M.post_ts, M.update_ts, M.update_cnt, M.ip, M.hostname, M.ua, M.uid, M.user_id"
 			." FROM thread T JOIN message M"
 			." ON T.bid = M.bid AND T.tid = M.tid AND M.tmid = 1"
