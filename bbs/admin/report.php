@@ -54,8 +54,8 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 				$mysql->begin_transaction(MYSQLI_TRANS_START_READ_WRITE);
 
 				// 削除ログ登録
-				$sql = "INSERT INTO report_deleted (id, bid, mid, comment, ts, ip, hostname, ua, uid, user_id, guest_id, created_at) ";
-				$sql .= "SELECT id, bid, mid, comment, ts, ip, hostname, ua, uid, user_id, guest_id, NOW()";
+				$sql = "INSERT INTO report_deleted (bid, mid, comment, ts, ip, hostname, ua, uid, user_id, guest_id, created_at) ";
+				$sql .= "SELECT bid, mid, comment, ts, ip, hostname, ua, uid, user_id, guest_id, NOW()";
 				$sql .= " FROM report WHERE id = $id";
 				$mysql->query($sql);
 				if($mysql->error) {

@@ -122,7 +122,7 @@ if(!isset($tmid)) {
 	if($mysql->error) die("ERROR13:存在しないIDです");
 
 	// ページ切り替えリンク生成
-	$view = isset($_GET["view"]) ? ($_GET["view"] == "asc") ? "&view=asc" : "&view=desc" : "";
+	$view = isset($_GET["view"]) ? (($_GET["view"] == "asc") ? "&view=asc" : "&view=desc") : "";
 	if(($page > 0) && ($thread->message_cnt > 0)) {
 		$pagelink = "<a href=\"./read.php?id=$id&tid=$tid$view&page=".($page - 1).$guid_on."\"".mbi_ack("*").">".mbi("*.")."前のページ</a> | ";
 	} else {

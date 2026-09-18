@@ -83,9 +83,6 @@ if($image_w > $width) {
 	header('Content-type: image/jpeg');
 	imagejpeg($canvas, null, $quality);
 
-	// メモリを開放する
-	imagedestroy($canvas);
-
 // 出力画像サイズより元画像が小さい場合
 } else {
 
